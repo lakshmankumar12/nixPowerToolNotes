@@ -1,0 +1,19 @@
+-n  <-- will suppress the default printing.
+-i  <-- in place replacement (ensure to have backup!)
+
+'s/match/replace/g' 
+
+Some quick sed scripts
+======================
+
+prints from 2nd line, every 3rd line.
+------------------------------------
+
+sed -n '2~3p' <>
+
+
+
+Delete empty lines
+-------------------
+
+sed '/^$/d' myFile > tt 
