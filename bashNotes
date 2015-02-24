@@ -1,0 +1,13 @@
+
+substring
+----------
+
+${i:index}     .. substring of i starting at index(0-based)
+${i:index:len} .. substring of i starting at index(0-based) for length len
+
+Arrays
+------
+
+index is a number. Gaps are okay when initializing. those members dont exist
+
+${Array[index]}    
