@@ -1,0 +1,31 @@
+# for amma's phone
+ffmpeg -strict experimental -i test-1.mp4 -f 3gp -t 00:00:30 -r 15 -s qcif -vcodec mpeg4  -acodec aac test-1.3gp
+
+# to just see what's in a file
+ffmpeg -i test-1.mp4 
+
+#for nokia-x6
+ffmpeg -strict experimental -i ../../rhymes/12345-once-i.webm -f mp4 -s ega -vcodec mpeg4 -acodec libmp3lame 12345-once-i.mp4
+
+#only audio
+ffmpeg -i he-hookah-i/cd-1.m4v -acodec libmp3lame -vn cd1.mp3
+
+#for chroma player
+avconv -strict experimental -i ~/Lakshman/rhymes/12345-once-i.webm -f avi -s qvga -r 20 -vcodec libxvid -acodec libmp3lame 12345-once-i.avi
+
+
+# copy desktop
+avconv -f alsa -i default -f x11grab -r 30 -s <*> -i :0.0 -acodec flac -vcodec libx264 -threads 0 output.mkv
+avconv -f alsa -i default -f x11grab -r 30 -s 1920x1200 -i :0.0 -acodec flac -vcodec libx264 -threads 0 output.mkv
+avconv -f alsa -i default -f x11grab -r 30 -s 1024x768  -i :0.0 -acodec flac -vcodec libx264 -threads 0 output.mkv
+
+* -> use xrandr to find out what to give.
+
+#doesn't work
+#avconv -f alsa -i pulse -f x11grab -r 30 -s 1024x768 -i :0.0 -acodec pcm_s16le -vcodec libx264 -vpre lossless_ultrafast -threads 0 output.mkv
+
+
+Available sizes (-s)
+
+“vga” (640×480), “svga” (800×600), “xga” (1024×768), “uxga” (1600×1200), “hd480″ (852×480), “hd720″ (1280×720), and “hd1080″ (1920×1024).
+
