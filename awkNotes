@@ -49,6 +49,9 @@ Detect duplicate lines in 2 files.
 
 sort file1 file2 | awk ' seen[$0]++ == 1' > dups
 
+get extra lines in file2 that are not in file1
+----------------------------------------------
 
+awk 'NR==FNR{a[$0];next}!($0 in a)' file1 file2 > diff.txt
 
 

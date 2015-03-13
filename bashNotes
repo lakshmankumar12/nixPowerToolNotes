@@ -5,9 +5,27 @@ substring
 ${i:index}     .. substring of i starting at index(0-based)
 ${i:index:len} .. substring of i starting at index(0-based) for length len
 
+Filenames and extractions
+------------------------
+
+filename=$(basename "$fullpathfile")
+dirname=$(dirname "$fullpathfile")
+extension="${filename##*.}"
+filename="${filename%.*}"
+
+
 Arrays
 ------
 
 index is a number. Gaps are okay when initializing. those members dont exist
 
 ${Array[index]}    
+
+Iterating over each line of a  file
+-----------------------------------
+
+while read i ; do echo "one line: $i" ; done < file
+
+Note: for i in $(cat line) .. will interate over each word of the file, not line!
+Note: cat file | while     .. wont cut it as while will work in a bash of its own and variables modifed inside
+                                         while wont be seen by this bash.
