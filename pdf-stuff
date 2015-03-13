@@ -1,0 +1,35 @@
+
+# remove password
+pdftk protected.pdf input_pw sekritPassword cat output unprotected.pdf
+
+#or simply open in evince and print!
+
+
+# watermarking (works only for text-files).
+pdftk input.pdf background mark.pdf output marked-file.pdf
+
+
+# jdf-tewak
+java -jar ./jpdftweak.jar 
+
+
+# Rotate the first PDF page to 90 degrees clockwise
+pdftk in.pdf cat 1east 2-end output out.pdf
+
+# Rotate an entire PDF document to 180 degrees
+pdftk in.pdf cat 1-endsouth output out.pdf
+
+# Modify meta-data
+# ... In this usage, the contents of the file data.txt consist of an InfoKey and InfoValue pair, like this:
+pdftk DocBook_Overview.pdf update_info data.txt output DocBookOverview.pdf
+# ...
+***
+InfoKey: Keywords
+InfoValue: DocBook,writing,documentation,background
+***
+# ... You can change only the following metadata items with pdftk: title, author, subject, producer, and keywords.
+#
+
+# extract a picture from a pdf
+convert -verbose -density 150 -trim file.pdf -quality 100 -sharpen 0x1.0 output.jpg
+
