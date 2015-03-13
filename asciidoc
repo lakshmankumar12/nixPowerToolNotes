@@ -1,0 +1,32 @@
+Simply asciidoc compilation
+
+asciidoc -a toc my_doc.txt
+
+For pdf:
+
+a2x -f pdf my_doc.txt
+
+
+Doc Title
+=========
+
+
+Level 1
+-------
+
+Level 2
+~~~~~~~
+
+Level 3
+^^^^^^^
+
+Level 4
++++++++
+
+
+forced +
+line break
+
+normal, _italic_, *bold*, +mono+.
+``double quoted'', `single quoted'
+normal, ^super^, ~sub~
