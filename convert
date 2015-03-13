@@ -1,0 +1,45 @@
+# What is the size of the image
+identify picture.jpeg
+
+#convert pdf to image with good resultion
+convert -density 300 file.pdf image.png
+
+# To scale image
+convert rose.jpg -size 1240x1754 rose.png
+
+# To sclae in percentage
+convert rose.jpg -resize 50% rose.png
+
+# to just scale to a diff size
+convert rose.jpg -resize 595x841\! scaled-rose.png
+
+# split into 2 vertical halves:
+convert -crop 50%x100% +repage input_image.jpg out%d_image.jpg
+
+# Details on A4 size:
+A4 is 210 x 297mm. <Millimeters>
+An image is expressed in pixels x pixels.
+The two are totally different things.
+You can put an image of 210 x 297 pixels on an A4, but you can also put an image of 21000 x 29700 pixels on the same A4 sheet!
+If it is to print on a standard low cost printer, use a RESOLUTION of 72 pixels per inch: make your image 595x841 pxls, 72pxls/inch
+For a better result, use 150pxls/inch and an image of 1240 x 1754 pxls.
+For professional results (ie a brochure), use 300pxl/inch and an image of 2480 x 3508 pxls.
+
+#nokia size
+1944x2592
+
+#water marking
+composite -dissolve 50% -quality 100 lnl.png fu.jpg output.jpg 
+composite -dissolve 50% -quality 100 mark.png orig.jpg mixed.jpg 
+
+In this command: 
+  composite : to combine two images 
+  -dissolve 50% : to make the overlay image (lnl.png) 50% transparent 
+  -quality 100 : keep the quality at 100% 
+   lnl.png : the image with the text 
+   fu.jpg : original picture
+   output.jpg : the output image 
+
+
+#make an animated gif .. delay is in ms and -loop <n> loops n-times. 0 loops infinitely
+convert -delay 120 -loop 0 *.png animated.gif
