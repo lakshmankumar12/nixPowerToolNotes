@@ -1,0 +1,4 @@
+size_t is unsigned.
+strcpy/memcpy return the char*/void*
+-E in gcc stops at preprocessing stage
+-dM in processing stage dumps all macro definitions used.

@@ -1,0 +1,10 @@
+
+New:
+
+* allocate memory  .. operator new (size_t)
+* call constructor
+
+Delete:
+
+* call destructor
+* operator delete(void*)
