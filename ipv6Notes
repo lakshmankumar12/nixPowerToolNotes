@@ -1,0 +1,118 @@
+IP-Prefixes
+------------
+
+Binary       |   Hex          |   What                 |  Notes
+-------------+----------------+------------------------+----------
+001          |  2xxx::        |   Global Unicast       |  This is controlled and assigned. You can get this only if some one gives you a prefix.
+             |  3xxx::        |                        |
+             |                |                        |          +----+----+----+----+----+----+----+----+
+             |                |                        |          |    48  bits  |16  |    64  bits       |
+             |                |                        |          +----+----+----+----+----+----+----+----+
+             |                |                        |        Assigned to    Subnet
+             |                |                        |           a AS               From MAC .. insert FFEE into ur 48bit mac
+             |                |                        |
+             |                |                        |
+11111110     |  FE80::        |   Link Local           |  Always assignable locally. As of now,
+10000000     |                |                        |
+             |                |                        |          +----+----+----+----+----+----+----+----+
+             |                |                        |          |FE80 0000 0000 0000|    64  bits       |
+             |                |                        |          +----+----+----+----+----+----+----+----+
+             |                |                        |                              From MAC .. insert FFEE into ur 48bit mac
+             |                |                        |
+             |                |                        |  This address can't escape a L2 network. Routers should pass them over. So, within a L2
+             |                |                        |    you can communicate w/o bothering to get any other IPv6
+             |                |                        |
+1111110x     |  FDxx::        |  Unique Local          |  The FCxx:: is like undefined for now. Its always FDxx::
+             |  FCxx::        |  (is this site-local?) |
+             |                |                        |          +----+----+----+----+----+----+----+----+
+             |                |                        |          |FD...yyyy.....|    |    64  bits       |
+             |                |                        |          +----+----+----+----+----+----+----+----+
+             |                |                        |            x local assigned = 1 bit (1 for now)
+             |                |                        |            y     global id  = 40 bits
+             |                |                        |                  subnet     = 16 bits
+             |                |                        |
+             |                |                        |  This is like a organization's local boundary. This pkt will not be routed in internet.
+             |                |                        |  (Kind of private address space)
+             |                |                        |
+             |                |                        |
+all 0's      |  ::/128        |  Unspecified           |  Nobody should use this for any purpose!
+             |                |                        |
+             |                |                        |
+No bits      |  ::/0          |  Default route         |  Any address matches to this prefix (as its prefix of size 0).
+             |                |                        |  This is a short form for saying default route. (Same as in ipv4)
+             |                |                        |
+127 0's and  |  ::1/128       |  Loopback              |  Exactly one loop address in contrast to a entire 127.*.*.* in ipv4
+single 1     |                |                        |
+             |                |                        |
+11111111     |  FFxy::        |  Multicast             |  Multicast IP
+             |                |                        |          +----+----+----+----+----+----+----+----+
+             |                |                        |          |FFxy|    112 bits                      |
+             |                |                        |          +----+----+----+----+----+----+----+----+
+             |                |                        |        x  - flags
+             |                |                        |        y  - scope
+             |                |                        |
+             |                |                        |
+
+
+Very common multicast address
+-----------------------------
+
+ FF01::1   all nodes   in interface-local  (kind of loop back within same interface!)
+ FF01::2   all routers in interface-local
+ FF02::1   all nodes   in link-local
+ FF02::2   all routers in link-local
+ FF05::2   all routers in site-local
+
+
+ARP is replaced with ICMPv6 neighbour discovery protocol
+--------------------------------------------------------
+
+* A host in IPv6 network is capable of auto­configuring itself with a unique link­local address. 
+* As soon as it is equipped with an IPv6 address, it joins a number of multicast groups. 
+     For eg: These are ... (???)
+* All communications related to that segment happens on those multicast addresses only. 
+  (There is no broadcast)
+
+A host goes through a series of states in IPv6:
+
+Neighbor Solicitation: After configuring all IPv6’s either manually, or by DHCP Server or by
+                       auto­configuration, the host sends a Neighbor Solicitation message out 
+                       to FF02::1/16 multicast address  (link-local all nodes)
+                       for all its IPv6 addresses in order to know that no one else occupies 
+                       same addresses.
+
+DAD(Dupliate address Detection): 
+                       When the host does not listen from anything from the segment regarding 
+                       its Neighbor Solicitation message, it assumes that no duplicate address 
+                       exists on the segment.
+
+Neighbor Advertisement: After assigning the addresses to its interfaces and making them up and
+                        running, the host once again sends out a Neighbor Advertisement 
+                        message telling all other hosts on the segment, that it has assigned 
+                        those IPv6 addresses to its interfaces.
+
+Once a host is done with the configuration of its IPv6 addresses, it does the following things:
+
+Router Solicitation:     A host sends a Router Solicitation multicast packet out on its
+                         segment to know the presence of any router on this segment. This helps 
+                         the host to configure the router as its default gateway. If its 
+                         default gateway router goes down, the host can shift to a new
+                         router and makes it the default gateway.
+
+Router Advertisement:    When a router receives a Router Solicitation message, it responses back
+                         to the host advertising its presence on that link.
+
+Redirect:                This may be the situation where a Router receives a Router Solicitation 
+                         request but it knows that it is not the best gateway for the host. In 
+                         this situation, the router sends back a Redirect message telling the 
+                         host that there is a better ‘next­hop’ router available. 
+                         Next­hop is where the host will send its data destined to a host 
+                         which does not belong to the same segment.
+
+Sub-netting
+-----------
+
+  /48 is assigned to organization
+  /64  (i.e 49 ..to 64 ) 65K subnets are available for the organization.
+
+  The final /64 should be always given to one host fully! so that auto-configuration is possible.
