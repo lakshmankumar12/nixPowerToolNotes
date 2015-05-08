@@ -8,3 +8,29 @@ Delete:
 
 * call destructor
 * operator delete(void*)
+
+enum class Traffic_light { Red, green, yellow };
+ * strict type-checking
+ * we can define operators for this. -- Traffic_light& operator++(Traffic_light& t)
+
+static_assert(A,S) prints S as a compiler error message if A is not true.
+
+const int a=5; <-- a is a named-const
+constexpr double max1 = 1.4∗square(dmv); // constexpr: meaning roughly ‘‘to be evaluated at compile time’’
+
+std::initializer_list<T> lst;
+ Has the following attributes
+   lst.size()
+
+eg: std::initializer_list<double> lst{2.2,2.3,2.4};
+
+unique_ptr<T>
+  -> when it goes out of scope, it deletes the object underneath
+
+std::move(x);
+  -> get an rvalue for x. This helps in invoking a move-assignment
+      z=x;            // copy-assignment
+      z=std::move(x); // move assignment
+
+
+=delete; can be used to suppress any operation, that the compiler does for free.

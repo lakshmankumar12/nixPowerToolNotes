@@ -6,6 +6,12 @@
 Some quick sed scripts
 ======================
 
+Print only the matching back-reference part
+-------------------------------------------
+
+sed -n 's/^\s*discard\(want\)discar.*$/\1/p' 
+
+
 prints from 2nd line, every 3rd line.
 ------------------------------------
 
