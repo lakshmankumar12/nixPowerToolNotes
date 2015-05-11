@@ -57,11 +57,12 @@ single 1     |                |                        |
 Very common multicast address
 -----------------------------
 
- FF01::1   all nodes   in interface-local  (kind of loop back within same interface!)
- FF01::2   all routers in interface-local
- FF02::1   all nodes   in link-local
- FF02::2   all routers in link-local
- FF05::2   all routers in site-local
+ FF01::1            all nodes   in interface-local  (kind of loop back within same interface!)
+ FF01::2            all routers in interface-local
+ FF02::1            all nodes   in link-local
+ FF02::2            all routers in link-local
+ FF02::1:ff00:0/104 solicited-node multicast
+ FF05::2            all routers in site-local
 
 
 ARP is replaced with ICMPv6 neighbour discovery protocol
