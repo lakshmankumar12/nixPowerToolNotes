@@ -1,6 +1,19 @@
+General
+-------
 
+Source high-lighting:
+:source-highlighter: pygments
+
+To get the <1> to nice markers
+:icons: font
+
+To get  a blank line
+{empty} +
 
 Asciidoctor and deck.js
+
+Put the following after the doc title
+:backend: deckjs
 
 * Link ..../github/asciidoctor-deckjs/deck.js to the pwd where ur asciidoc is present.
 
