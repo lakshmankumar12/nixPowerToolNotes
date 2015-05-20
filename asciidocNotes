@@ -1,0 +1,7 @@
+
+
+Asciidoctor and deck.js
+
+* Link ..../github/asciidoctor-deckjs/deck.js to the pwd where ur asciidoc is present.
+
+asciidoctor -T ../github/asciidoctor-backends/haml doc.asciidoc
