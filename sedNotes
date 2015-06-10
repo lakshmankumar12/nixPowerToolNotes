@@ -17,6 +17,10 @@ prints from 2nd line, every 3rd line.
 
 sed -n '2~3p' <>
 
+Remote color-codes form screen/tmux capture
+-------------------------------------------
+
+sed -r 's:\x1B\[[0-9;]*[mK]::g'
 
 
 Delete empty lines
