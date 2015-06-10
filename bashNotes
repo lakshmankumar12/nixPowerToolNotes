@@ -5,6 +5,13 @@ substring
 ${i:index}     .. substring of i starting at index(0-based)
 ${i:index:len} .. substring of i starting at index(0-based) for length len
 
+is substring in string
+----------------------
+if [[ $string == *"My long"* ]]
+then
+  echo "It's there!";
+fi
+
 Filenames and extractions
 ------------------------
 
