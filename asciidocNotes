@@ -4,6 +4,14 @@ General
 Source high-lighting:
 :source-highlighter: pygments
 
+and put ur src text in like this
+
+.title
+[source,sh]
+----
+cp src dest
+---
+
 To get the <1> to nice markers
 :icons: font
 
@@ -14,7 +22,36 @@ Asciidoctor and deck.js
 
 Put the following after the doc title
 :backend: deckjs
+:navigation:
+:menu:
+
+= Doc Title that should appear only once
+== Leve1 Heading
+=== Level2 Heading
+
 
 * Link ..../github/asciidoctor-deckjs/deck.js to the pwd where ur asciidoc is present.
 
 asciidoctor -T ../github/asciidoctor-backends/haml doc.asciidoc
+
+* Building column'ish display
+
+++++
+<table><tr><td>
+++++
+
+Asciidoc contents here
+
+++++
+</td><td>
+++++
+
+Next column content here
+
+++++
+</td></tr></table>
+++++
+
+image:images/icons/home.png[Alt text]
+
+[options="step"]

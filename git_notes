@@ -1,0 +1,4 @@
+Create a new branch that tracks another branch
+
+git branch -t name remotes/origin/name
+git checkout name
