@@ -1,4 +1,175 @@
-Create a new branch that tracks another branch
+
+List all tracked files
+----------------------
+
+git ls-tree --full-tree -r HEAD
+
+Get a particular revision
+-------------------------
+
+git show treeish:path/to/file
+
+use HEAD to get the tip.
+
+Git bring back a file discarding chagnes
+---------------------------------------
+
+git checkout -- path/to/file
+
+getting rid of the top-commit :: DANGEROUS DANGEROUS
+-----------------------------
+
+git reset --hard HEAD~1
+
+List all branches in server
+----------------------------
+
+ssh mitgscm@mitg-git list-branches asr5k/master
+
+List all branches in a local clone
+------------------------------------
+
+git branch -a
+
+
+TO see all changes to a file across all branch
+----------------------------------------------
+
+git log --all -- <path/to/file>
+
+
+
+GIt-notes
+--------
+There are 3 object types
+
+1. blob   - File-contents
+2. tree   - dir-listing, that bundles blobs together
+3. commit - that points to a tree, with a meta-data like comments, author and a pointer to the previous commit(s)!.
+
+A branch is simply a pointer to a commit. HEAD is a pointer to the current branch!
+
+
+Get new clone
+-----------
+
+git-ws --branch v160.main asr5k/master.git master
+
+git submodule  
+git submodule status | grep '^ '
+
+rolldown:
+
+git forest pull
+
+Getting a tag
+--------------
+
+git-ws --tag  buildnumber_54290 asr5k/master master
+
+Temp in vim
+-------------
+
+:source /ws/lakskuma-bgl/anyoneszone/git-vim/plugin/fugitive.vim
+
+getting latest /top commit
+-----------------------
+git log -n 1
+git log -n 1 --pretty=format:"%H"
+
+geting parent commit of a commit
+---------------------------------
+
+git show --quiet --pretty=format:"%P" <commit>
+
+setting up meld
+---------------
+
+git config --global alias.meld '!/ws/lakskuma-bgl/anyoneszone/git-meld/git-meld.pl'
+
+get rid of unwanted packages
+----------------------------
+
+git submodule status | grep -v '^-' | grep -v boxer | grep -v buildtools | awk ' {cmd="rm -rf " $2; print cmd ; }'
+git submodule status | grep -v '^-' | grep -v boxer | grep -v buildtools | awk ' {cmd="rm -rf " $2; print cmd ; system(cmd) ;}'
+
+which branches contain a commit
+------------------------------
+
+git branch -a --contains <commit>
+
+getting rid of a submodule
+---------------------------
+
+git submodule deinit packages/<..>
+
+
+doing a csettool:
+-----------------
+
+commit=<whatever>
+parent=$(git show --quiet --pretty=format:"%P" $commit)
+git meld $parent $commit
+
+Getting older revisions of files:
+---------------------------------
+
+Get the revision of a submodule of a particular revision of a super module
+
+git ls-tree buildnumber_50269 packages/common
+cd packages/common
+git show <commit>:<file>
+
+getting the commit id of a submodule for a given commit of super-module
+------------------------------------------------------------------------
+
+git ls-tree -r <master-commit> | grep 'packages/<package>'
+
+git ls-tree -r HEAD | grep 'packages/<package>'
+
+is a commit in a build-number
+-----------------------------
+
+git merge-base --is-ancestor <commit> buildnumber_<build>
+
+Old commands equivalent
+-----------------------
+
+bk -r diffs -u -p            git diff -u -p
+bk sfiles -Ug                git ls-tree -r HEAD --name-only 
+bk sfiles -cg                git ls-files --modified
+bk sfiles -gp                git ls-files --cached
+bk unedit <file>             git checkout -- <file>                       .. careful!
+bk unedit $(bk sfiles -cg)   git checkout -- $(git ls-files --modified)   .. careful!
+bk delta -Y $(..)            git add $(git ls-files --modified)
+bk sfiles -x                 ??
+bk changes                   git log 
+bk changes -L                git log  origin/v160.main..HEAD
+bk changes -R                git fetch ; git log ..origin/v160.main
+                             git fetch ; git log ..$(git branch -vv | grep '^*' | awk -F\' '{print $2}')
+bk cset -r                   git diff-tree --no-commit-id --name-only -r <commit-id>
+model                        git submodule status | grep -v '^-'
+                             git submodule status | grep -v '^-' | awk ' {print $2 }' | awk -F\/ '{print $2}'| grep -v buildtools
+bk undo -r<>                 git reset --hard HEAD~1
+bk cset -x                   ??
+bk export -tpatch            git show --pretty=format: <commit> | tail -n +2 
+bk changes -u<user>          git log --author=<user>
+bk changes -/text/           git log --grep=<text>
+
+
+***********
+
+Create a new branch
+
+git checkout -b branch_name
+
+Switch to a branch
+
+git checkout test
+
+Create a new branch that tracks a branch
 
 git branch -t name remotes/origin/name
 git checkout name
+
+
