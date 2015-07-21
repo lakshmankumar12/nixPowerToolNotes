@@ -54,4 +54,11 @@ get extra lines in file2 that are not in file1
 
 awk 'NR==FNR{a[$0];next}!($0 in a)' file1 file2 > diff.txt
 
+Get rid of 1st field
+--------------------
+
+# The sub(FS,"") gets rid of the first field separator
+# print is implicit
+awk '{$1=""}sub(FS,"")'
+
 

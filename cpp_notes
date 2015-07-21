@@ -17,6 +17,9 @@ static_assert(A,S) prints S as a compiler error message if A is not true.
 
 const int a=5; <-- a is a named-const
 constexpr double max1 = 1.4∗square(dmv); // constexpr: meaning roughly ‘‘to be evaluated at compile time’’
+                                         // In above example, the function square should also be a constexpr like below
+constexpr double square(double x) { return x∗x; }   // a constexpr function can be called from anywhere. Just that the result wont be constexpr.
+                                                    // This allows same function for both variables and constexpr
 
 std::initializer_list<T> lst;
  Has the following attributes

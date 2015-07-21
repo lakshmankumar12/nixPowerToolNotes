@@ -36,3 +36,13 @@ while read i ; do echo "one line: $i" ; done < file
 Note: for i in $(cat line) .. will interate over each word of the file, not line!
 Note: cat file | while     .. wont cut it as while will work in a bash of its own and variables modifed inside
                                          while wont be seen by this bash.
+
+echo with colors
+----------------
+
+https://en.wikipedia.org/wiki/Tput
+
+tput setaf
+
+reset:
+tput sgr0
