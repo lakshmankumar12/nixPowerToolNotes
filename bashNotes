@@ -46,3 +46,25 @@ tput setaf
 
 reset:
 tput sgr0
+
+Getting yes/no or other inputs from user
+----------------------------------------
+
+echo "Do you wish to install this program?"
+select yn in "Yes" "No"; do
+    case $yn in
+        Yes ) echo "Yay"; break;;
+        No ) echo "Nay"; break;;
+    esac
+done
+
+or
+
+while true; do
+    read -p "Do you wish to install this program?" yn
+    case $yn in
+        [Yy]* ) echo "Yay" ; break;;
+        [Nn]* ) echo "Nay" ; break;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
