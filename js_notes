@@ -1,0 +1,57 @@
+General rules
+-------------
+
+* All variables must be declared before use with var
+
+Basic Types
+-----------
+
+Primitive Types
+ -> Number
+ -> strings
+ -> booleans
+ -> null
+
+Arrays
+ -> 0 indexed.
+
+Objects
+  -> dictionary of name/value pairs called properties
+  -> Properties
+    -> Attributes
+      -> writable
+      -> mutable
+      -> configurable
+    -> prototype, class, extensible-flag
+    -> own(directly-defined)/inherited(defined in prototype)
+  -> types
+    -> native objects
+      -> arrays, functions, dates, regex
+    -> host objects
+      -> HTMLElement objects
+    -> user-defined
+
+Null/Undefined
+--------------
+
+null -> no value
+undefined -> deeper absense ..
+  (non existing variable, return value of fn that didn't return anything)
+
+constructor
+-----------
+
+var a = new Car();
+
+Useful functions
+-------
+
+* parseInt(), parseFloat()
+* anyobject.toString()
+* anyobject.valueOf()
+
+
+
+
+Global object
+-------------
