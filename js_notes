@@ -51,7 +51,18 @@ Useful functions
 * anyobject.valueOf()
 
 
+string functions
+-----------------
 
+new_string = string.replace("old_literal_text","new_literal_text");
+string[index]  .. gives single char at index
+string.slice(beg_index[,end_index])  .. gives from beg_index, but exclusing end-index
+
+
+Jquery
+------
+
+$("#id_name").append(htmlContent);
 
 Global object
 -------------
