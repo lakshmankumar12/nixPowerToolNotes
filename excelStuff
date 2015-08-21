@@ -1,0 +1,21 @@
+
+Range
+------
+
+Range("B3").Value
+
+
+ActiveCell
+-----------
+
+ActiveCell.row
+
+Sheet
+------
+
+Sheet.cells(x,y).value
+
+Sum rows that have same name
+----------------------------
+
+=IF(A1<>A2,SUMIF($A$1:A1,A1,$B$1:B1),"")
