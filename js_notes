@@ -3,6 +3,11 @@ General rules
 
 * All variables must be declared before use with var
 
+Literals
+--------
+
+* In object literal, the property name is always a string. It needs to be enclosed in quotes if it has spaces/hyphen
+
 Basic Types
 -----------
 
@@ -20,7 +25,7 @@ Objects
   -> Properties
     -> Attributes
       -> writable
-      -> mutable
+      -> enumerable
       -> configurable
     -> prototype, class, extensible-flag
     -> own(directly-defined)/inherited(defined in prototype)
@@ -30,6 +35,9 @@ Objects
     -> host objects
       -> HTMLElement objects
     -> user-defined
+  -> Creation
+    -> object literal. type will be Object
+    -> new Constructor(). type will be Constructor. Inside you can set o.prototype = Something. If unset, this will be Constructor.prototype
 
 Null/Undefined
 --------------
@@ -49,15 +57,20 @@ Useful functions
 * parseInt(), parseFloat()
 * anyobject.toString()
 * anyobject.valueOf()
-
+* anyobject.hasOwnProperty("property")
+* anyobject.properyIsEnumerable("property")
+* Object.getOwnPropertyDescriptor(object, "property")
+* Object.defineProperty(object, { value: ".." , writable: true/false, enumerable: true/false, configurable: true/false } )
 
 string functions
------------------
+---------------
 
-new_string = string.replace("old_literal_text","new_literal_text");
+str.length
 string[index]  .. gives single char at index
 string.slice(beg_index[,end_index])  .. gives from beg_index, but exclusing end-index
+str.substring(beg_index,end_index)
 
+new_string = string.replace("old_literal_text","new_literal_text");
 
 Jquery
 ------
