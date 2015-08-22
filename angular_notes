@@ -1,0 +1,12 @@
+Angular app
+===========
+
+3 things to get angular:
+
+1. In html tag, add
+      <html ng-app="todoApp">
+2. In script, import angular
+      <script src="angular.js"></script>
+3. Create one or more angular modules:
+      var todoApp = angular.module("todoApp", []);
+        -> arg: name of module to create, modules needed.
