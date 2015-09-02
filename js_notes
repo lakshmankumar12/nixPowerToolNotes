@@ -61,6 +61,8 @@ Useful functions
 * anyobject.properyIsEnumerable("property")
 * Object.getOwnPropertyDescriptor(object, "property")
 * Object.defineProperty(object, { value: ".." , writable: true/false, enumerable: true/false, configurable: true/false } )
+* object.isFunction
+
 
 string functions
 ---------------
@@ -71,6 +73,11 @@ string.slice(beg_index[,end_index])  .. gives from beg_index, but exclusing end-
 str.substring(beg_index,end_index)
 
 new_string = string.replace("old_literal_text","new_literal_text");
+
+statements
+----------
+
+if/while/for -> conditions inside parenthesis
 
 Jquery
 ------

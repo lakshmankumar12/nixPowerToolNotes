@@ -14,3 +14,7 @@ clear: right
 
 No floating elements are allowed on mentioned side
 
+display: None
+
+  Hides the element.
+
