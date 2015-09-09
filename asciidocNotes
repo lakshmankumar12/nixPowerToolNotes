@@ -24,6 +24,7 @@ Put the following after the doc title
 :backend: deckjs
 :navigation:
 :menu:
+:last-update-label!:
 
 = Doc Title that should appear only once
 == Leve1 Heading

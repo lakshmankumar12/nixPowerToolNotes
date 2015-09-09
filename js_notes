@@ -8,6 +8,29 @@ Literals
 
 * In object literal, the property name is always a string. It needs to be enclosed in quotes if it has spaces/hyphen
 
+Constructs
+----------
+
+/* pretty much c-like looking */
+
+if (expression) {
+
+} else if (expression) {
+
+} else {
+
+}
+
+for ( initial_expr ; condition ; incr_expr ) {
+
+}
+
+while (expression) {
+
+}
+
+
+
 Basic Types
 -----------
 
