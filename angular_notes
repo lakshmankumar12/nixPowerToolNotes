@@ -40,6 +40,8 @@ The object assigned in the controller can be later used in the HTML element
   you can also call functions that are available in the $scope
 
   ng-hide="expression" --> if true will hide the element.
+                       --> ng-hide="scope_var.error" is a common use-case.
+  ng-show="expression" --> inverse of hide. 
 
   ng-class="some_function_in_controller()"   --> is a way to seletively apply a class to an element.
 
@@ -64,3 +66,13 @@ orderBy: "propertyName"    (Filters an array of objects based on object.property
 filter:  "Function"        (Invokes the given function on the collection. Its upto the funciton to select a subset from there)
 
    The filter is another way to implement. You an either add a module(..).filter(..) or pass a $filter to your controller, and then invoke filter: function.
+
+Services
+=========
+
+Created in a module using the factory method..
+
+module("moduleName").factory("serviceName", factory_function)
+
+The factory_function() should return a object that exposes functions (The services offered).
+The factory_function itself will be called once and the object returned will be used later (this is a singleton object)
