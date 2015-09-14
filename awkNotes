@@ -62,3 +62,10 @@ Get rid of 1st field
 awk '{$1=""}sub(FS,"")'
 
 
+
+Not exactly awk, but text processing
+===================================
+
+combile 2 or more files column wise
+
+paste -d, file1 file2 file3
