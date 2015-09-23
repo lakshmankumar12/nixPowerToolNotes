@@ -105,8 +105,19 @@ Item 12: Initialize all parts of a class
           -- Dont implement one constructor/assignment operator with another. Have a 3rd function and calls this from all 
              constructors and assignment operators
 
+Resource Management
 
-
+Item 13: Use objects to manage resources
+          -- Use resource-management objects to manage resources. Acquire resources as part of the constructor of these objects
+             and let their destructors return the object. This is called RAII
+          -- std::shared_ptr and std::auto_ptr are 2 common classes for this. Note that shared_ptr can't break cycles.
+Item 14: Think carefully about copying of resource-management classes
+          -- we can prohibit copying / reference-count underlying resource / duplicate or deep-copy / transfer ownership (auto_ptr)
+Item 15: Provide access to raw resources
+          -- offer a .get() method to get the underlying resource. (but needs clients to invoke this!)
+          -- offer operator overloads like -> * to allow natural usage.
+          -- you may do a operator UnderlyingObject() to allow implicit conversion, but this may result in dangling references!
+                          (but same issue results with .get(), just that its more explicit to see)
              
 
      
