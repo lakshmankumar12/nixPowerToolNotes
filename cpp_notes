@@ -38,6 +38,16 @@ std::move(x);
 
 =delete; can be used to suppress any operation, that the compiler does for free.
 
+shared_ptr<ptr,deleter_func>
+
+* A shared_ptr is twice the size of a raw pointer, uses dynamically allocated
+  memory for bookkeeping and deleter-specific data, uses a virtual function
+  call when invoking its deleter, and incurs thread synchronization overhead
+  when modifying the reference count in an application it believes is
+  multithreaded. (You can disable multithreading support by defining a
+  preprocessor symbol.)
+
+
 Signatures for common function
 ------------------------------
 
@@ -54,7 +64,29 @@ Object& Object::operator=(const DiffTypeObject &rhs);
    -- same for all assignments like +=,-=,*=,/=
 
 
+Miscellaneous notes
+-------------------
+
+Adding explicit to a constructor prevents implicit invocation to convert types
+
+On the roll
+-----------
+
+Bad stuff list
+~~~~~~~~~~~~~~
+
+. Defining variables too soon can cause a drag on performance.
+. Overuse of casts can lead to code that’s slow, hard to maintain, and infected
+  with subtle bugs.
+. Returning handles to an object’s internals can defeat encapsulation and leave
+  clients with dangling handles. Failure to consider the impact of exceptions can
+  lead to leaked resources and corrupted data structures. Overzealous inlining
+  can cause code bloat.
+. Excessive coupling can result in unacceptably long build times.
+
+
 Effective C++
+--------------
 
 Accustoming to C++
 
@@ -72,7 +104,7 @@ Item 3: use  const wherever possible
 
 Constructors, Destructors and Assignment Operators
 
-Item 4: Objects shoudl be initialized before their use
+Item 4: Objects should be initialized before their use
           -- use initialization list
           -- order of initailzation is base-class, member definition order.
           -- avoid initialization order problem, by having data-members local to compilation unit and static
@@ -118,7 +150,91 @@ Item 15: Provide access to raw resources
           -- offer operator overloads like -> * to allow natural usage.
           -- you may do a operator UnderlyingObject() to allow implicit conversion, but this may result in dangling references!
                           (but same issue results with .get(), just that its more explicit to see)
-             
+Item 16: Use new/delete and new[]/delete[]
+          -- esp be careful when the [] is hidden inside a typedef
+Item 17: Use separate statements to store new'ed objects into resource-mgmt objects
+          -- That is, dont store them into resource-objects in function arguments.
 
-     
+Designs and Declarations
 
+Item 18: Make interfaces easy to use correctly and hard to use incorrectly
+           -- Keep interfaces consistent. (Eg: name all length functions of all containers the same - like size())
+           -- Behavorial compatibility with built-in-types. If you overload operators, behave as ints do..
+           -- Prevent errors in invoking using new-types, restricting operations on types, constraining object values
+           -- Strive to minimize client-interface responsibiliies (like having to call delete on a ptr received)
+               (shared_ptr can help here, as well provide the custom deleter function)
+Item 19:  Treat class design as type design
+           -- How should objects of your new type be created and destroyed?
+           -- How should object initialization differ from object assignment?
+           -- What does it mean for objects of your new type to be passed by value?
+           -- What are the restrictions on legal values for your new type?
+           -- Does your new type fit into an inheritance graph?
+           -- What kind of type conversions are allowed for your new type?
+           -- What operators and functions make sense for the new type?
+           -- What standard functions should be disallowed?
+           -- Who should have access to the members of your new type?
+           -- What is the “undeclared interface” of your new type?
+           -- How general is your new type?
+           -- Is a new type really what you need?
+Item 20:  Prefer pass by reference-to-const over pass-by-value
+           -- Its more efficient.
+           -- Some exceptions are built-in-types, STL iterators, function-object-types
+Item 21:  Dont return a reference when you should return a object
+           -- returning reference to local(stack) object is outright wrong.
+           -- reference to heap/static(function) is also wrong
+           -- (item-3: return a const object if assignment to this temporary is to be avoided)
+Item 22:  Keep data-members private
+           -- protected is not very much encapsulated than public
+Item 23:  Prefer non-member non-friend functions to member function
+           -- A bit anti-intuitive, but this reduces the amount of code that is to be changed when
+               private data-members change.
+           -- You can split these function in multiple header files
+           -- Clients can extend these functions.
+Item 24:  Declare non-member functions when type conversions should apply to all parameters.
+           -- Rational a = 2 * b; will work by converting 2 to Rational only if
+              const operator*(const Rational &,const Rational&) is non-member.
+Item 25: NEEDS RE_READING. Template stuff.
+
+Implementations
+
+Item 26:  Postpone variable definitions as long as possible.
+            -- if sth is needed in a loop, define it within loop (construct/destrcut
+               in every iteration) unless the const of assgn is a lot cheaper than
+               construction/destruction.
+Item 27:  Minimize casting
+            -- Avoid c-sytle and fn-style casts. Fn-style is okay if you are
+               explicitly calling constructors. Otherwise use the c++ casts.
+            -- const_cast<T>(expr)  -- removes const. Only cast that can do it.
+            -- dynamic_cast<T>(expr)  -- base to drived. Costly. May do lots of
+                                      strcmp(). Cannot be performed by c-style
+                                      cast
+            -- reinterpret_cast<T>(expr) -- cast ptr to int etc.. May not be
+                                         portable
+            -- static_const<T>(expr) -- force implicit converstions. Non-const
+                                     to const, void* to ptr*,
+                                     ptr-base to ptr-derived (without check)
+            -- Try hiding casts inside functions so that client code is free
+               of them.
+Item 28:  Avoid returning handles to object internals.
+            -- It opens up encapsulation.
+            -- Note the example, where a const member function returns a 
+               non-const data (as data is not immediately in this object,
+               but is pointed to from the object)
+            -- Note the example, where a reference to object is dead, as
+               its from a temporary object (an expression result unnamed).
+            -- operator[] typically works by returning reference, but
+               this is an exception and not a rule.
+          
+
+
+
+
+Questions to check
+------------------
+
+* c-style cast is this
+    (T)expr
+  fn-style cast is this
+    T(expr)
+
+  Is function style cast a c++ only thing? Is it just syntactic sugar for invoking constructor?
