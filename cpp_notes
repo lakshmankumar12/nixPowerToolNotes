@@ -224,8 +224,85 @@ Item 28:  Avoid returning handles to object internals.
                its from a temporary object (an expression result unnamed).
             -- operator[] typically works by returning reference, but
                this is an exception and not a rule.
-          
+Item 29:  Strive for exception safe code
+            -- nothrow (doesn't throw anything) is a non-compiler controlled
+               guarantee
+               throw() -- means, if the fuction throws sth, its a serious 
+               error (like assert) and the unexpected() will be called.
+            -- basic guarantee -- program is in some valid state after the
+                                  exception is thrown
+               strong guarantee -- program is in prev state before func was
+                                   called (as if the fn wasn't called)
+               nothrow guarantee -- doesn't throw exceptions.
+            -- strong guarantee is typically implemented by copy-and-swap
+               technique, but not practical or possible for all functions.
+            -- a function can't guarantee exception safety beyond the
+               weakest of the guarantee of the functions that it calls
+Item 30:  Understand the ins and outs of inling
+            -- Limit most inlining to small, frequently called functions. This
+               facilitates debugging and binary upgradability, minimizes potential
+               code bloat, and maximizes the chances of greater program speed.
+            -- Don’t declare function templates inline just because they appear in
+               header files.
+Item 31:  Minimize compilation dependencies
+            -- The general idea behind minimizing compilation dependencies is to
+               depend on declarations instead of definitions. Two approaches
+               based on this idea are Handle classes and Interface classes.
+            -- Library header files should exist in full and declaration-only
+               forms.  This applies regardless of whether templates are involved.
 
+Inheritance and object-oriented design
+
+Item 32:  Make sure public inheritance models "is-a" relationship
+            -- Everything that applies to base classes must also apply to
+               derived classes, because every derived class object is a base class
+               object.
+            -- Remember the penguin-bird-fly problem,
+               square-rectangle-change-height problem
+Item 33:  Avoid hiding inherited names
+            -- Even if one function in derived has same name as a non-virtual
+               fn in base (with diff args), it will hide all base class fns with
+               same name.
+            -- Names in derived classes hide names in base classes. Under public
+               inheritance, this is never desirable.
+            -- To make hidden names visible again, employ using declarations or
+               forwarding functions(explicit fns in derived that call Base::fn)
+Item 34:  Differentiate between inheriting interface and inhering implementation
+            -- Public inheritance always inherits base-class interface
+            -- Pure-virtual -> inherits interface only
+                 (if a default impl is desired on explicit req, impl the
+                  pure-virtual fn, and use Base::fn_name in derived class
+                  to choose that impl.)
+               simple-virtual -> inherits interface and an optional implementation
+               non-virtual -> inherits both interface and a mandatory impl.
+
+
+
+More effective c++
+-----------------
+
+Item 1: Distinguish pointers and references
+         -- References can never be null.
+         -- References cannot re-point to sth else. Hence must be initialized at creation
+         -- References are needed in operator overloading
+Item 2: Casts
+         -- static_cast<>() to be used in most places where c-style casts are needed.
+         -- const_cast<>() to cast const away
+         -- dynamic_cast<() to cast down a inheriticance
+            -- will return NULL for pointers
+            -- will throw exception for references!
+         -- reinterpret_cast<>() to perform conversions, whose results are impl. defined
+            -- most common use-case is to cast one fn-ptr type to another
+Item 3: Dont treat arrays polymorphically. 
+         -- Dont let a array of derived class decay into a base-class pointer
+            which is used as array *(ptr+n), as the size of derived class > base class
+Item 4: Avoid gratuitous default constructors if that doesn't make sense.
+         -- However, u cannot do the following if you dont have default constructor
+           -- Create arrays of the type
+           -- Perhaps not place this in container classes. (however std::vector doesn't
+                 have that limitation)
+           -- Another problem is these can't be virtual base classes.
+ 
 
 
 
@@ -238,3 +315,5 @@ Questions to check
     T(expr)
 
   Is function style cast a c++ only thing? Is it just syntactic sugar for invoking constructor?
+
+* Understand how virtual base classes work.
