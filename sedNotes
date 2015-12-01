@@ -27,3 +27,17 @@ Delete empty lines
 -------------------
 
 sed '/^$/d' myFile > tt 
+
+
+
+Not really SED but text stuff with other tools
+==============================================
+
+Find all non-ascii characters in a file
+
+\grep --color=auto -n -P '[^\x00-\x7F]+' <file>
+
+Print from nth line to end of file
+----------------------------------
+
+tail -n +2 <file>
