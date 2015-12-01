@@ -38,6 +38,16 @@ std::move(x);
 
 =delete; can be used to suppress any operation, that the compiler does for free.
 
+shared_ptr<ptr,deleter_func>
+
+* A shared_ptr is twice the size of a raw pointer, uses dynamically allocated
+  memory for bookkeeping and deleter-specific data, uses a virtual function
+  call when invoking its deleter, and incurs thread synchronization overhead
+  when modifying the reference count in an application it believes is
+  multithreaded. (You can disable multithreading support by defining a
+  preprocessor symbol.)
+
+
 Signatures for common function
 ------------------------------
 
@@ -54,7 +64,29 @@ Object& Object::operator=(const DiffTypeObject &rhs);
    -- same for all assignments like +=,-=,*=,/=
 
 
+Miscellaneous notes
+-------------------
+
+Adding explicit to a constructor prevents implicit invocation to convert types
+
+On the roll
+-----------
+
+Bad stuff list
+~~~~~~~~~~~~~~
+
+. Defining variables too soon can cause a drag on performance.
+. Overuse of casts can lead to code that’s slow, hard to maintain, and infected
+  with subtle bugs.
+. Returning handles to an object’s internals can defeat encapsulation and leave
+  clients with dangling handles. Failure to consider the impact of exceptions can
+  lead to leaked resources and corrupted data structures. Overzealous inlining
+  can cause code bloat.
+. Excessive coupling can result in unacceptably long build times.
+
+
 Effective C++
+--------------
 
 Accustoming to C++
 
@@ -72,7 +104,7 @@ Item 3: use  const wherever possible
 
 Constructors, Destructors and Assignment Operators
 
-Item 4: Objects shoudl be initialized before their use
+Item 4: Objects should be initialized before their use
           -- use initialization list
           -- order of initailzation is base-class, member definition order.
           -- avoid initialization order problem, by having data-members local to compilation unit and static
@@ -105,9 +137,257 @@ Item 12: Initialize all parts of a class
           -- Dont implement one constructor/assignment operator with another. Have a 3rd function and calls this from all 
              constructors and assignment operators
 
+Resource Management
+
+Item 13: Use objects to manage resources
+          -- Use resource-management objects to manage resources. Acquire resources as part of the constructor of these objects
+             and let their destructors return the object. This is called RAII
+          -- std::shared_ptr and std::auto_ptr are 2 common classes for this. Note that shared_ptr can't break cycles.
+Item 14: Think carefully about copying of resource-management classes
+          -- we can prohibit copying / reference-count underlying resource / duplicate or deep-copy / transfer ownership (auto_ptr)
+Item 15: Provide access to raw resources
+          -- offer a .get() method to get the underlying resource. (but needs clients to invoke this!)
+          -- offer operator overloads like -> * to allow natural usage.
+          -- you may do a operator UnderlyingObject() to allow implicit conversion, but this may result in dangling references!
+                          (but same issue results with .get(), just that its more explicit to see)
+Item 16: Use new/delete and new[]/delete[]
+          -- esp be careful when the [] is hidden inside a typedef
+Item 17: Use separate statements to store new'ed objects into resource-mgmt objects
+          -- That is, dont store them into resource-objects in function arguments.
+
+Designs and Declarations
+
+Item 18: Make interfaces easy to use correctly and hard to use incorrectly
+           -- Keep interfaces consistent. (Eg: name all length functions of all containers the same - like size())
+           -- Behavorial compatibility with built-in-types. If you overload operators, behave as ints do..
+           -- Prevent errors in invoking using new-types, restricting operations on types, constraining object values
+           -- Strive to minimize client-interface responsibiliies (like having to call delete on a ptr received)
+               (shared_ptr can help here, as well provide the custom deleter function)
+Item 19:  Treat class design as type design
+           -- How should objects of your new type be created and destroyed?
+           -- How should object initialization differ from object assignment?
+           -- What does it mean for objects of your new type to be passed by value?
+           -- What are the restrictions on legal values for your new type?
+           -- Does your new type fit into an inheritance graph?
+           -- What kind of type conversions are allowed for your new type?
+           -- What operators and functions make sense for the new type?
+           -- What standard functions should be disallowed?
+           -- Who should have access to the members of your new type?
+           -- What is the “undeclared interface” of your new type?
+           -- How general is your new type?
+           -- Is a new type really what you need?
+Item 20:  Prefer pass by reference-to-const over pass-by-value
+           -- Its more efficient.
+           -- Some exceptions are built-in-types, STL iterators, function-object-types
+Item 21:  Dont return a reference when you should return a object
+           -- returning reference to local(stack) object is outright wrong.
+           -- reference to heap/static(function) is also wrong
+           -- (item-3: return a const object if assignment to this temporary is to be avoided)
+Item 22:  Keep data-members private
+           -- protected is not very much encapsulated than public
+Item 23:  Prefer non-member non-friend functions to member function
+           -- A bit anti-intuitive, but this reduces the amount of code that is to be changed when
+               private data-members change.
+           -- You can split these function in multiple header files
+           -- Clients can extend these functions.
+Item 24:  Declare non-member functions when type conversions should apply to all parameters.
+           -- Rational a = 2 * b; will work by converting 2 to Rational only if
+              const operator*(const Rational &,const Rational&) is non-member.
+Item 25: NEEDS RE_READING. Template stuff.
+
+Implementations
+
+Item 26:  Postpone variable definitions as long as possible.
+            -- if sth is needed in a loop, define it within loop (construct/destrcut
+               in every iteration) unless the const of assgn is a lot cheaper than
+               construction/destruction.
+Item 27:  Minimize casting
+            -- Avoid c-sytle and fn-style casts. Fn-style is okay if you are
+               explicitly calling constructors. Otherwise use the c++ casts.
+            -- const_cast<T>(expr)  -- removes const. Only cast that can do it.
+            -- dynamic_cast<T>(expr)  -- base to drived. Costly. May do lots of
+                                      strcmp(). Cannot be performed by c-style
+                                      cast
+            -- reinterpret_cast<T>(expr) -- cast ptr to int etc.. May not be
+                                         portable
+            -- static_const<T>(expr) -- force implicit converstions. Non-const
+                                     to const, void* to ptr*,
+                                     ptr-base to ptr-derived (without check)
+            -- Try hiding casts inside functions so that client code is free
+               of them.
+Item 28:  Avoid returning handles to object internals.
+            -- It opens up encapsulation.
+            -- Note the example, where a const member function returns a 
+               non-const data (as data is not immediately in this object,
+               but is pointed to from the object)
+            -- Note the example, where a reference to object is dead, as
+               its from a temporary object (an expression result unnamed).
+            -- operator[] typically works by returning reference, but
+               this is an exception and not a rule.
+Item 29:  Strive for exception safe code
+            -- nothrow (doesn't throw anything) is a non-compiler controlled
+               guarantee
+               throw() -- means, if the fuction throws sth, its a serious 
+               error (like assert) and the unexpected() will be called.
+            -- basic guarantee -- program is in some valid state after the
+                                  exception is thrown
+               strong guarantee -- program is in prev state before func was
+                                   called (as if the fn wasn't called)
+               nothrow guarantee -- doesn't throw exceptions.
+            -- strong guarantee is typically implemented by copy-and-swap
+               technique, but not practical or possible for all functions.
+            -- a function can't guarantee exception safety beyond the
+               weakest of the guarantee of the functions that it calls
+Item 30:  Understand the ins and outs of inling
+            -- Limit most inlining to small, frequently called functions. This
+               facilitates debugging and binary upgradability, minimizes potential
+               code bloat, and maximizes the chances of greater program speed.
+            -- Don’t declare function templates inline just because they appear in
+               header files.
+Item 31:  Minimize compilation dependencies
+            -- The general idea behind minimizing compilation dependencies is to
+               depend on declarations instead of definitions. Two approaches
+               based on this idea are Handle classes and Interface classes.
+            -- Library header files should exist in full and declaration-only
+               forms.  This applies regardless of whether templates are involved.
+
+Inheritance and object-oriented design
+
+Item 32:  Make sure public inheritance models "is-a" relationship
+            -- Everything that applies to base classes must also apply to
+               derived classes, because every derived class object is a base class
+               object.
+            -- Remember the penguin-bird-fly problem,
+               square-rectangle-change-height problem
+Item 33:  Avoid hiding inherited names
+            -- Even if one function in derived has same name as a non-virtual
+               fn in base (with diff args), it will hide all base class fns with
+               same name.
+            -- Names in derived classes hide names in base classes. Under public
+               inheritance, this is never desirable.
+            -- To make hidden names visible again, employ 'using' declarations or
+               forwarding functions(explicit fns in derived that call Base::fn)
+Item 34:  Differentiate between inheriting interface and inhering implementation
+            -- Public inheritance always inherits base-class interface
+            -- Pure-virtual -> inherits interface only
+                 (if a default impl is desired on explicit req, impl the
+                  pure-virtual fn, and use Base::fn_name in derived class
+                  to choose that impl.)
+               simple-virtual -> inherits interface and an optional implementation
+               non-virtual -> inherits both interface and a mandatory impl.
+Item 35:  Consider alternatives to virtual functions
+           -- Use NVI(non-virtual interface) idiom.
+              -- wraps a private virtual function with a non-virtual public interface
+                 in base-class
+              -- Derived classes can't call base-virtual function, but can re-implement
+                 them
+              -- Base class's non-virtual implementation, can do some pre-stuff,
+                 post-stuff(like locks/state-assertions,fill-default-values)
+                 before calling the virtual function. (this is useful if pre-stuff/post-stuff
+                 are property of base-class impl.)
+           -- Replace virtual functions with fn-pointer data-members
+              -- But this limits the fn-poiners to only call public interface of the class
+              -- Might open up encapsulation!
+           -- Use tr1::function<> types. This allows assigning fn-pointers with any
+              compatible signature type
+           -- Replace virt funs in one hierarchy with vir. functions in antoher hierarchy
+              (This is the conventional strategy pattern)
+Item 36:  Never redefine an inherited non-virtual fn
+Item 37:  Never redefine an inherited virtual fn's default value
+           -- Default values are statically bound! If needed use the NVI idiom.
+Item 38:  Model "has-a" or "is-implemented-in-terms-of" using composition
+           -- Composition is diff from is-a (public inheritance)
+           -- Composition is either "has-a" (application domain)
+               or "is-implemented-in-term-of" (impl. domain)
+Item 39:  Private inheritance
+           -- Rules: 
+              -- derived ref/ptr wont become base ref/ptr
+              -- public/prot members of base will be priv of derived.
+           -- Private inheritance means is-implemented-in-terms of. It’s usually
+              inferior to composition, but it makes sense when a derived class
+              needs access to protected base class members or needs to redefine
+              inherited virtual functions.
+           -- Unlike composition, private inheritance can enable the empty base
+              optimization. This can be important for library developers who strive
+              to minimize object sizes.
+Item 40:  Use multiple inheritance judiciously
+           -- Multiple inheritance is more complex than single inheritance. It can
+              lead to new ambiguity issues and to the need for virtual inheritance.
+           -- Virtual inheritance imposes costs in size, speed, and complexity of
+              initialization and assignment. It’s most practical when virtual base
+              classes have no data.
+           -- Multiple inheritance does have legitimate uses. One scenario involves
+              combining public inheritance from an Interface class with
+              private inheritance from a class that helps with implementation.
+
+Templates and Generic Programming
+
+Item 41:  Understand implicit and compile-time polymorphism
+           -- Both classes and templates support interfaces and polymorphism.
+           -- For classes, interfaces are explicit and centered on function
+              signatures. Polymorphism occurs at runtime through virtual
+              functions.
+           -- For template parameters, interfaces are implicit and based on
+              valid expressions. Polymorphism occurs during compilation through
+              template instantiation and function overloading resolution.
+Item 42:  Understand the two meanings of typename
+           -- When declaring template parameters, class and typename are
+              interchangeable.
+           -- Use typename to identify nested dependent type names, except in
+              base class lists or as a base class identifier in a member
+              initialization list.
+Item 43:  Know how to access names in templatized base classes
+           --  In derived class templates, refer to names in base class templates
+               via a “this->” prefix, via using declarations, or via an explicit base
+               class qualification.
+Item 44: 
 
 
-             
 
-     
 
+More effective c++
+-----------------
+
+Basics
+
+Item 1: Distinguish pointers and references
+         -- References can never be null.
+         -- References cannot re-point to sth else. Hence must be initialized at creation
+         -- References are needed in operator overloading
+Item 2: Casts
+         -- static_cast<>() to be used in most places where c-style casts are needed.
+         -- const_cast<>() to cast const away
+         -- dynamic_cast<() to cast down a inheriticance
+            -- will return NULL for pointers
+            -- will throw exception for references!
+         -- reinterpret_cast<>() to perform conversions, whose results are impl. defined
+            -- most common use-case is to cast one fn-ptr type to another
+Item 3: Dont treat arrays polymorphically. 
+         -- Dont let a array of derived class decay into a base-class pointer
+            which is used as array *(ptr+n), as the size of derived class > base class
+Item 4: Avoid gratuitous default constructors if that doesn't make sense.
+         -- However, u cannot do the following if you dont have default constructor
+           -- Create arrays of the type
+           -- Perhaps not place this in container classes. (however std::vector doesn't
+                 have that limitation)
+           -- Another problem is these can't be virtual base classes.
+
+Operators
+
+Item 5: Be wary of user-defined conversions
+ 
+
+
+
+
+Questions to check
+------------------
+
+* c-style cast is this
+    (T)expr
+  fn-style cast is this
+    T(expr)
+
+  Is function style cast a c++ only thing? Is it just syntactic sugar for invoking constructor?
+
+* Understand how virtual base classes work.
