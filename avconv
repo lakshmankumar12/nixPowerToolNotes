@@ -13,6 +13,9 @@ ffmpeg -i he-hookah-i/cd-1.m4v -acodec libmp3lame -vn cd1.mp3
 #for chroma player
 avconv -strict experimental -i ~/Lakshman/rhymes/12345-once-i.webm -f avi -s qvga -r 20 -vcodec libxvid -acodec libmp3lame 12345-once-i.avi
 
+# to merge 2 or more files
+avconv -i 'concat:first.mp3|second.mp3|third.mp3' final.mp3
+
 # extract subset of time
 avconv -i yourmovie.whatever -ss starttime -t duration -sameq outputfile
   # sameq is to maintain same quality
