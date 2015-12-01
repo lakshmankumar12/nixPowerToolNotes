@@ -67,6 +67,29 @@ Getting a tag
 
 git-ws --tag  buildnumber_54290 asr5k/master master
 
+creating a annotated tag
+-----------------------
+
+git tag -a <tagname> -m '<message>'
+
+Get info of a annotaed tag
+---------------------------
+
+git tag -l 'prefix*'   # will give all tags that start with prefix
+git tag -l '*substr*'  # will give all tags that have substr
+
+git show <tag-name>    # will show info of tag + the commit as well. Can get the time of the tagging.
+
+Push a tag
+-----------
+
+git push origin <tag_name>
+
+delete a tag from remote
+------------------------
+
+git push --delete origin tagname
+
 Temp in vim
 -------------
 
