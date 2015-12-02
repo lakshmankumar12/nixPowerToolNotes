@@ -80,6 +80,12 @@ git tag -l '*substr*'  # will give all tags that have substr
 
 git show <tag-name>    # will show info of tag + the commit as well. Can get the time of the tagging.
 
+Push only one or a few commits when we have more local commits
+--------------------------------------------------------------
+
+git push <remotename> <commit SHA>:<remotebranchname>
+git push <remotename> <commit SHA>:refs/heads/<new-remotebranchname-name>
+
 Push a tag
 -----------
 
