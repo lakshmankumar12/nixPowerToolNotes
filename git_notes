@@ -2,7 +2,8 @@
 List all tracked files
 ----------------------
 
-git ls-tree --full-tree -r HEAD
+git ls-files
+git ls-tree --full-tree -r HEAD   # too complex for the above?
 
 Get a particular revision
 -------------------------
@@ -16,18 +17,20 @@ Git bring back a file discarding chagnes
 
 git checkout -- path/to/file
 
-getting rid of the top-commit :: DANGEROUS DANGEROUS
+restore to head discarding all changes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+git checkout -- .
+
+getting rid of the top-commit
 -----------------------------
 
 git reset --hard HEAD~1
 
-List all branches in server
+# you can get it back as long as its in the same repo with git reflog (git pack may erase it after some time..)
+
+List all branches in server and clone
 ----------------------------
-
-ssh mitgscm@mitg-git list-branches asr5k/master
-
-List all branches in a local clone
-------------------------------------
 
 git branch -a
 
@@ -37,7 +40,35 @@ TO see all changes to a file across all branch
 
 git log --all -- <path/to/file>
 
+***********
 
+Vim-fugitive notes
+=================
+
+* fugitive works only on a file. So just open a file and then issue any fugitive command
+
+:Gdiff             # diff the current file's changes from index
+:Gdiff HEAD
+:Gdiff any_treeish
+
+:Gedit <commit>
+:Glog -n 5         #log the current-file, until 5 commits
+:Glog -n 5 --      #log from HEAD to HEAD~4
+
+Equivalents
+-----------
+
+cmd-line           fugitive            Comments
+
+:Git add %         :Gwrite             Stage the current file to the index
+:Git checkout %    :Gread              Revert current file to last checked in version
+:Git rm %          :Gremove            Delete the current file and the corresponding Vim buffer
+:Git mv %          :Gmove              Rename the current file and the corresponding Vim buffer
+
+:Git commit        :Gcommit
+:Git status        :Gst
+
+***********
 
 GIt-notes
 --------
@@ -96,10 +127,6 @@ delete a tag from remote
 
 git push --delete origin tagname
 
-Temp in vim
--------------
-
-:source /ws/lakskuma-bgl/anyoneszone/git-vim/plugin/fugitive.vim
 
 getting latest /top commit
 -----------------------
@@ -110,17 +137,6 @@ geting parent commit of a commit
 ---------------------------------
 
 git show --quiet --pretty=format:"%P" <commit>
-
-setting up meld
----------------
-
-git config --global alias.meld '!/ws/lakskuma-bgl/anyoneszone/git-meld/git-meld.pl'
-
-get rid of unwanted packages
-----------------------------
-
-git submodule status | grep -v '^-' | grep -v boxer | grep -v buildtools | awk ' {cmd="rm -rf " $2; print cmd ; }'
-git submodule status | grep -v '^-' | grep -v boxer | grep -v buildtools | awk ' {cmd="rm -rf " $2; print cmd ; system(cmd) ;}'
 
 which branches contain a commit
 ------------------------------
