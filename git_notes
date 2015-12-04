@@ -40,6 +40,16 @@ TO see all changes to a file across all branch
 
 git log --all -- <path/to/file>
 
+Various flavors of git-log
+--------------------------
+
+git log --author=abc         # show all commits of author
+git log --grep=efg           # show all commits with comments having the string
+git log -S=hij               # show all commits with changed lines having the string. Slower -> so narrow ur commit-list
+git log --name-only          # display names of files changed with every commit
+
+git log --pretty=fuller      # shows both dates
+
 ***********
 
 Vim-fugitive notes
