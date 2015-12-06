@@ -63,6 +63,13 @@ Object& Object::operator=(const DiffTypeObject &rhs);
    -- note non-const reference return and const reference arg.
    -- same for all assignments like +=,-=,*=,/=
 
+prefix / postfix
+
+Object& operator++()         // prefix
+const Object operator++(int) // postfix
+
+Object& operator--()         // prefix
+const Object operator--(int) // postfix
 
 Miscellaneous notes
 -------------------
@@ -121,7 +128,7 @@ Item 7: Polymorphic class should have virtual destructor
           -- non polymorphic classes shoudn't
 Item 8: Destructors should not throw exceptions
           -- Destructor may already be called in a exception unwinding stack. So it may leaad to double-throw
-          -- Swallow it in destructor
+          -- Swallow it in destructor (use try {} catch(...) {} blocks in destructors - Note the ellipsis)
           -- If class clients need to be able to react to exceptions thrown during
              an operation, the class should provide a regular (i.e., non-destructor) function that performs the operation.
 Item 9: Never call virtual functions from constructors or destructors
@@ -340,8 +347,22 @@ Item 43:  Know how to access names in templatized base classes
            --  In derived class templates, refer to names in base class templates
                via a “this->” prefix, via using declarations, or via an explicit base
                class qualification.
-Item 44: 
-
+Item 44:  Factor parameter-independant code out of templates
+           -- Templates generate multiple classes and multiple functions, so any
+              template code not dependent on a template parameter causes bloat.
+           -- Bloat due to non-type template parameters can often be eliminated
+              by replacing template parameters with function parameters or class
+              data members.
+           -- Bloat due to type parameters can be reduced by sharing
+              implementations for instantiation types with identical binary
+              representations.
+Item 45:   Use member function templates to generate functions that accept all compatible types.
+           -- Let the arg of the member funciton take the other type as a template-arg
+              and use normal copy/assignment (like initializer list), to ensure
+              only acceptable conversions take place
+           -- If you declare member templates for generalized copy construction
+              or generalized assignment, you’ll still need to declare the normal
+              copy constructor and copy assignment operator, too.
 
 
 
@@ -362,12 +383,13 @@ Item 2: Casts
             -- will throw exception for references!
          -- reinterpret_cast<>() to perform conversions, whose results are impl. defined
             -- most common use-case is to cast one fn-ptr type to another
-Item 3: Dont treat arrays polymorphically. 
+Item 3: Dont treat arrays polymorphically.
          -- Dont let a array of derived class decay into a base-class pointer
             which is used as array *(ptr+n), as the size of derived class > base class
 Item 4: Avoid gratuitous default constructors if that doesn't make sense.
          -- However, u cannot do the following if you dont have default constructor
            -- Create arrays of the type
+             -- This can be overcome with allocating the 
            -- Perhaps not place this in container classes. (however std::vector doesn't
                  have that limitation)
            -- Another problem is these can't be virtual base classes.
@@ -375,10 +397,64 @@ Item 4: Avoid gratuitous default constructors if that doesn't make sense.
 Operators
 
 Item 5: Be wary of user-defined conversions
- 
+           -- implicit conversions are done by
+             -- single arg constructors
+             -- implicit type converstion functions   [ operator double() const; ]
+               -- they have no return type.
+           -- consider writing explicit conversion fns with good names
+               eg: std::string<>::c_str() , Rational::as_double()
+           -- add explicit keyword to constructors to avoid implicit-type-conversions
+                -- explicit calling is allowed, static_cast<UrClass>(source_type) is
+                   also allowed, c-style explicit cast is also allowed
+Item 6:  Prefix and postfix operators
+           -- Remember to put const for post-fix return type.
+           -- Prefix is cheaper as postfix involves creating a temporary
+           -- Implement postfix in terms of prefix call so that the underlying
+              increment activity is the same
+Item 7:  Never overload &&, || and comma operators
+           -- expr1 && expr2 becomes expr1.operator&&(expr2) for member fn or 
+                operator&&(expr1, expr2) for global. 
+              This doesn't offer short-circuit - beware!!
+Item 8:  Understand the different meanings of new and delete
+           -- new operator and delete operator are the normal externally visible
+              operators. operator new is internal . See below for relation:
+                  new operator
+                     -- calls operator new to get memory
+                     -- calls constructor on the given memory
+                     -- returns the pointer of corresponding type
+           -- new-operator can't be overloaded. It always does the above 3
+              steps. However, operator-new can be overloaded, so that gives
+              us flexibility in getting the memory from wherever we need.
+           -- We can't call constructor directly ever. But we have placement
+              new that is same as calling constructor on a given memory.
+                 new(pointer) ClassName(construct_arg1, construct_arg2)
+              The syntax (braces and ptr-arg) distinguish normal new from
+              placement new.
+           -- Dont overload operator-new globally. This will render ur app
+              incompatible with libraries that decide to do same thing.
+           (To read further: how to overload operator-new)
 
+Exceptions
 
-
+Item 9:  Use destructors to prevent resource leaks
+Item 10: Prevent resource leaks in constructors
+           -- This can be aided by keeping resource holding pointers as
+              resource-managing objects so that they are properly
+              destructed.
+Item 11: Prevent exceptions from leaving destructors
+           -- Similar to Item-8 of book1
+Item 12: Understand how throwing an exception differs from param-pass
+         and virt-func call
+           -- Exceptions are always thrown by a copy-by-value, even
+              if catch clause catches it by ptr or reference.
+              This is one reason why exceptions are slow
+           -- Copy is done using object's static type (not run-time
+              type). If u throw a base-class ptr or ref, what  gets
+              thrown is a base-class object.
+           -- throw;  // re-throws what was received.
+              throw some_var_name; // will throw a copy of whatever
+                                      this name is referring.
+             
 
 Questions to check
 ------------------
@@ -391,3 +467,8 @@ Questions to check
   Is function style cast a c++ only thing? Is it just syntactic sugar for invoking constructor?
 
 * Understand how virtual base classes work.
+
+* How to throw exceptions of objects that dont permit copying (copy
+  constructor is private)
+
+* Wha happens when abstract classes are thrown?
