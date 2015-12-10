@@ -1,0 +1,10 @@
+logarithms
+---------
+
+log x  =   log x        # Way to convert a log to a different base. Here we need
+   d          b         # log of x to base-d. But we dont know. We know logs of
+           ------       # base b though. So, this formula helps us to convert
+           log d        # to another base. It has a pattern. Numberator has the
+              b         # same number to take log for, with base-replaced. RHS has
+                        # both numbers to the friendly base. Denominator is the
+                        # unknown number which was the base on LHS.
