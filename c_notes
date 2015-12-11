@@ -2,3 +2,11 @@ size_t is unsigned.
 strcpy/memcpy return the char*/void*
 -E in gcc stops at preprocessing stage
 -dM in processing stage dumps all macro definitions used.
+
+long int strtol(const char *nptr, char **end_ptr, int base);
+long long int strtoll(...);
+  -- long atol(const char*) (or atoi) is same as strtol(ptr, NULL, 10);
+  -- base is any of 0 to 36 (inclusive). 0 means 0x-begin, 0-begin or 10-base.
+  -- end_ptr if non-NULL is set to the location of ptr which has first non-0 bad value. if it points to '\0', the entire string was good.
+  -- errno is ERANGE if return is LONG_MAX/MIN and long doesn't fit.
+
