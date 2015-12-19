@@ -37,6 +37,11 @@ Find all non-ascii characters in a file
 
 \grep --color=auto -n -P '[^\x00-\x7F]+' <file>
 
+Delete all non-printing chars (but retain lines)
+------------------------------------------------
+
+cat file |   tr -dc '[\011\012\015\040-\176]' > result
+
 Print from nth line to end of file
 ----------------------------------
 
