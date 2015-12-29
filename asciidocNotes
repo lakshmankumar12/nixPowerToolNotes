@@ -55,4 +55,9 @@ Next column content here
 
 image:images/icons/home.png[Alt text]
 
+To keep content after a list-item:
+
+Keep adding a plus after every para-break will the next *
+
+
 [options="step"]

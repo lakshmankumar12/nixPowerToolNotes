@@ -69,6 +69,7 @@ Equivalents
 -----------
 
 cmd-line           fugitive            Comments
+git anything       :Git anything       Execute any random git command
 
 :Git add %         :Gwrite             Stage the current file to the index
 :Git checkout %    :Gread              Revert current file to last checked in version
