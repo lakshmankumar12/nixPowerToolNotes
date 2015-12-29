@@ -9,7 +9,7 @@ Binary       |   Hex          |   What                 |  Notes
              |                |                        |          |    48  bits  |16  |    64  bits       |
              |                |                        |          +----+----+----+----+----+----+----+----+
              |                |                        |        Assigned to    Subnet
-             |                |                        |           a AS               From MAC .. insert FFEE into ur 48bit mac
+             |                |                        |           a AS               From MAC .. insert FFEE into ur 48bit mac (in the MIDDLE 2 octets!)
              |                |                        |
              |                |                        |
 11111110     |  FE80::        |   Link Local           |  Always assignable locally. As of now,
@@ -19,7 +19,7 @@ Binary       |   Hex          |   What                 |  Notes
              |                |                        |          +----+----+----+----+----+----+----+----+
              |                |                        |                              From MAC .. insert FFEE into ur 48bit mac
              |                |                        |
-             |                |                        |  This address can't escape a L2 network. Routers should pass them over. So, within a L2
+             |                |                        |  This address can't escape a L2 network. Routers shouldn't pass them over. So, within a L2
              |                |                        |    you can communicate w/o bothering to get any other IPv6
              |                |                        |
 1111110x     |  FDxx::        |  Unique Local          |  The FCxx:: is like undefined for now. Its always FDxx::
@@ -27,7 +27,7 @@ Binary       |   Hex          |   What                 |  Notes
              |                |                        |          +----+----+----+----+----+----+----+----+
              |                |                        |          |FD...yyyy.....|    |    64  bits       |
              |                |                        |          +----+----+----+----+----+----+----+----+
-             |                |                        |            x local assigned = 1 bit (1 for now)
+             |                |                        |            x local assigned = 1 bit (1 for now) (Part of FD -> lsb bit in first octet)
              |                |                        |            y     global id  = 40 bits
              |                |                        |                  subnet     = 16 bits
              |                |                        |
@@ -64,6 +64,13 @@ Very common multicast address
  FF02::1:ff00:0/104 solicited-node multicast
  FF05::2            all routers in site-local
 
+Other reserved multicast addresses
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ FF02::5            OSPFv3
+ FF02::6            OSFFv3 designated routers
+ FF02::9            RIPng
+ FF02::A            EIGRP
 
 ARP is replaced with ICMPv6 neighbour discovery protocol
 --------------------------------------------------------
@@ -117,3 +124,8 @@ Sub-netting
   /64  (i.e 49 ..to 64 ) 65K subnets are available for the organization.
 
   The final /64 should be always given to one host fully! so that auto-configuration is possible.
+
+Special features in IPv6
+-------------------------
+
+* Anycast -> The ability to choose any random destination in a group.
