@@ -1,10 +1,41 @@
-General
+Asciidoc Syntax Related
+-----------------------
+
+
+Doc Title
+=========
+
+Level 1
 -------
 
-Source high-lighting:
-:source-highlighter: pygments
+Level 2
+~~~~~~~
 
-and put ur src text in like this
+Level 3
+^^^^^^^
+
+Level 4
++++++++
+
+or
+
+= Doc Title
+== Level 1
+=== Level 2
+==== Level 3
+===== Level 4
+
+forced +
+line break
+
+To get  a blank line
+{empty} +
+
+normal, _italic_, *bold*, +mono+.
+``double quoted'', `single quoted'
+normal, ^super^, ~sub~
+
+put ur src text in like this (src-highlighting for asciidoctor given below)
 
 .title
 [source,sh]
@@ -12,30 +43,8 @@ and put ur src text in like this
 cp src dest
 ---
 
-To get the <1> to nice markers
-:icons: font
-
-To get  a blank line
-{empty} +
-
-Asciidoctor and deck.js
-
-Put the following after the doc title
-:backend: deckjs
-:navigation:
-:menu:
-:last-update-label!:
-
-= Doc Title that should appear only once
-== Leve1 Heading
-=== Level2 Heading
-
-
-* Link ..../github/asciidoctor-deckjs/deck.js to the pwd where ur asciidoc is present.
-
-asciidoctor -T ../github/asciidoctor-backends/haml doc.asciidoc
-
-* Building column'ish display
+Columish Display
+~~~~~~~~~~~~~~~~
 
 ++++
 <table><tr><td>
@@ -53,11 +62,47 @@ Next column content here
 </td></tr></table>
 ++++
 
+Links and Images
+~~~~~~~~~~~~~~~~
+
 image:images/icons/home.png[Alt text]
 
 To keep content after a list-item:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Keep adding a plus after every para-break will the next *
+
+
+Pythonic asciidoc specific
+--------------------------
+
+asciidoc -a toc my_doc.txt
+
+To get pdf:
+a2x -f pdf my_doc.txt
+
+Asciidoctor specific
+--------------------
+
+:toc:
+
+Source high-lighting:
+:source-highlighter: pygments
+
+To get the <1> to nice markers
+:icons: font
+
+Asciidoctor and deck.js
+-----------------------
+Put the following after the doc title
+:backend: deckjs
+:navigation:
+:menu:
+:last-update-label!:
+
+* Link ..../github/asciidoctor-deckjs/deck.js to the pwd where ur asciidoc is present.
+
+asciidoctor -T ../github/asciidoctor-backends/haml doc.asciidoc
 
 
 [options="step"]
