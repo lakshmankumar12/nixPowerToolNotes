@@ -105,9 +105,10 @@ Put the following after the doc title
 :menu:
 :last-update-label!:
 
-* Link ..../github/asciidoctor-deckjs/deck.js to the pwd where ur asciidoc is present.
-
-asciidoctor -T ../github/asciidoctor-backends/haml doc.asciidoc
-
-
 [options="step"]
+
+sudo gem install asciidoctor tilt haml
+Link https://github.com/imakewebthings/deck.js to the pwd where ur asciidoc is present.
+asciidoctor -T ...wherever/https://github.com/asciidoctor/asciidoctor-deck.js/templates/haml doc.asciidoc
+Remember you need the deckjs folder while viewing. The html points to this.
+
