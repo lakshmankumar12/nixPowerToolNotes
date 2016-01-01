@@ -1,12 +1,75 @@
-size_t is unsigned.
-strcpy/memcpy return the char*/void*
--E in gcc stops at preprocessing stage
--dM in processing stage dumps all macro definitions used.
+C Notes
+=======
+:toc:
 
+== Declarations
+
+* What is really guaranteed on sizes? http://c-faq.com/decl/inttypes.html[Faq 1.1]
+** type char can hold values up to 127(1 byte);
+** types short int and int can hold values up to 32,767(2 bytes); and
+** type long int can hold values up to 2,147,483,647(4 bytes).
+** something like the relation
++
+----
+    sizeof(char) <= sizeof(short) <= sizeof(int) <= sizeof(long) <= sizeof(long long)
+----
+* Use size_t when dealing with sizes.
+* Use int, double when possible - fastest data-types.
+** Using things like char, short, float may result in more code.
+* typedefs have scope rules. So they should be preferred over #defines.
+
+=== Some complex typedef styles
+
+* Typedefing function pointers
++
+----
+typedef int (*funcptr)();
+----
++
+Now both the following are same.
++
+----
+funcptr pf1, pf2;
+int (*pf1)(), (*pf2)();
+----
+* Typedefing pointers
++
+----
+typedef char *charp;
+const charp p;
+----
++
+Will make p a +char $$*$$const p+ and not +const char $$*$$p+. This is desirable.
+
+== Some facts to remember
+
+* size_t is unsigned.
+
+== Signatures of common routines
+
+* strcpy
++
+----
+char *strcpy(char *dest, const char *src);
+char *strncpy(char *dest, const char *src, size_t n);
+----
++
+** strcpy/memcpy return the char*/void* of dst.
+* strtol, atoi
++
+----
 long int strtol(const char *nptr, char **end_ptr, int base);
 long long int strtoll(...);
-  -- long atol(const char*) (or atoi) is same as strtol(ptr, NULL, 10);
-  -- base is any of 0 to 36 (inclusive). 0 means 0x-begin, 0-begin or 10-base.
-  -- end_ptr if non-NULL is set to the location of ptr which has first non-0 bad value. if it points to '\0', the entire string was good.
-  -- errno is ERANGE if return is LONG_MAX/MIN and long doesn't fit.
+----
++
+** long atol(const char*) (or atoi) is same as strtol(ptr, NULL, 10);
+** base is any of 0 to 36 (inclusive). 0 means 0x-begin, 0-begin or 10-base.
+** end_ptr if non-NULL is set to the location of ptr which has first non-0 bad value. if it points to '\0', the entire string was good.
+** errno is ERANGE if return is LONG_MAX/MIN and long doesn't fit.
+
+== Compilation Tips
+
+* Argument -E in gcc stops at preprocessing stage
+* Argument -dM in processing stage dumps all macro definitions used.
+
 

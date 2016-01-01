@@ -41,7 +41,12 @@ put ur src text in like this (src-highlighting for asciidoctor given below)
 [source,sh]
 ----
 cp src dest
----
+----
+
+Escaping text
+~~~~~~~~~~~~~
+
+This escapes the otherwise bolding effect - char $$*$$p, $$*q$$;
 
 Columish Display
 ~~~~~~~~~~~~~~~~
