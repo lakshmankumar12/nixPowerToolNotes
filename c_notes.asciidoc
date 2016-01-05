@@ -18,6 +18,25 @@ C Notes
 ** Using things like char, short, float may result in more code.
 * typedefs have scope rules. So they should be preferred over #defines.
 
+=== String Initialization
+A string literal (the formal term for a double-quoted string in C source) can
+be used in two slightly different ways:
+
+----
+char a[] = "string literal";
+char *p  = "string literal";
+----
+
+* As the initializer for an array of char, as in the declaration of char a[] ,
+  it specifies the initial values of the characters in that array (and, if
+  necessary, its size).
+* Anywhere else, it turns into an unnamed, static array of characters, and this
+  unnamed array may be stored in read-only memory, and which therefore cannot
+  necessarily be modified. In an expression context, the array is converted at
+  once to a pointer, as usual (see section 6), so the second declaration
+  initializes p to point to the unnamed array's first element.
+
+
 === Some complex typedef styles
 
 * Typedefing function pointers
@@ -41,12 +60,30 @@ const charp p;
 +
 Will make p a +char $$*$$const p+ and not +const char $$*$$p+. This is desirable.
 
+=== Namespaces
+
+* Detailed in this http://c-faq.com/decl/namespace.html[Faq 1.29]
+
+There are 4 major namespaces
+
+* labels (i.e. goto targets);
+* tags (names of structures, unions, and enumerations; these three aren't separate even though they theoretically could be);
+* structure/union members (one namespace per structure or union); and
+* everything else (functions, variables, typedef names, enumeration constants), termed ``ordinary identifiers'' by the Standard.
+** Note that the struct-names comes under 2nd category, while typedef-names sit along-side variable names
+
 == Some facts to remember
 
 * size_t is unsigned.
 
 == Signatures of common routines
 
+* main
++
+----
+int main(int argc, char **argv)
+----
++
 * strcpy
 +
 ----
