@@ -75,6 +75,33 @@ There are 4 major namespaces
 == Some facts to remember
 
 * size_t is unsigned.
+* struct compare isn't directly possible, as there are unused/padding holes in the struct.
+* ANSI C has a offsetof(type,field) macro in <stddef.h>
+* bit-fields are possible only within a struct/union definition
+
+== Sequence points
+
+* The following in undefined (not even unspecified)
++
+----
+a[i] = i++;
+i = i++;
+a ^= b ^= a ^= b
+----
++
+* Operator precedance doesn't gurantee function evaulation sequence
++
+----
+f() + g() * h()  /* although * happens before +, f,g,h can be called in any order */
+----
++
+* Comma opeartor guarantees left to right evaulation (each comma is a sequence point). But function arguments
+  are not comma operators and doesn't guranatee order of evaluation
++
+----
+printf("%d %d", f1(), f2());   /* no guarantee on order of f1 or f2 */
+----
+
 
 == Signatures of common routines
 
@@ -109,4 +136,6 @@ long long int strtoll(...);
 * Argument -E in gcc stops at preprocessing stage
 * Argument -dM in processing stage dumps all macro definitions used.
 
-
+////
+Last read FAQ: 3.7
+////

@@ -42,6 +42,10 @@ Delete all non-printing chars (but retain lines)
 
 cat file |   tr -dc '[\011\012\015\040-\176]' > result
 
+#\015 is ^M
+
+cat file |   tr -dc '[\011\012\040-\176]' > result
+
 Print from nth line to end of file
 ----------------------------------
 
