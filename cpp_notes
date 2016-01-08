@@ -1,112 +1,149 @@
+CPP Notes
+=========
 
-New:
+== Miscellaneous notes
+
+=== New
 
 * allocate memory  .. operator new (size_t)
 * call constructor
 
-Delete:
+=== Delete
 
 * call destructor
 * operator delete(void*)
 
+== $$C++14$$ Features
+
+=== Enum class
+
+----
 enum class Traffic_light { Red, green, yellow };
- * strict type-checking
- * we can define operators for this. -- Traffic_light& operator++(Traffic_light& t)
+----
 
+* strict type-checking
+* we can define operators for this. -- Traffic_light& operator++(Traffic_light& t)
+
+----
 static_assert(A,S) prints S as a compiler error message if A is not true.
+----
 
+=== Const Expressions
+
+----
 const int a=5; <-- a is a named-const
 constexpr double max1 = 1.4∗square(dmv); // constexpr: meaning roughly ‘‘to be evaluated at compile time’’
                                          // In above example, the function square should also be a constexpr like below
 constexpr double square(double x) { return x∗x; }   // a constexpr function can be called from anywhere. Just that the result wont be constexpr.
                                                     // This allows same function for both variables and constexpr
+----
 
+=== Initializer list
+
+----
 std::initializer_list<T> lst;
  Has the following attributes
    lst.size()
 
 eg: std::initializer_list<double> lst{2.2,2.3,2.4};
+----
 
+=== Unique Ptrs
+
+----
 unique_ptr<T>
-  -> when it goes out of scope, it deletes the object underneath
+----
 
+* Better than auto_ptr
+* when it goes out of scope, it deletes the object underneath
+
+----
+shared_ptr<ptr,deleter_func>
+----
+
+A shared_ptr is twice the size of a raw pointer, uses dynamically allocated
+memory for bookkeeping and deleter-specific data, uses a virtual function
+call when invoking its deleter, and incurs thread synchronization overhead
+when modifying the reference count in an application it believes is
+multithreaded. (You can disable multithreading support by defining a
+preprocessor symbol.)
+
+=== Moves
+
+----
 std::move(x);
   -> get an rvalue for x. This helps in invoking a move-assignment
       z=x;            // copy-assignment
       z=std::move(x); // move assignment
+----
 
-
+----
 =delete; can be used to suppress any operation, that the compiler does for free.
-
-shared_ptr<ptr,deleter_func>
-
-* A shared_ptr is twice the size of a raw pointer, uses dynamically allocated
-  memory for bookkeeping and deleter-specific data, uses a virtual function
-  call when invoking its deleter, and incurs thread synchronization overhead
-  when modifying the reference count in an application it believes is
-  multithreaded. (You can disable multithreading support by defining a
-  preprocessor symbol.)
+----
 
 
-Signatures for common function
-------------------------------
+== Signatures for common function
 
-binary operators
+=== binary operators
 
+----
 const Object operator+(const Object &lhs, const Object &rhs);
-   -- note the return is const-value, while args are const-references
+----
 
-assignment
+* note the return is const-value, while args are const-references
 
+=== assignment
+
+----
 Object& Object::operator=(const Object &rhs);
 Object& Object::operator=(const DiffTypeObject &rhs);
-   -- note non-const reference return and const reference arg.
-   -- same for all assignments like +=,-=,*=,/=
+----
+* note non-const reference return and const reference arg.
+* same for all assignments like +=,-=,*=,/=
 
-prefix / postfix
+=== prefix / postfix
 
+----
 Object& operator++()         // prefix
 const Object operator++(int) // postfix
 
 Object& operator--()         // prefix
 const Object operator--(int) // postfix
+Object& operator++()         // prefix
+----
 
-Miscellaneous notes
--------------------
+== Miscellaneous notes
 
 Adding explicit to a constructor prevents implicit invocation to convert types
 
-On the roll
------------
+== On the roll
 
-Bad stuff list
-~~~~~~~~~~~~~~
+=== Bad stuff list
 
-. Defining variables too soon can cause a drag on performance.
-. Overuse of casts can lead to code that’s slow, hard to maintain, and infected
+* Defining variables too soon can cause a drag on performance.
+* Overuse of casts can lead to code that’s slow, hard to maintain, and infected
   with subtle bugs.
-. Returning handles to an object’s internals can defeat encapsulation and leave
+* Returning handles to an object’s internals can defeat encapsulation and leave
   clients with dangling handles. Failure to consider the impact of exceptions can
   lead to leaked resources and corrupted data structures. Overzealous inlining
   can cause code bloat.
-. Excessive coupling can result in unacceptably long build times.
+* Excessive coupling can result in unacceptably long build times.
 
 
-Effective C++
---------------
+== Effective C++
 
-Accustoming to C++
+=== Accustoming to C++
 
-Item 1: parts of c++ -> c, oo-part, template-part and STL
-Item 2: const, enum and inlines to #define
-          -- static const inside class needn't have definition (integral types - as long as address is not taken)
-          -- #define dont have scope
-          -- inline functions have type-checking, and can accept expressions as arguments, which wil be evaluated once.
-Item 3: use  const wherever possible
-          -- const Rational operator*(const Rational &lhs, const Rational &rhs);
-             -- const helps to avoid unnecessary assignment to a return value
-          -- member functions can be overloaded with const
-          -- bitwise constness, logical constness
+==== Item 1: parts of c++ -> c, oo-part, template-part and STL
+==== Item 2: const, enum and inlines to #define
+* static const inside class needn't have definition (integral types - as long as address is not taken)
+* #define dont have scope
+* inline functions have type-checking, and can accept expressions as arguments, which wil be evaluated once.
+==== Item 3: use  const wherever possible
+* const Rational operator*(const Rational &lhs, const Rational &rhs);
+** const helps to avoid unnecessary assignment to a return value
+* member functions can be overloaded with const
+* bitwise constness, logical constness
 
 
 Constructors, Destructors and Assignment Operators
@@ -366,8 +403,7 @@ Item 45:   Use member function templates to generate functions that accept all c
 
 
 
-More effective c++
------------------
+== More effective c++
 
 Basics
 
@@ -456,8 +492,7 @@ Item 12: Understand how throwing an exception differs from param-pass
                                       this name is referring.
              
 
-Questions to check
-------------------
+== Questions to check
 
 * c-style cast is this
     (T)expr
