@@ -138,6 +138,8 @@ delete a tag from remote
 
 git push --delete origin tagname
 
+git push origin :refs/tag/tagname
+
 
 getting latest /top commit
 -----------------------
