@@ -81,7 +81,7 @@ There are 4 major namespaces
 
 == Sequence points
 
-* The following in undefined (not even unspecified)
+* The following are all undefined (not even unspecified)
 +
 ----
 a[i] = i++;
