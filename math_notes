@@ -1,6 +1,6 @@
-logarithms
----------
+== logarithms
 
+----
 log x  =   log x        # Way to convert a log to a different base. Here we need
    d          b         # log of x to base-d. But we dont know. We know logs of
            ------       # base b though. So, this formula helps us to convert
@@ -8,3 +8,21 @@ log x  =   log x        # Way to convert a log to a different base. Here we need
               b         # same number to take log for, with base-replaced. RHS has
                         # both numbers to the friendly base. Denominator is the
                         # unknown number which was the base on LHS.
+----
+
+== Combinatoris
+
+****
+
+~n~C~r~ = n! / ( (n-r)! * r! )
+~n~P~r~ = n! / (n-r)!
+~n~C~r~ = ~n~P~r~ / r!
+
+~n~C~r~ = ~n-1~C~r-1~ + ~n-1~C~r~
+~n~C~n~ = ~n~C~1~ = 1
+
+****
+
+
+
+
