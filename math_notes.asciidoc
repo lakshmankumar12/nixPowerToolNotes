@@ -1,3 +1,28 @@
+= Math Notes
+:toc:
+:last-update-label!:
+
+== Powers of 2
+
+[option="header"]
+|========
+| Power   |          Value     |  Human-friendly |  Comments
+| 1       |           2        |                 |
+| 2       |           4        |                 |
+| 3       |           8        |                 |
+| 4       |          16        |                 |
+| 5       |          32        |                 |
+| 6       |          64        |                 |
+| 7       |         128        |                 |
+| 8       |         256        |                 |
+| 9       |         512        |                 |
+| 10      |        1,024       |  1K             |
+| 12      |        4,096       |  4K             | Typical page size
+| 20      |     1,048,576      |  1M             | Easy to rem. 1K*1K so 20
+| 30      |  1,073,741,824     |  1G or Billion  | Easy to rem. 1M*1K so 30
+| 32      |  4,294,967,295     |  4G             | Capacity of a typical word
+|========
+
 == logarithms
 
 ----
@@ -15,11 +40,21 @@ log x  =   log x        # Way to convert a log to a different base. Here we need
 ****
 
 ~n~C~r~ = n! / ( (n-r)! * r! )
+
 ~n~P~r~ = n! / (n-r)!
+
 ~n~C~r~ = ~n~P~r~ / r!
 
 ~n~C~r~ = ~n-1~C~r-1~ + ~n-1~C~r~
-~n~C~n~ = ~n~C~1~ = 1
+
+* This is the class case of reducing a combinaion into smaller sub-problems
+* We are eiher picking the 1st and doing a combination for remaining n-1 items
+  AND we are not picking 1st and doing a combination for remaining n items in
+  the smaller subset.
+
+~n~C~n~ = 1
+
+~n~C~1~ = n
 
 ****
 
