@@ -81,6 +81,27 @@ There are 4 major namespaces
 
 == Sequence points
 
+Best explained here in http://c-faq.com/expr/seqpoints.html[faq 3.8]
+
+A sequence point is a point in time at which the dust has settled and all side
+effects which have been seen so far are guaranteed to be complete. The sequence
+points listed in the C standard are:
+
+* at the end of the evaluation of a full expression (a full expression is an
+  expression statement, or any other expression which is not a
+  subexpression within any larger expression);
+* at the ||, &&, ?:, and comma operators; and
+* at a function call (after the evaluation of all the arguments, and just before the actual call).
+
+The Standard states that
+
+****
+Between the previous and next sequence point an object shall have its stored
+value modified at most once by the evaluation of an expression. Furthermore,
+the prior value shall be accessed only to determine the value to be
+stored.
+****
+
 * The following are all undefined (not even unspecified)
 +
 ----
@@ -102,6 +123,9 @@ f() + g() * h()  /* although * happens before +, f,g,h can be called in any orde
 printf("%d %d", f1(), f2());   /* no guarantee on order of f1 or f2 */
 ----
 
+=== value preserving vs unsigned preserving
+
+Talked about in http://c-faq.com/expr/unswarn.html[faq 3.19]
 
 == Signatures of common routines
 

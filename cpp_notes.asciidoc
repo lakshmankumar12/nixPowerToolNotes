@@ -495,7 +495,9 @@ Operators
 ==== Item 8:  Understand the different meanings of new and delete
 * new operator and delete operator are the normal externally visible
   operators. operator new is internal . See below for relation:
-      new operator
++
+new operator
++
 ** calls operator new to get memory
 ** calls constructor on the given memory
 ** returns the pointer of corresponding type
