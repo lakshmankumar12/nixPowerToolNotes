@@ -57,4 +57,57 @@ avconv -f alsa -i default -f x11grab -r 30 -s 1024x768  -i :0.0 -acodec flac -vc
 * hd720 (1280×720)
 * hd1080 (1920×1024).
 
+== ID3V2 commands
 
+These are the required tags
+
+* TIT2 (Title/songname/content description)
++
+The Title
++
+* TALB (Album/Movie/Show title)
++
+Album
++
+* TPE1 (Lead performer(s)/Soloist(s))
++
+Artist
++
+* TPE2 (Band/orchestra/accompaniment)
++
+Album Artist
++
+* TCON (Content type):
++
+Genre
++
+* TRCK (Track number/Position in set)
++
+Track number
++
+* TYER (Year)
+* APIC (Attached picture)
++
+Image
++
+
+.To set any frame
+----
+id3v2 --TIT2 'Title of Track' file.mp3
+----
+
+.To remove a frame
+----
+id3v2 --remove-frame 'TXXX' file.mp3
+----
+
+.To add image
+----
+eyeD3 --add-image 'cover.jpg:FRONT_COVER' Akhilandeshwari.mp3
+\ls *.mp3 | while read i ; do eyeD3 -2 --add-image 'cover.jpg:FRONT_COVER' $i ; done
+----
+
+.To remove image
+----
+eyeD3 --remove-images file.mp3
+----
