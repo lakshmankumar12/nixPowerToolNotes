@@ -13,6 +13,7 @@ C Notes
 ----
     sizeof(char) <= sizeof(short) <= sizeof(int) <= sizeof(long) <= sizeof(long long)
 ----
++
 * Use size_t when dealing with sizes.
 * Use int, double when possible - fastest data-types.
 ** Using things like char, short, float may result in more code.
@@ -69,7 +70,7 @@ There are 4 major namespaces
 * labels (i.e. goto targets);
 * tags (names of structures, unions, and enumerations; these three aren't separate even though they theoretically could be);
 * structure/union members (one namespace per structure or union); and
-* everything else (functions, variables, typedef names, enumeration constants), termed ``ordinary identifiers'' by the Standard.
+* everything else (functions, variables, typedef names, enumeration constants), termed 'ordinary identifiers' by the Standard.
 ** Note that the struct-names comes under 2nd category, while typedef-names sit along-side variable names
 
 == Some facts to remember
@@ -78,6 +79,11 @@ There are 4 major namespaces
 * struct compare isn't directly possible, as there are unused/padding holes in the struct.
 * ANSI C has a offsetof(type,field) macro in <stddef.h>
 * bit-fields are possible only within a struct/union definition
+* $$void*$$ is a generic type only for data-objects. There is no guarantee for
+  function-pointers to be stored to $$void*$$. However all function pointers are
+  inter-castable explicitly. If you need to store both types in one place, have
+  a union of $$void*$ and some function-ptr type.
+  http://c-faq.com/ptrs/int2ptr.html[Faq 4.14]
 
 == Sequence points
 

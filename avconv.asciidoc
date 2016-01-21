@@ -89,7 +89,7 @@ Track number
 * APIC (Attached picture)
 +
 Image
-+
+
 
 .To set any frame
 ----

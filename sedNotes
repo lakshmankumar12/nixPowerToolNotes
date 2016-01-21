@@ -50,3 +50,8 @@ Print from nth line to end of file
 ----------------------------------
 
 tail -n +2 <file>
+
+List a file wiht both hex and ascii
+-----------------------------------
+
+hexdump -C <file> | less
