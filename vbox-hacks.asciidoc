@@ -1,0 +1,11 @@
+VirtualBox Hacks
+================
+
+== If NTP time lags
+
+In virtual box gues, type
+
+----
+sudo VBoxService --timesync-set-threshold 1000
+----
+
