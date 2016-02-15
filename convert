@@ -41,5 +41,14 @@ In this command:
    output.jpg : the output image 
 
 
+#creating a watermark
+gimp -> new
+     -> advanced options -> background -> tranparent
+                         -> size-> required size
+     -> text box -> write ur text
+     -> rotate -> rotate ur image
+     -> move -> center it.
+     -> export as png
+
 #make an animated gif .. delay is in ms and -loop <n> loops n-times. 0 loops infinitely
 convert -delay 120 -loop 0 *.png animated.gif

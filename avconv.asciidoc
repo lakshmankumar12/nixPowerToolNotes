@@ -111,3 +111,8 @@ eyeD3 --add-image 'cover.jpg:FRONT_COVER' Akhilandeshwari.mp3
 ----
 eyeD3 --remove-images file.mp3
 ----
+
+.To remove v1 tag
+----
+id3v2 -s file.mp3
+----
