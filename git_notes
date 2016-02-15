@@ -5,6 +5,11 @@ List all tracked files
 git ls-files
 git ls-tree --full-tree -r HEAD   # too complex for the above?
 
+List all untracked files
+------------------------
+
+git ls-files --others --exclude-standard
+
 Get a particular revision
 -------------------------
 
@@ -34,6 +39,13 @@ List all branches in server and clone
 
 git branch -a
 
+checkout remote branch with tracking
+-------------------------------------
+
+git checkout --track -b <local branch> <remote>/<tracked branch>
+
+# if -b <name> is to be same as remote's name, you can skip it
+git checkout -t origin/haml
 
 TO see all changes to a file across all branch
 ----------------------------------------------
@@ -49,6 +61,20 @@ git log -S=hij               # show all commits with changed lines having the st
 git log --name-only          # display names of files changed with every commit
 
 git log --pretty=fuller      # shows both dates
+
+To quickly get the sha-1 of any tag/branch-name/commit-representative!
+----------------------------------------------------------------------
+
+#especially if you are in a script
+git rev-parse HEAD
+git rev-parse tag_name
+
+#to check if this is a git-repo
+git rev-parse HEAD
+if [ $? -eq 0 ] ; then
+  echo "you are in a git repo"
+else
+  echo "you are NOT in a git repo"
 
 ***********
 
@@ -138,6 +164,7 @@ delete a tag from remote
 
 git push --delete origin tagname
 
+#https://nathanhoad.net/how-to-delete-a-remote-git-tag
 git push origin :refs/tag/tagname
 
 
@@ -199,6 +226,17 @@ git diff --name-only --diff-filter=U
 # to keep local or remote files
 git checkout --theirs /path/to/file
 git checkout --ours /path/to/file
+
+To amend dates for a bulk of commits
+-------------------------------------
+
+git rebase -i
+#choose edit in the EDITOR
+#and do this when you are prompted in each stage
+
+git commit --amend --date="Wed Feb 16 14:00 2011 +0100"
+git rebase --continue
+
 
 Old commands equivalent
 -----------------------
