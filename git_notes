@@ -76,6 +76,11 @@ if [ $? -eq 0 ] ; then
 else
   echo "you are NOT in a git repo"
 
+Get upstream info
+-----------------
+
+git rev-parse --abbrev-ref @{u}
+
 ***********
 
 Vim-fugitive notes
@@ -227,6 +232,11 @@ git diff --name-only --diff-filter=U
 git checkout --theirs /path/to/file
 git checkout --ours /path/to/file
 
+Better merge strategy
+--------------------
+
+git merge|rebase|cherry-pick  --strategy=recursive --strategy-option=patience
+
 To amend dates for a bulk of commits
 -------------------------------------
 
@@ -279,3 +289,27 @@ git branch -t name remotes/origin/name
 git checkout name
 
 
+*****
+
+Info model
+-----------
+
+files,
+a working tree,
+an index,
+a local repository,
+a remote repository,
+remotes (pointers to remote repositories),
+commits,
+treeishes (pointers to commits),
+branches,
+a stash
+
+refs
+tags
+the reflog
+fast-forward commits
+detached head state
+remote branches
+tracking
+namespaces
