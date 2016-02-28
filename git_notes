@@ -198,6 +198,11 @@ which branches contain a commit
 
 git branch -a --contains <commit>
 
+which commit has a certain version of file
+------------------------------------------
+
+which_commit_has_this_blob.pl <blob-sha>
+
 getting rid of a submodule
 ---------------------------
 
@@ -232,7 +237,7 @@ is a commit in a build-number
 
 git merge-base --is-ancestor <commit> buildnumber_<build>
 
-During merging
+During merging / merge
 --------------
 
 # list conflict files
@@ -241,6 +246,11 @@ git diff --name-only --diff-filter=U
 # to keep local or remote files
 git checkout --theirs /path/to/file
 git checkout --ours /path/to/file
+
+git ls-files -u
+  1: common
+  2: ours
+  3: theirs
 
 Better merge strategy
 --------------------
