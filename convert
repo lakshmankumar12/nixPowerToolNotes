@@ -52,3 +52,12 @@ gimp -> new
 
 #make an animated gif .. delay is in ms and -loop <n> loops n-times. 0 loops infinitely
 convert -delay 120 -loop 0 *.png animated.gif
+
+
+#make a terminal recording
+https://github.com/icholy/ttygif
+
+#or this
+https://asciinema.org/
+https://github.com/asciinema/asciinema
+https://github.com/asciinema/asciinema-player

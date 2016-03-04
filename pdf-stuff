@@ -1,9 +1,13 @@
 
 # remove password
+# or simply open in evince and print!
 pdftk protected.pdf input_pw sekritPassword cat output unprotected.pdf
 
-#or simply open in evince and print!
+# when u know only user password
+qpdf --password=sekritPassword --decrypt protected.pdf unprotected.pdf
 
+# merge 2 pdfs
+pdftk A=in1.pdf B=in2.pdf cat A1-2 B4-end output out1.pdf
 
 # watermarking (works only for text-files).
 pdftk input.pdf background mark.pdf output marked-file.pdf
