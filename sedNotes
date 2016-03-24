@@ -1,7 +1,7 @@
 -n  <-- will suppress the default printing.
 -i  <-- in place replacement (ensure to have backup!)
 
-'s/match/replace/g' 
+'s/match/replace/g'
 
 Some quick sed scripts
 ======================
@@ -9,7 +9,7 @@ Some quick sed scripts
 Print only the matching back-reference part
 -------------------------------------------
 
-sed -n 's/^\s*discard\(want\)discar.*$/\1/p' 
+sed -n 's/^\s*discard\(want\)discar.*$/\1/p'
 
 
 prints from 2nd line, every 3rd line.
@@ -26,14 +26,22 @@ sed -r 's:\x1B\[[0-9;]*[mK]::g'
 Delete empty lines
 -------------------
 
-sed '/^$/d' myFile > tt 
-
+sed '/^$/d' myFile > tt
 
 
 Not really SED but text stuff with other tools
 ==============================================
 
+Use perl when sed doesn't cut it
+--------------------------------
+
+esp - greedy regex .*?
+
+.. | perl -ne 's/regex/replace/' | ..
+perl -ne -i 's/regex/replace/' file_to_work_inline
+
 Find all non-ascii characters in a file
+---------------------------------------
 
 \grep --color=auto -n -P '[^\x00-\x7F]+' <file>
 
@@ -55,3 +63,10 @@ List a file wiht both hex and ascii
 -----------------------------------
 
 hexdump -C <file> | less
+
+Using find
+----------
+
+List upto a certain depth
+
+find -maxdepth 2 .

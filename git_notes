@@ -47,6 +47,9 @@ git checkout --track -b <local branch> <remote>/<tracked branch>
 # if -b <name> is to be same as remote's name, you can skip it
 git checkout -t origin/haml
 
+# if brach is already present locally
+git branch -u origin/remote_branch_name local_branch_name
+
 TO see all changes to a file across all branch
 ----------------------------------------------
 
@@ -61,6 +64,15 @@ git log -S=hij               # show all commits with changed lines having the st
 git log --name-only          # display names of files changed with every commit
 
 git log --pretty=fuller      # shows both dates
+
+To get the tag done on a given date
+-----------------------------------
+
+git describe branch_name@{mar.04.2016}  # This uses reflog.. so u may see only available till date.
+
+git log branch_name --until=aug.04.2016
+
+git describe --tags $(git rev-list -n 1 --before=05.aug.2015 HEAD)  #sub head with branch if u are not in branch
 
 To quickly get the sha-1 of any tag/branch-name/commit-representative!
 ----------------------------------------------------------------------
@@ -266,6 +278,14 @@ git rebase -i
 
 git commit --amend --date="Wed Feb 16 14:00 2011 +0100"
 git rebase --continue
+
+Bisect
+-------
+
+git bisect start <bad> <good> --
+git bisect run /script
+
+git bisect start HEAD TiMOS-MG_0_0_I1630 --
 
 
 Old commands equivalent

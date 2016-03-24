@@ -57,6 +57,23 @@ convert -delay 120 -loop 0 *.png animated.gif
 #make a terminal recording
 https://github.com/icholy/ttygif
 
+**
+Steps
+1. Start recording with ttyrec
+2. type ^d to finish.
+3. You will find whatever u did from 1-2 recorded in a ttyrec file.
+4. Do ttygif <ttyrec-file>
+5. You will find the temp-img dir and coverted files.. You can play with the delays and fine tune the gif.
+6. Convert all files to jpg in a tmep dir
+    mkdir jpg ; \ls *.xwd | while read i ; do b=${i%.*} ; convert $i jpg/$b.jpg ; done
+7. And split the command in file(with taking backup) ..
+    %s/-delay/\r-delay/g
+    remove images that aren't needed .. Add delay to images as u choose
+    And bring the command back into a line again
+    %s/\n/ /g
+8. Execute command
+9. Repat 7&8 as many times necessary.
+
 #or this
 https://asciinema.org/
 https://github.com/asciinema/asciinema

@@ -26,7 +26,15 @@ Arrays
 
 index is a number. Gaps are okay when initializing. those members dont exist
 
-${Array[index]}    
+#remember the flow-brace after dollar and before arr-name.
+
+${Array[index]}
+
+eg:
+a=("hello" "world")
+echo ${a[0]}   # prints hello
+echo ${#a[@]}  # prints 2. Note where # appears
+for i in ${a[@]} ; do echo happy $i ; done #  iterates.
 
 Iterating over each line of a  file
 -----------------------------------
@@ -68,3 +76,42 @@ while true; do
         * ) echo "Please answer yes or no.";;
     esac
 done
+
+Find all unique files in 2 folders
+-----------------------------------
+
+#this WONT GIVE u if a file is present twice is DIR1 itself but absent in DIR2!
+export DIR1=whatever
+export DIR2=whatever2
+find $DIR1 $DIR2 -type f -exec sha1sum '{}' \+ | sort | uniq -c --check-chars 40 | egrep '^ *1 ' | cut -c 51-
+
+Argument referencing
+--------------------
+
+http://zsh.sourceforge.net/Doc/Release/Expansion.html
+
+<Event Designator>:<Word Designator>:<Modifier>
+
+Event Designator - chooses which command
+
+!! last comand
+!-n last nth command .. !-1 is same as !-2
+!# current command so far
+
+
+Word Designator - if blank, entire command.
+
+0 - first word (command)
+1 - first arg
+n - nth arg
+$ - last arg
+
+Modifier
+
+a - abs path name
+h - like dirname
+t - like basename
+
+
+
+
