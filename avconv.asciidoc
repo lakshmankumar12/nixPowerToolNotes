@@ -34,8 +34,18 @@ avconv -i 'concat:first.mp3|second.mp3|third.mp3' final.mp3
 ----
 
 .Extract subset of time
++
+strip minutes out
++
 ----
 avconv -i yourmovie.whatever -ss starttime -t duration -sameq outputfile
+avconv -i Rasanubhavam.mp3 -ss 00:56:58 -t 00:02:31 -acodec copy thillana-Kamas.mp3
+----
++
+or if end position is known,
++
+----
+avconv -i Rasanubhavam.mp3 -ss 00:56:58 -to 01:06:43 -acodec copy thillana-Kamas.mp3
 ----
 
 .copy desktop
@@ -115,4 +125,11 @@ eyeD3 --remove-images file.mp3
 .To remove v1 tag
 ----
 id3v2 -s file.mp3
+----
+
+.To just know the image
+Create a folder and extract the image to that folder
+
+----
+mkdir -p check; eyeD3 --write-images=check *.mp3
 ----
