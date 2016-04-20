@@ -12,6 +12,13 @@ Print only the matching back-reference part
 sed -n 's/^\s*discard\(want\)discar.*$/\1/p'
 
 
+print from one patter to another
+--------------------------------
+
+sed -n '/pat1/,/pat2/p'
+sed -n '1,/pat/p'    # print from beg-of-file to pat
+sed -n '/pat/,$p'    # print from pat to end-of-file
+
 prints from 2nd line, every 3rd line.
 ------------------------------------
 
@@ -21,6 +28,9 @@ Remote color-codes form screen/tmux capture
 -------------------------------------------
 
 sed -r 's:\x1B\[[0-9;]*[mK]::g'
+
+^m
+sed -r 's:\x10::g'
 
 
 Delete empty lines
