@@ -61,6 +61,9 @@ Get rid of 1st field
 # print is implicit
 awk '{$1=""}sub(FS,"")'
 
+Strip leading/trailing white spaces
+
+function stripw(var) { gsub(/^[ \t]+/,"",var); gsub(/[ \t]+$/,"",var); return var }
 
 
 Not exactly awk, but text processing
