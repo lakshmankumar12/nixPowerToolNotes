@@ -7,3 +7,12 @@ to list threads
 
 add -L
 
+
+rdesktop args
+-------------
+
+# go full screen
+rdesktop <hostname/ip> -u "DOMAIN\Username" -z -f -x 0x81
+
+# choose a resolution and dont go full screen
+rdesktop <hostname/ip> -u "DOMAIN\Username" -z -g "80%" -x 0x81

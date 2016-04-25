@@ -50,6 +50,9 @@ git checkout -t origin/haml
 # if brach is already present locally
 git branch -u origin/remote_branch_name local_branch_name
 
+# to set the refspec right.
+git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+
 TO see all changes to a file across all branch
 ----------------------------------------------
 
@@ -286,6 +289,24 @@ git bisect start <bad> <good> --
 git bisect run /script
 
 git bisect start HEAD TiMOS-MG_0_0_I1630 --
+
+worktree
+---------
+
+git worktree add <path> [<branch>]    # add path and checkout branch into it.
+
+Eg:
+----
+$ git worktree add -b emergency-fix ../temp master
+$ pushd ../temp
+# ... hack hack hack ...
+$ git commit -a -m ´emergency fix for boss´
+$ popd
+$ rm -rf ../temp
+$ git worktree prune
+----
+
+
 
 
 Old commands equivalent

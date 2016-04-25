@@ -49,6 +49,7 @@ echo with colors
 ----------------
 
 https://en.wikipedia.org/wiki/Tput
+https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
 
 tput setaf
 
