@@ -1,9 +1,9 @@
 ps
-===
+---
 
 
 to list threads
----------------
+~~~~~~~~~~~~~~~
 
 add -L
 
@@ -16,3 +16,13 @@ rdesktop <hostname/ip> -u "DOMAIN\Username" -z -f -x 0x81
 
 # choose a resolution and dont go full screen
 rdesktop <hostname/ip> -u "DOMAIN\Username" -z -g "80%" -x 0x81
+
+# what works in dell laptop VM
+rdesktop 135.227.232.97 -u 'ENG\lnara002' -p - -z  -x 0x81 -g 1152x648 -a 32
+
+Tmux
+----
+
+#move a window form one session to another
+#  come to the window to be moved
+:move-window -t target_session_name
