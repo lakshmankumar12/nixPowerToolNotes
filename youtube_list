@@ -1,0 +1,11 @@
+Retrieve a list
+----------------
+
+developer console https://console.developers.google.com
+-> youtube-data-api
+  ->  Try this api in a explorer
+    ->  youtube.playlistItems.list
+      -> part=snippet & playlistId = "id" & maxResults = 50
+        -> execute
+    
+
