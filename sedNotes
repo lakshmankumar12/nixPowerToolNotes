@@ -55,6 +55,11 @@ Find all non-ascii characters in a file
 
 \grep --color=auto -n -P '[^\x00-\x7F]+' <file>
 
+Grep source-files for cscope for a file-list
+--------------------------------------------
+
+egrep -i '\.([chlys](xx|pp)*|cc|hh|tcl|inc)$'
+
 Delete all non-printing chars (but retain lines)
 ------------------------------------------------
 
@@ -68,6 +73,11 @@ Print from nth line to end of file
 ----------------------------------
 
 tail -n +2 <file>
+
+Print till the nth line of file
+-------------------------------
+
+head -n -3 <file>
 
 List a file wiht both hex and ascii
 -----------------------------------

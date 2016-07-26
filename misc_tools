@@ -31,3 +31,10 @@ Mosh command to pick a particular port
 ----------------------------------------
 
 mosh-server new -s -c 8 -p 60000 -l LANG=en_US.UTF-8 -l LANGUAGE=en_US -l LC_CTYPE=en_US.UTF-8
+
+Restarting network in centos
+------------------------------
+
+service network stop
+service network start
+service network restart
