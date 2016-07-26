@@ -38,3 +38,11 @@ Restarting network in centos
 service network stop
 service network start
 service network restart
+
+Fireup a quick http-server
+--------------------------
+
+#for 2.7
+python -m SimpleHTTPServer 8000
+#for 3
+python3 -m http.server 8000
