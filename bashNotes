@@ -7,7 +7,7 @@ ${i:index:len} .. substring of i starting at index(0-based) for length len
 
 is substring in string
 ----------------------
-if [[ $string == *"My long"* ]]
+if [[ $haystack == *"$needle"* ]]
 then
   echo "It's there!";
 fi
@@ -24,6 +24,9 @@ filename="${filename%.*}"
 Arrays
 ------
 
+Initialize an array literal using paranthsesis
+array=(one two three)
+
 index is a number. Gaps are okay when initializing. those members dont exist
 
 #remember the flow-brace after dollar and before arr-name.
@@ -35,6 +38,23 @@ a=("hello" "world")
 echo ${a[0]}   # prints hello
 echo ${#a[@]}  # prints 2. Note where # appears
 for i in ${a[@]} ; do echo happy $i ; done #  iterates.
+
+reference: http://www.tldp.org/LDP/abs/html/arrays.html#ARRAYSTROPS
+
+${a[@]/#/XY}  #adds a XY to the beginning of all members
+${a[@]/%/XY}  #adds a XY to the end of all members
+
+gobble a command's line into a array:
+
+IFS=$'\r\n' GLOBIGNORE='*' XYZ=($(command))
+
+In zsh
+~~~~~~
+
+sentence="Space separated collection of words"
+eval "arrayOfWords=($sentence)"
+for i in $arrayOfWords ; do echo "word in this iteration is $i"; done
+
 
 Iterating over each line of a  file
 -----------------------------------
@@ -55,6 +75,23 @@ tput setaf
 
 reset:
 tput sgr0
+
+Direct colors:
+~~~~~~~~~~~~~
+
+'\033[0;0m'
+
+set:
+'\033[1;35m'
+
+\033[ x;y;z m
+x=1 or leave.. bold text ( This doesn't work very well in solarized)
+  4 or leave.. underline
+y=30-37  .. for text color        90..97 increased intensity
+z=40-47  .. for background color  100..107 increased intensity
+
+    0  1  ..     2 3      ....    4 5       ..    6 7
+Black Red .. Green Yellow .... Blue Magenta .. Cyan White
 
 Getting yes/no or other inputs from user
 ----------------------------------------
@@ -112,6 +149,91 @@ if ( set -o noclobber; echo "$$" > "$lockfile") 2> /dev/null; then
 else
         echo "Lock Exists: $lockfile owned by $(cat $lockfile)"
 fi
+
+Argc/Argv Parsing
+-----------------
+
+good
+* long-options and short-options
+
+bad
+* can't support args after options.. Grr!
+* no unix sytle combining of options
+
+----
+#Usage: ./myscript.sh -e conf -s /etc -l /usr/lib /etc/hosts 
+# note: if this is set to > 0 the /etc/hosts part is not recognized ( may be a bug )
+while [[ $# > 1 ]]
+do
+key="$1"
+
+case $key in
+    -e|--extension)
+    EXTENSION="$2"
+    shift # past argument
+    ;;
+    -s|--searchpath)
+    SEARCHPATH="$2"
+    shift # past argument
+    ;;
+    -l|--lib)
+    LIBPATH="$2"
+    shift # past argument
+    ;;
+    --default)
+    DEFAULT=YES
+    ;;
+    *)
+            # unknown option
+    ;;
+esac
+shift # past argument or value
+done
+echo FILE EXTENSION  = "${EXTENSION}"
+echo SEARCH PATH     = "${SEARCHPATH}"
+echo LIBRARY PATH    = "${LIBPATH}"
+echo "Number files in SEARCH PATH with EXTENSION:" $(ls -1 "${SEARCHPATH}"/*."${EXTENSION}" | wc -l)
+if [[ -n $1 ]]; then
+    echo "Last line of file specified as non-opt/last argument:"
+    tail -1 $1
+fi
+
+----
+
+or
+
+good
+* unix sytle combining of options
+* can support args after options.. Grr!
+
+bad
+* no long-options support
+
+----
+OPTIND=1         # Reset in case getopts has been used previously in the shell.
+
+# Initialize our own variables:
+output_file=""
+verbose=0
+
+while getopts "h?vf:" opt; do
+    case "$opt" in
+    h|\?)
+        show_help
+        exit 0
+        ;;
+    v)  verbose=1
+        ;;
+    f)  output_file=$OPTARG
+        ;;
+    esac
+done
+
+shift $((OPTIND-1))
+
+[ "$1" = "--" ] && shift
+Leftovers=$@
+----
 
 
 Argument referencing
