@@ -79,6 +79,7 @@ tput sgr0
 Direct colors:
 ~~~~~~~~~~~~~
 
+reset:
 '\033[0;0m'
 
 set:

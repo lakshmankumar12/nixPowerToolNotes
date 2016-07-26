@@ -49,6 +49,7 @@ git checkout -t origin/haml
 
 # if brach is already present locally
 git branch -u origin/remote_branch_name local_branch_name
+git branch --set-upstream-to=upstream/remote_branch_name
 
 # to set the refspec right.
 git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
@@ -95,6 +96,16 @@ Get upstream info
 -----------------
 
 git rev-parse --abbrev-ref @{u}
+
+
+To get the commit from where you started working
+------------------------------------------------
+
+Normally, @{u} is enuf. However, if you did a git fetch, chances are @{u} has advanced.
+
+git merge-base @{u} $(git symbolic-ref --short -q HEAD)
+
+
 
 ***********
 
@@ -208,6 +219,13 @@ geting parent commit of a commit
 
 git show --quiet --pretty=format:"%P" <commit>
 
+commit~1  .. First Parent of commit
+commit~2  .. Grand(second) Parent of commit
+
+commit^1  .. First left parent of commit
+commit^2  .. second left parent of commit (meaningful for merge commits)
+
+
 which branches contain a commit
 ------------------------------
 
@@ -305,6 +323,15 @@ $ popd
 $ rm -rf ../temp
 $ git worktree prune
 ----
+
+panos-flow
+~~~~~~~~~~
+
+#to create study only branches off some tag
+git worktree add -b 60R4_study   ../../60R4_study/panos TiMOS-MG_6_0_R4
+
+#to create a regular working branch to push
+git worktree add -b mg80f ../../mg80f/panos remotes/origin/TiMOS-MG_8_0_future
 
 
 
