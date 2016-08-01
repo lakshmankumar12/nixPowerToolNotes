@@ -9,3 +9,13 @@ developer console https://console.developers.google.com
         -> execute
     
 
+Get thumbnail Pictures
+----------------------
+
+small 320x180
+http://img.youtube.com/vi/VIDEOID/mqdefault.jpg
+medium 480x360
+http://img.youtube.com/vi/VIDEOID/0.jpg
+high 1280x720 or 1920x1080 (only if 720p or 1080p)
+http://img.youtube.com/vi/VIDEOID/maxresdefault.jpg
+
