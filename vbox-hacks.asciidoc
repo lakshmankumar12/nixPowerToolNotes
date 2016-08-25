@@ -9,3 +9,18 @@ In virtual box gues, type
 sudo VBoxService --timesync-set-threshold 1000
 ----
 
+resetclipvm () {
+        op=$(ps -ef | grep VBoxClient | grep clip)
+        lines=$(echo $op | wc -l)
+        if [ $lines -ne 1 ]
+        then
+                echo "Got more than one line - $op"
+                return 1
+        fi
+        pid=$(echo $op | awk '{print $2}')
+        echo "killing pid: $pid, op:$op"
+        kill -9 $pid
+        echo "starting again"
+        /usr/bin/VBoxClient --clipboard
+}
+

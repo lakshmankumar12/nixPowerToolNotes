@@ -39,6 +39,16 @@ List all branches in server and clone
 
 git branch -a
 
+If you dont see remotes/origin branches here, then your refspec isn't good.
+
+Check repo_root/.git/config and see if you have this:
+
+[remote "origin"]
+    url = WHATEVER
+    fetch = +refs/heads/*:refs/remotes/origin/*
+
+If you are missing the fetch line, add it.
+
 checkout remote branch with tracking
 -------------------------------------
 
@@ -105,6 +115,11 @@ Normally, @{u} is enuf. However, if you did a git fetch, chances are @{u} has ad
 
 git merge-base @{u} $(git symbolic-ref --short -q HEAD)
 
+
+Difftool with a different tool
+------------------------------
+
+git difftool -t meld 
 
 
 ***********
@@ -323,6 +338,8 @@ $ popd
 $ rm -rf ../temp
 $ git worktree prune
 ----
+
+git worktree list
 
 panos-flow
 ~~~~~~~~~~
