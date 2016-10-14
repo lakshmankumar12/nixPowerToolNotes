@@ -19,3 +19,14 @@ http://img.youtube.com/vi/VIDEOID/0.jpg
 high 1280x720 or 1920x1080 (only if 720p or 1080p)
 http://img.youtube.com/vi/VIDEOID/maxresdefault.jpg
 
+youtube-dl
+-----------
+
+#List all available formats to download
+youtube-dl -F <11-char-id>
+
+#Typicall 140 has audio
+youtube-dl -f 140 <11-char-id>
+
+#options
+-o <filename>  saves in that filename.

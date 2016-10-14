@@ -27,6 +27,10 @@ Tmux
 #  come to the window to be moved
 :move-window -t target_session_name
 
+#capture a pane
+tmux capture-pane -S- -t <target>
+tmux save-buffer <path-to-dest-filename>
+
 Mosh command to pick a particular port
 ----------------------------------------
 
