@@ -29,16 +29,16 @@ For professional results (ie a brochure), use 300pxl/inch and an image of 2480 x
 1944x2592
 
 #water marking
-composite -dissolve 50% -quality 100 lnl.png fu.jpg output.jpg 
-composite -dissolve 50% -quality 100 mark.png orig.jpg mixed.jpg 
+composite -dissolve 50% -quality 100 lnl.png fu.jpg output.jpg
+composite -dissolve 50% -quality 100 mark.png orig.jpg mixed.jpg
 
-In this command: 
-  composite : to combine two images 
-  -dissolve 50% : to make the overlay image (lnl.png) 50% transparent 
-  -quality 100 : keep the quality at 100% 
-   lnl.png : the image with the text 
+In this command:
+  composite : to combine two images
+  -dissolve 50% : to make the overlay image (lnl.png) 50% transparent
+  -quality 100 : keep the quality at 100%
+   lnl.png : the image with the text
    fu.jpg : original picture
-   output.jpg : the output image 
+   output.jpg : the output image
 
 
 #creating a watermark
@@ -78,3 +78,79 @@ Steps
 https://asciinema.org/
 https://github.com/asciinema/asciinema
 https://github.com/asciinema/asciinema-player
+
+
+16:9 sizes
+----------
+
+Width      Height      Standard
+640      360      nHD
+720      405
+848      480
+60      540      qHD
+1024      576
+1280      720      HD
+1366      768
+1600      900      HD+
+1920      1080      Full HD
+2048      1152
+2560      1440      QHD
+2880      1620
+3200      1800      QHD+
+3840      2160      4K UHDTV
+4096      2304
+5120      2880      5K
+7680      4320      8K UHDTV
+15360      8640      16K
+
+4:3 sizes
+-----------
+
+    40   x    30
+    160   x    120
+    140   x    192
+    160   x    200
+    160   x    256
+    256   x    192
+    280   x    192
+    320   x    200
+    320   x    240
+    560   x    192
+    384   x    288
+    480   x    250
+    400   x    300
+    640   x    200
+    640   x    256
+    512   x    384
+    640   x    350
+    480   x    500
+    720   x    348
+    720   x    350
+    640   x    400
+    720   x    364
+    640   x    480
+    640   x    512
+    800   x    600
+    832   x    624
+    960   x    720
+    1024   x    768
+    1024   x    800
+    1120   x    832
+    1152   x    864
+    1280   x    960
+    1400   x    1050
+    1440   x    1080
+    1600   x    1200
+    1792   x    1344
+    1856   x    1392
+    1920   x    1440
+    2048   x    1536
+    2304   x    1728
+    2560   x    1920
+    2732   x    2048
+    2800   x    2100
+    3200   x    2400
+    4096   x    3072
+    6400   x    4800
+
+

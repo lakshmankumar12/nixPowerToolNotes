@@ -20,3 +20,16 @@ route print -4 135*
 
 Lowest metric is the highest priority as per http://superuser.com/a/198784[this
 superuser answer]
+
+Shortcut names
+
+%AppData%
+%UserProfile%
+%temp%
+
+http://winaero.com/blog/the-full-list-of-shell-commands-in-windows-8/
+
+shell:startup
+shell:common startup
+shell:Start Menu
+shell:Profile
