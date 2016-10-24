@@ -116,6 +116,15 @@ Normally, @{u} is enuf. However, if you did a git fetch, chances are @{u} has ad
 git merge-base @{u} $(git symbolic-ref --short -q HEAD)
 
 
+git diff args
+--------------
+
+git diff <lhs-commit> <rhs-commit> <file-path>
+
+git diff HEAD -- <all-files>
+
+
+
 Difftool with a different tool
 ------------------------------
 

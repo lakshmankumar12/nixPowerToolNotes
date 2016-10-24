@@ -16,6 +16,11 @@ convert rose.jpg -resize 595x841\! scaled-rose.png
 # split into 2 vertical halves:
 convert -crop 50%x100% +repage input_image.jpg out%d_image.jpg
 
+# rotate clockwise 90 degrees
+convert orig.jpg -rotate "90" rotated.jpg
+# rotate anti-clockwise 90 degrees
+convert orig.jpg -rotate "-90" rotated.jpg
+
 # Details on A4 size:
 A4 is 210 x 297mm. <Millimeters>
 An image is expressed in pixels x pixels.
