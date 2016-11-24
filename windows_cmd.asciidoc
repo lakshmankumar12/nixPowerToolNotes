@@ -8,6 +8,14 @@ Grep Equivalent
 output | findstr "String"
 ----
 
+Get MotherBoard Info
+--------------------
+
+C:\Users\lnara002>wmic baseboard get product,Manufacturer,version,serialnumber
+Manufacturer           Product    SerialNumber     Version
+ASUSTeK COMPUTER INC.  Z97M-PLUS  140933017106254  Rev X.0x
+
+C:\Users\lnara002>
 
 Display Routing Table
 ---------------------

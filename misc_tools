@@ -50,3 +50,10 @@ Fireup a quick http-server
 python -m SimpleHTTPServer 8000
 #for 3
 python3 -m http.server 8000
+
+
+zip
+---
+
+#list files in a zip
+unzip -l zipfile.zip

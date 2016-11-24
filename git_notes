@@ -146,6 +146,8 @@ Vim-fugitive notes
 :Glog -n 5         #log the current-file, until 5 commits
 :Glog -n 5 --      #log from HEAD to HEAD~4
 
+To get the current commit while watching Gedit - y, then ^g
+
 Equivalents
 -----------
 
@@ -427,3 +429,19 @@ detached head state
 remote branches
 tracking
 namespaces
+
+
+
+*******
+
+cvs commands
+
+#set a CVSROOT
+cvs -d '<...>' co repoName
+
+#get root
+cat CVS/Root
+
+#update a repo
+cvs update -Pqd
+
