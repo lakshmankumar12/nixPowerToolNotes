@@ -174,6 +174,10 @@ There are 3 object types
 
 A branch is simply a pointer to a commit. HEAD is a pointer to the current branch!
 
+Know type of a sha
+------------------
+
+git cat-file -t <sha>
 
 Get new clone
 -----------
@@ -351,6 +355,18 @@ $ git worktree prune
 ----
 
 git worktree list
+
+goto root of repo
+-----------------
+
+#gives absolute path
+git rev-parse --show-toplevel
+
+#gives relative-path (or) empty if already in root
+git rev-parse --show-cdup
+
+#useful bash-alias for bashrc
+alias gitroot='cd ./$(git rev-parse --show-cdup)'
 
 panos-flow
 ~~~~~~~~~~

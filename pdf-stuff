@@ -14,7 +14,7 @@ pdftk input.pdf background mark.pdf output marked-file.pdf
 
 
 # jdf-tewak
-java -jar ./jpdftweak.jar 
+java -jar ./jpdftweak.jar
 
 
 # Rotate the first PDF page to 90 degrees clockwise
@@ -34,7 +34,7 @@ InfoValue: DocBook,writing,documentation,background
 # ... You can change only the following metadata items with pdftk: title, author, subject, producer, and keywords.
 #
 
-# extract a picture from a pdf
+# extract a jpeg/picture from a pdf
 convert -verbose -density 150 -trim file.pdf -quality 100 -sharpen 0x1.0 output.jpg
 
 # Add password
@@ -42,7 +42,7 @@ convert -verbose -density 150 -trim file.pdf -quality 100 -sharpen 0x1.0 output.
 #The user password, if set, is what you need to provide in order to open a PDF.
 #Acrobat/Reader will prompt a user to enter the user password. If it's not
 #correct, the document will not open.
- 
+
 #The owner password, if set, controls permissions, such as printing, editing,
 #extracting, commenting, etc. Acrobat/Reader will disallow these things
 #based on the permission settings. Acrobat will require this password if you
@@ -56,3 +56,7 @@ pdftk 1.pdf output 1.128.pdf owner_pw foo user_pw baz
 
 #Same as above, except printing is allowed (once the PDF is open)
 pdftk 1.pdf output 1.128.pdf owner_pw foo user_pw baz allow printing
+
+#Get no of pages
+pdftk my.pdf dump_data | grep NumberOfPages
+

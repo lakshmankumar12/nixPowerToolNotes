@@ -57,3 +57,12 @@ zip
 
 #list files in a zip
 unzip -l zipfile.zip
+
+grep
+----
+
+Highlight non-ascii chars
+++++++++++++++++++++++++++
+(find unicode)
+
+\grep --color=auto -nH -P  '[^\x00-\x7F]' /tmp/a
