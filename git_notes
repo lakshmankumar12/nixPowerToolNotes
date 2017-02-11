@@ -79,6 +79,24 @@ git log --name-only          # display names of files changed with every commit
 
 git log --pretty=fuller      # shows both dates
 
+
+Various pretty
+--------------
+
+git log --pretty=oneline     # <sha1> <title line>
+                 short       # 2LH + message, commit/author
+                 medium
+                 full
+                 fuller
+                 format:".."
+
+                 %H/%h = commit hash/abbr-hash
+                 %T/%t = tree   hash/abbr-hash
+                 %P/%p = parent hashes
+                 %an   = author name
+                 %ad/%aD/%ar/%i/%I = author-date  (data=/2822/relative/unixTim/ISO8601/strict)
+                 %cd/%cD/%cr/%i/%I = author-date  (data=/2822/relative/unixTim/ISO8601/strict)
+
 To get the tag done on a given date
 -----------------------------------
 
@@ -87,6 +105,11 @@ git describe branch_name@{mar.04.2016}  # This uses reflog.. so u may see only a
 git log branch_name --until=aug.04.2016
 
 git describe --tags $(git rev-list -n 1 --before=05.aug.2015 HEAD)  #sub head with branch if u are not in branch
+
+mgtags 80S | tail -n 100 | while read i ; do npgit log -n 1 --decorate --pretty=format:"$i %cD" $i ; echo ; ; done
+
+#print every 50th tag.
+mgtags 80S | sed -n '1~50p' | while read i ; do npgit log -n 1 --decorate --pretty=format:"$i %cD" $i ; echo ; ; done
 
 To quickly get the sha-1 of any tag/branch-name/commit-representative!
 ----------------------------------------------------------------------
@@ -128,7 +151,7 @@ git diff HEAD -- <all-files>
 Difftool with a different tool
 ------------------------------
 
-git difftool -t meld 
+git difftool -t meld
 
 
 ***********
@@ -184,7 +207,7 @@ Get new clone
 
 git-ws --branch v160.main asr5k/master.git master
 
-git submodule  
+git submodule
 git submodule status | grep '^ '
 
 rolldown:
@@ -384,14 +407,14 @@ Old commands equivalent
 -----------------------
 
 bk -r diffs -u -p            git diff -u -p
-bk sfiles -Ug                git ls-tree -r HEAD --name-only 
+bk sfiles -Ug                git ls-tree -r HEAD --name-only
 bk sfiles -cg                git ls-files --modified
 bk sfiles -gp                git ls-files --cached
 bk unedit <file>             git checkout -- <file>                       .. careful!
 bk unedit $(bk sfiles -cg)   git checkout -- $(git ls-files --modified)   .. careful!
 bk delta -Y $(..)            git add $(git ls-files --modified)
 bk sfiles -x                 ??
-bk changes                   git log 
+bk changes                   git log
 bk changes -L                git log  origin/v160.main..HEAD
 bk changes -R                git fetch ; git log ..origin/v160.main
                              git fetch ; git log ..$(git branch -vv | grep '^*' | awk -F\' '{print $2}')
@@ -400,7 +423,7 @@ model                        git submodule status | grep -v '^-'
                              git submodule status | grep -v '^-' | awk ' {print $2 }' | awk -F\/ '{print $2}'| grep -v buildtools
 bk undo -r<>                 git reset --hard HEAD~1
 bk cset -x                   ??
-bk export -tpatch            git show --pretty=format: <commit> | tail -n +2 
+bk export -tpatch            git show --pretty=format: <commit> | tail -n +2
 bk changes -u<user>          git log --author=<user>
 bk changes -/text/           git log --grep=<text>
 
