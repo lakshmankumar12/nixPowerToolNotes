@@ -97,6 +97,10 @@ git log --pretty=oneline     # <sha1> <title line>
                  %ad/%aD/%ar/%i/%I = author-date  (data=/2822/relative/unixTim/ISO8601/strict)
                  %cd/%cD/%cr/%i/%I = author-date  (data=/2822/relative/unixTim/ISO8601/strict)
 
+--name-only   : Adds filenames
+--name-status : Adds a M to filename.
+--stat        : count of lines changed.
+
 To get the tag done on a given date
 -----------------------------------
 
