@@ -79,3 +79,13 @@ Highlight non-ascii chars
 (find unicode)
 
 \grep --color=auto -nH -P  '[^\x00-\x7F]' /tmp/a
+
+Draw ascii figures in web
+---------------------------
+
+textik.com
+
+Excel stuff
+------------
+
+SUMIF(range, criteria, sum-range)
