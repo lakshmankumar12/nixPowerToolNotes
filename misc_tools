@@ -35,6 +35,26 @@ tmux save-buffer <path-to-dest-filename>
 ... | tmux loadb -
 tmux saveb - | ...
 
+#bg-color change of current pane
+tmux select-pane -t:.1 -P 'bg=red'
+#bg-color of  a target pane
+tmux select-pane -t:.1 -P 'bg=red'
+
+#restore to detaul
+-P 'default'
+-P 'fg=red,bg=yellow'
+-P 'fg=colour48,bg=black'
+
+#some good fg colors that stand distinct in our sol-background
+colour45  <- bluish
+colour48  <- greenish
+colour201 <- pinkish
+colour190 <- yellowish
+colour196 <- reddish
+
+#Note too many fd/files open issue in tmux
+Ensure your original tmux and the attached-client version are same!
+
 ssh
 ---
 

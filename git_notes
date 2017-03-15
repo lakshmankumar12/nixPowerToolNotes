@@ -57,7 +57,7 @@ git checkout --track -b <local branch> <remote>/<tracked branch>
 # if -b <name> is to be same as remote's name, you can skip it
 git checkout -t origin/haml
 
-# if brach is already present locally
+# if brach is already present locally / existing track
 git branch -u origin/remote_branch_name local_branch_name
 git branch --set-upstream-to=upstream/remote_branch_name
 
@@ -403,6 +403,19 @@ git worktree add -b 60R4_study   ../../60R4_study/panos TiMOS-MG_6_0_R4
 
 #to create a regular working branch to push
 git worktree add -b mg80f ../../mg80f/panos remotes/origin/TiMOS-MG_8_0_future
+
+
+Avoid typing passwords
+----------------------
+
+#WARNING: very very weak. All passwords in clear text 
+
+#locally update your repo's config.
+git config credentials.helper store
+
+#your password will bein ~/.git-credentials in clear text.
+
+
 
 
 

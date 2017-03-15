@@ -251,6 +251,18 @@ shift $((OPTIND-1))
 Leftovers=$@
 ----
 
+Finding who set that env variable
+---------------------------------
+
+env - typically lists variables in the order in which it was set.
+
+zsh -xl --> Super dump of all scripts that is run during a sesseion init.
+
+bash:
+PS4='+$BASH_SOURCE> ' BASH_XTRACEFD=7 bash -xl 7>&2
+
+source: http://unix.stackexchange.com/a/154971
+
 
 Argument referencing
 --------------------
