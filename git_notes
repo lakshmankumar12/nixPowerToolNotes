@@ -157,6 +157,26 @@ Difftool with a different tool
 
 git difftool -t meld
 
+stash
+------
+
+#create a stash
+git stash
+
+#re-apply a stash
+git stash pop
+
+#list all stashes
+git stash list
+
+#delete a stash
+git stash drop
+git stash drop stash@{1}
+
+#show content w/o applying
+git stash show -p
+git stash show -p stash@{1}
+
 
 ***********
 
