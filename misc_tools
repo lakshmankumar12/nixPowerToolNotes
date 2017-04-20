@@ -109,3 +109,35 @@ Excel stuff
 ------------
 
 SUMIF(range, criteria, sum-range)
+
+
+Sequence Diagrams
+-----------------
+
+https://www.websequencediagrams.com/
+
+title: Some Title for the Entire Seq Diag
+
+A -> B: Just introduce A and B and a directed msg between then
+note right of A: boxed message.
+A --> B: Dotted line from A to B.
+
+A->+B: start of vertical box at B
+B->A:  B's response to A.
+
+destroy B     // Put a x at B.
+
+
+alt cond1
+  A->B:
+else cond2
+  A->B:
+
+Encrypt  / Decrypt
+------------------
+
+#encrypt
+openssl enc -in foo.bar -aes-256-cbc -pass stdin > foo.bar.enc
+
+#decrypt
+openssl enc -in foo.bar.enc -d -aes-256-cbc -pass stdin > foo.bar
