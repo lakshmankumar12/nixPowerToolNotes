@@ -1,0 +1,19 @@
+
+command + left/right : Jump start of line/end of line
+option  + left/right : Jump start of word
+command + up/down : Jump para'ish
+
+In general:
+
+command + green -> maximize w/o full-screen
+
+
+chrome:
+
+command+t -> new tab
+command+click -> new tab
+command+shift+click -> new tab + focus
+shift + green -> maximize
+
+
+
