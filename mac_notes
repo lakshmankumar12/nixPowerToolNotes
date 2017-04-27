@@ -1,19 +1,100 @@
+General Desktop:
+----------------
+
+Gestures:
+~~~~~~~~~
+
+#Same like chrombook:
+2 finger for scroll
+2 finger touch for right click
+3 finger up -> show all windows. This is called mission-control
+3 finger down ->
+#New in MAC:
+3 finger left/right -> for window change (like alt-tab)
+
+Green-button           -- fullscreen
+Double-click on title  -- zoom
+Shift+Green-button     -- maximize w/o full-screen (Doesn't work?)
+
+Keyboard
+~~~~~~~~~
+
+Command + Tab  -- alt tab between windows
+double-click   -- maximize w/o full-screen
+
+command + options + d  -> hide/unhide dock
+
+command + c - copy
+command + v - paste
+command + x - cut
+command + w - close tab
+
+command + shift + [  ]  - shift tabs in chrome
+
+control + up - Mission control (also use F3 in mac-keyboard)
+control + left/right -> switch desktop
+
+ctrl + F2 -> menu bar
+ctrl + F3 -> go to dock, then use up/down arrow
+
+show desktop - F11
+
+custom-set ones:
+----------------
+
+(These are set using automator as services. You should see them in App->services in menu-bar for them to work)
+
+command + control + option - 7  -- iTerm
+command + control + option - 8  -- outlook
+command + control + option - 9  -- chrome
+
+command + shift + l --  lock screen
+command + shift + m --  zoom/maximize (doesnt work?)
+
+Things to Know/Terminologies
+--------------------------
+
+Mission Control -> The all windows splashing stuff
+LaunchPad       -> Grid of apps
+
+Text Movements:
+----------------
 
 command + left/right : Jump start of line/end of line
-option  + left/right : Jump start of word
+option  + left/right : Jump start of word      <--- MOST FREQUENT NEED
 command + up/down : Jump para'ish
 
-In general:
-
-command + green -> maximize w/o full-screen
-
-
 chrome:
+--------
 
-command+t -> new tab
-command+click -> new tab
-command+shift+click -> new tab + focus
-shift + green -> maximize
+command+t           -> new tab
+command+click       -> new tab
+command+shift+click -> new tab + focus   # MOST USED
+command+l           -> address bar
+
+iTerm
+-----
+
+Command +   +/-  -->  Font size increase decrease
+
+Pop-up a message
+------------------
+
+osascript -e 'display notification "Lorem ipsum dolor sit amet" with title "Title"'
+
+YET TO FIND:
+~~~~~~~~~~~~
+
+* how to shift tabs (as in 3 finger scroll in chromebook) with gesture
+* how to shut display of mac with a second monitor, with mac lid open?
+  * how to move all windows to another display in dual monitor case, where i haven't closed my mac-lid
+   (using mirroring for now)
+* zoom/maximize sometimes only vertically maximizes (eg: iTerm, chrome!, no option/shift/command click doesn't work)
+* mission control splashes all windows, but doesn't have a way to choose an app using keyboard.
+* Hotkey to open up iTerm sucks at best, very unpredictable working sometimes and not working at times.
+  Hotkey to lock too has same flaky behavior
+* How to auto adjust font-size for iTerm based on display?
+
 
 
 
