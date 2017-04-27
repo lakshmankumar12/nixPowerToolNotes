@@ -27,9 +27,8 @@ command + options + d  -> hide/unhide dock
 command + c - copy
 command + v - paste
 command + x - cut
-command + w - close tab
+command + w - close tab/window
 
-command + shift + [  ]  - shift tabs in chrome
 
 control + up - Mission control (also use F3 in mac-keyboard)
 control + left/right -> switch desktop
@@ -38,6 +37,13 @@ ctrl + F2 -> menu bar
 ctrl + F3 -> go to dock, then use up/down arrow
 
 show desktop - F11
+
+Tabby-stuff (for iTerm/Chrome)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+command+t               -- new tab
+Command + 1..9          -- nth tab
+command + shift + [  ]  -- shift tabs
 
 custom-set ones:
 ----------------
@@ -67,9 +73,8 @@ command + up/down : Jump para'ish
 chrome:
 --------
 
-command+t           -> new tab
-command+click       -> new tab
-command+shift+click -> new tab + focus   # MOST USED
+command+click       -> open link in new tab
+command+shift+click -> open link in new tab + focus   # MOST USED
 command+l           -> address bar
 
 iTerm
