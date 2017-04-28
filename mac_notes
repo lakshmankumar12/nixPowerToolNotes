@@ -31,6 +31,7 @@ command + w - close tab/window
 
 
 control + up - Mission control (also use F3 in mac-keyboard)
+control + down - show all windows of the current application (when u have multiple tabs of the same app)
 control + left/right -> switch desktop
 
 ctrl + F2 -> menu bar
@@ -82,10 +83,22 @@ iTerm
 
 Command +   +/-  -->  Font size increase decrease
 
+Outlook
+--------
+
+Comman + T  --> mark an item as read.
+
 Pop-up a message
 ------------------
 
 osascript -e 'display notification "Lorem ipsum dolor sit amet" with title "Title"'
+
+Restart dock
+------------
+
+#when some icon has notification info stuck
+killall Dock
+
 
 YET TO FIND:
 ~~~~~~~~~~~~
@@ -99,7 +112,5 @@ YET TO FIND:
 * Hotkey to open up iTerm sucks at best, very unpredictable working sometimes and not working at times.
   Hotkey to lock too has same flaky behavior
 * How to auto adjust font-size for iTerm based on display?
-
-
 
 

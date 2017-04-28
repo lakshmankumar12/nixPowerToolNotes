@@ -94,6 +94,8 @@ tput sgr0
 Direct colors:
 ~~~~~~~~~~~~~
 
+echo -ne 'Any of these in single quote'
+
 reset:
 '\033[0;0m'
 
