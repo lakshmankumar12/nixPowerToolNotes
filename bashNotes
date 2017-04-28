@@ -75,6 +75,10 @@ Note: for i in $(cat line) .. will interate over each word of the file, not line
 Note: cat file | while     .. wont cut it as while will work in a bash of its own and variables modifed inside
                                          while wont be seen by this bash.
 
+while read i ; do ... done   < $(another cmd) <- wont work. as that captures the output into a string.
+
+while read i ; do ... done   < <(another cmd) <- works. as that creates a named-pipe (a fd) and that can be given as stdin.
+
 List all key-bindings in zsh
 -----------------------------
 
@@ -264,6 +268,12 @@ bash:
 PS4='+$BASH_SOURCE> ' BASH_XTRACEFD=7 bash -xl 7>&2
 
 source: http://unix.stackexchange.com/a/154971
+
+ps
+--
+
+#with long names
+ps -e -o "pid,user:16,command"
 
 
 Argument referencing

@@ -110,6 +110,15 @@ Excel stuff
 
 SUMIF(range, criteria, sum-range)
 
+lsof
+-----
+
+#find all fd's of a process
+lsof -p <pid>
+
+#find the process listeing on a given port
+lsof -i :<port>
+
 
 Sequence Diagrams
 -----------------

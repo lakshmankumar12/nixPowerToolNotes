@@ -103,11 +103,16 @@ killall Dock
 YET TO FIND:
 ~~~~~~~~~~~~
 
+Big Bummers in that order:
+* Outlook has no format painter! [ :( ]
+* zoom/maximize sometimes only vertically maximizes (eg: iTerm, chrome!, no option/shift/command click doesn't work)
+
+Other inconveniences:
+
 * how to shift tabs (as in 3 finger scroll in chromebook) with gesture
 * how to shut display of mac with a second monitor, with mac lid open?
   * how to move all windows to another display in dual monitor case, where i haven't closed my mac-lid
    (using mirroring for now)
-* zoom/maximize sometimes only vertically maximizes (eg: iTerm, chrome!, no option/shift/command click doesn't work)
 * mission control splashes all windows, but doesn't have a way to choose an app using keyboard.
 * Hotkey to open up iTerm sucks at best, very unpredictable working sometimes and not working at times.
   Hotkey to lock too has same flaky behavior
