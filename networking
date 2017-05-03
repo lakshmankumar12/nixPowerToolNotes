@@ -1,0 +1,65 @@
+
+iproute2
+
+http://lartc.org/howto/
+
+L2-ish
+------
+
+#list all interfaces
+ip link list
+
+#arp
+ip neigh show
+#actual info is in /proc/net/arp
+
+#delete a apr cache
+ip neigh delete 9.3.76.43 dev eth0
+
+#add a vlan
+ip link add link eth0 name eth0.2 type vlan id 2
+## The loose_binding flag stops the VLAN interface from tracking the line protocol status of the underlying device.
+## Also note the .2 name is not mandatory. But its nice to have that for convention!
+ip link add link eth0 name myvlan type vlan id 2 loose_binding on
+ip link delete myvlan type vlan
+ip link add foo type vlan help
+
+#create a tun/tap interface
+ip tuntap add dev mytap mode tap user md
+
+#create a bridge
+ip link add name bridge_name type bridge
+ip link set bridge_name up
+ip link delete bridge_name type bridge
+
+#add/del a interface to a bridge
+ip link set eth0 master bridge_name
+ip link set eth0 nomaster
+
+L3-ish
+------
+
+#list ip
+ip addr show
+
+#list a particular interface
+ip addr show eth0
+
+Routing-ish
+------------
+
+#list routes
+ip route show
+
+#find local ip used for a route
+ip route get <ip>
+ip route get <ip> | awk ' {print $NF; exit}'
+
+#routing policy (What the heck is that)
+ip rule list
+---
+  0:      from all lookup local
+  32766:  from all lookup main
+  32767:  from all lookup default
+---
+

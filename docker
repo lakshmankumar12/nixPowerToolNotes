@@ -1,0 +1,77 @@
+Concepts
+--------
+
+https://docs.docker.com/get-started/
+
+Images : (like program files) - Files with information
+Container: (like process) - One running instance of a image. After a container is done, its goes to stopped state.
+Dockerfile: Prepares a image
+Local-Image-Registry: Machine local repository of image.
+
+#list images
+docker images
+
+#list containers
+docker ps
+#list just id
+docker ps -q
+
+#info
+docker version
+docker info
+
+#login from command-shell
+docker login
+
+#build from a Dockerfile
+# -t  is the name of the image
+docker build -t friendlyhello .
+
+Running a image
+~~~~~~~~~~~~~~~~
+
+#run a image
+docker run hello-world
+
+#-p map port 4000 of local machine to 80 of container
+#-d run in detached mode
+docker run -d -p 4000:80 friendlyhello
+
+#delete a container
+docker rm <container-id>
+
+Networking
+~~~~~~~~~~
+
+* There are 3 networks - bridge / host / none. By default, all containers run in the bridge network
+
+docker network ls
+docker network inspect bridge
+
+
+Dockerfile
+----------
+
+FROM some_base_image:version
+
+# Set the working directory to /app
+WORKDIR /app
+
+# Copy the current directory contents into the container at /app
+# Do this if you prepare ur image from a particular folder
+ADD . /app
+
+# Install any needed packages specified in requirements.txt
+RUN pip install -r requirements.txt
+
+# Make port 80 available to the world outside this container
+EXPOSE 80
+
+# Define environment variable
+ENV NAME World
+
+# Run app.py when the container launches
+CMD ["python", "app.py"]
+
+
+

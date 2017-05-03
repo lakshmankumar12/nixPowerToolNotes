@@ -150,3 +150,9 @@ openssl enc -in foo.bar -aes-256-cbc -pass stdin > foo.bar.enc
 
 #decrypt
 openssl enc -in foo.bar.enc -d -aes-256-cbc -pass stdin > foo.bar
+
+wget/curl
+----------
+
+curl 'http://...link' -o out_file
+wget '..' -O out_file

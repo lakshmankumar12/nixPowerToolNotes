@@ -37,7 +37,7 @@ control + left/right -> switch desktop
 ctrl + F2 -> menu bar
 ctrl + F3 -> go to dock, then use up/down arrow
 
-show desktop - F11
+show desktop - F11 (doest work on mac keyboard though)
 
 Tabby-stuff (for iTerm/Chrome)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -87,6 +87,12 @@ Outlook
 --------
 
 Comman + T  --> mark an item as read.
+
+Finder
+-------
+
+Command-up   -> one folder up
+Command-down -> go into selected foler (like enter)
 
 Pop-up a message
 ------------------
