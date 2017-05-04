@@ -27,15 +27,32 @@ docker login
 # -t  is the name of the image
 docker build -t friendlyhello .
 
+#push a image to repo
+#if :tag is omitted, it tagged as :latest and existing :latest is lost.
+docker tag local_image_name lakshmankumar12/repo_name:tag_to_this_version_of_image
+
 Running a image
 ~~~~~~~~~~~~~~~~
 
-#run a image
+#syntax
+docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
+
+#simplest -- just run a image, with the program mentioned as part of image
 docker run hello-world
 
-#-p map port 4000 of local machine to 80 of container
+#-p host-port:cont-port  -> map port 4000 of local machine to 80 of container
+#-P                      -> (no-arg) auto-map random ports of host to all exposed container ports
 #-d run in detached mode
+#-e NAME=VALUE  -> set env NAME and give VALUE
+#-u userid      -> start as that userid
+#-v host-folder:cont-folder[:ro]    -> mount host-folder at cont-folder
+#-t             -> Give a tty
+#-i use this image
 docker run -d -p 4000:80 friendlyhello
+
+
+#Other run args:
+--rm   -> remove the container on exit
 
 #delete a container
 docker rm <container-id>
@@ -48,6 +65,21 @@ Networking
 docker network ls
 docker network inspect bridge
 
+Volumes
+~~~~~~~~
+
+* Created using docker create or implicitly by docker run
+* A volume is a directly in a container/image that bypasses UFS
+  * volumes are initialized when (runtime)containers are created. If the baseimage
+    has data at that location, then that data is copied into the newly initalized
+    volume. (This doesnt apply to host-mounted dir/file)
+  * Data volumes can be shared and reused among containers.
+  * Changes to a data volume are made directly.
+  * Changes to a data volume will not be included when you update an image.
+  * Data volumes persist even if the container itself is deleted.
+* Data volumes have persist lifetime, and not related to container lifetime
+
+(I dont understand this fully - for now -v host-dir:container-dir is good enuf)
 
 Dockerfile
 ----------

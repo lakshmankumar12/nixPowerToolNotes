@@ -55,7 +55,7 @@ ip route show
 ip route get <ip>
 ip route get <ip> | awk ' {print $NF; exit}'
 
-#routing policy (What the heck is that)
+#routing policy
 ip rule list
 ---
   0:      from all lookup local
@@ -63,3 +63,9 @@ ip rule list
   32767:  from all lookup default
 ---
 
+#show a routing-table
+ip route show table all
+ip route show table local
+
+# dump all iptables rule
+iptables-save
