@@ -149,10 +149,9 @@ Other inconveniences:
 * how to shut display of mac with a second monitor, with mac lid open?
   * how to move all windows to another display in dual monitor case, where i haven't closed my mac-lid
    (using mirroring for now)
-* mission control splashes all windows, but doesn't have a way to choose an app using keyboard.
 * Hotkey to open up iTerm sucks at best, very unpredictable working sometimes and not working at times.
   Hotkey to lock too has same flaky behavior
-    -- Found the proble. We need to ensure every app, shows this in its (apple) -> app -> services list.
+    -- For one, we need to ensure every service-shortcut shows up in (apple) -> app -> services list.
 * How to auto adjust font-size for iTerm based on display?
    -- I am just manually cmd- +/-'ing everytime
 
