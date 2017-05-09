@@ -154,5 +154,11 @@ openssl enc -in foo.bar.enc -d -aes-256-cbc -pass stdin > foo.bar
 wget/curl
 ----------
 
+# -f  --> be quiet on failures (Not sure, what failures are okay and what shouldn't be quietened)
+# -s  --> silent or quiet mode. Mute o/p
+# -S  --> when used with -s, -S will show errors
+# -L  --> Track redirects
 curl 'http://...link' -o out_file
+
+
 wget '..' -O out_file

@@ -521,3 +521,32 @@ cat CVS/Root
 #update a repo
 cvs update -Pqd
 
+*******
+
+svn commands
+=============
+
+Reference: http://svnbook.red-bean.com/en/1.7/index.html
+
+Concepts
+----------
+
+Revisions
+~~~~~~~~~
+
+HEAD     -> the top one in the repo
+BASE     -> the one in my working-dir, before my changes
+COMMITED -> the actual revision starting from BASE(inclusive) in which the file changed.
+PREV     -> COMMITED-1.
+
+branches are represented as sub-folders in repos/your_repo_name/branches/branch_name
+master is under                            repos/your_repo_name/trunk/
+
+Commands
+---------
+
+#log a file
+svn log filename
+
+#get a particular version of file
+svn cat -r 3 http://svn.red-bean.com/repos/test/readme.txt

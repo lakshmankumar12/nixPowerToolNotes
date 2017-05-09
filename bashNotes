@@ -30,6 +30,12 @@ dirname=$(dirname "$fullpathfile")
 extension="${filename##*.}"
 filename="${filename%.*}"
 
+Passing Arguments
+-----------------
+
+$*    -- all args as a single word
+$@    -- all args are intact, as invidivual quoted strings
+
 
 Arrays
 ------

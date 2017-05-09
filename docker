@@ -2,6 +2,7 @@ Concepts
 --------
 
 https://docs.docker.com/get-started/
+https://github.com/wsargent/docker-cheat-sheet
 
 Images : (like program files) - Files with information
 Container: (like process) - One running instance of a image. After a container is done, its goes to stopped state.
@@ -10,6 +11,10 @@ Local-Image-Registry: Machine local repository of image.
 
 #list images
 docker images
+docker images -a
+
+#remove images
+docker rmi <image-id>
 
 #list containers
 docker ps
@@ -56,6 +61,13 @@ docker run -d -p 4000:80 friendlyhello
 
 #delete a container
 docker rm <container-id>
+
+#find the mapped ports
+docker port devbox
+
+#elimitate prune
+docker image prune
+
 
 Networking
 ~~~~~~~~~~

@@ -69,3 +69,9 @@ ip route show table local
 
 # dump all iptables rule
 iptables-save
+
+List all open ports
+--------------------
+
+
+ss -l -p -n

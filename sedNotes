@@ -90,3 +90,6 @@ Using find
 List upto a certain depth
 
 find -maxdepth 2 .
+
+#ls just dirs
+find . -maxdepth 1 ! -path . -type d

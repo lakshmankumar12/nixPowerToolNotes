@@ -28,6 +28,7 @@ command + c - copy
 command + v - paste
 command + x - cut
 command + w - close tab/window
+command + option + w - close all windows/tabs
 
 
 control + up - Mission control (also use F3 in mac-keyboard)
@@ -42,9 +43,11 @@ show desktop - F11 (doest work on mac keyboard though)
 Tabby-stuff (for iTerm/Chrome)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-command+t               -- new tab
-Command + 1..9          -- nth tab
-command + shift + [  ]  -- shift tabs
+command+t                       -- new tab
+Command + 1..9                  -- nth tab
+command + shift + [  ]          -- shift tabs
+command + shift + options [  ]  -- move tabs (doesn't work in chrome, but works for iterm)
+
 
 custom-set ones:
 ----------------
@@ -94,6 +97,16 @@ Finder
 Command-up   -> one folder up
 Command-down -> go into selected foler (like enter)
 
+Dont make mac go to sleep
+--------------------------
+
+#-t <>  time in sec, omit it if u want forever
+#-d     dont display sleep
+#-i     dont idle sleep (Whatever is that from normal sleep)
+#-m     no disk sleep
+#-s     no sleep on ac-power
+caffeinate -t 3600 -d -m -i -s &
+
 Pop-up a message
 ------------------
 
@@ -105,23 +118,42 @@ Restart dock
 #when some icon has notification info stuck
 killall Dock
 
-
 YET TO FIND:
 ~~~~~~~~~~~~
 
+* how to shift tabs (as in 3 finger scroll in chromebook) with gesture
+
+AWESOME in mac
+--------------
+
+* Screen
+* Speed it opens up -- both sleep/boot
+* weight of the laptop!
+* its full-screen mode
+  * you still get system notifications
+  * you hover mouse up and see the desktop status icons (and access everything off there)
+* mouse gestures
+* iterm integration with opening files by Command+click
+
 Big Bummers in that order:
+---------------------------
+
 * Outlook has no format painter! [ :( ]
 * zoom/maximize sometimes only vertically maximizes (eg: iTerm, chrome!, no option/shift/command click doesn't work)
+* mission control should have a way to keyboard-select app of choice.
+* Absence of a application-key that emulates a right click at a location.
 
 Other inconveniences:
+-----------------------
 
-* how to shift tabs (as in 3 finger scroll in chromebook) with gesture
 * how to shut display of mac with a second monitor, with mac lid open?
   * how to move all windows to another display in dual monitor case, where i haven't closed my mac-lid
    (using mirroring for now)
 * mission control splashes all windows, but doesn't have a way to choose an app using keyboard.
 * Hotkey to open up iTerm sucks at best, very unpredictable working sometimes and not working at times.
   Hotkey to lock too has same flaky behavior
+    -- Found the proble. We need to ensure every app, shows this in its (apple) -> app -> services list.
 * How to auto adjust font-size for iTerm based on display?
+   -- I am just manually cmd- +/-'ing everytime
 
 
