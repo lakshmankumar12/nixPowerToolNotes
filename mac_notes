@@ -38,6 +38,8 @@ control + left/right -> switch desktop
 ctrl + F2 -> menu bar
 ctrl + F3 -> go to dock, then use up/down arrow
 
+command + enter -> full-screen/out-of-full-screen
+
 show desktop - F11 (doest work on mac keyboard though)
 
 Tabby-stuff (for iTerm/Chrome)
@@ -80,6 +82,8 @@ chrome:
 command+click       -> open link in new tab
 command+shift+click -> open link in new tab + focus   # MOST USED
 command+l           -> address bar
+
+command+up/down     -> Goto top of page/bottom of page.   # Useful suprising more often.
 
 iTerm
 -----
@@ -139,6 +143,8 @@ Big Bummers in that order:
 ---------------------------
 
 * Outlook has no format painter! [ :( ] And doesn't paste-text with formatting preserved. Yikes!
+* Auto-hotkey (karabiner seems unavailable in mac-os, that is suggested as alternative)
+  I basically just need scrollup/down, and hjkl navigation
 * zoom/maximize sometimes only vertically maximizes (eg: iTerm, chrome!, no option/shift/command click doesn't work either)
 * mission control should have a way to keyboard-select app of choice.
 * Absence of a application-key that emulates a right click at a location.

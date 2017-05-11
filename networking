@@ -24,6 +24,10 @@ ip link add link eth0 name myvlan type vlan id 2 loose_binding on
 ip link delete myvlan type vlan
 ip link add foo type vlan help
 
+#old/deprecated
+vconfig add lan ${id}
+vconfig rem ${ifname}
+
 #create a tun/tap interface
 ip tuntap add dev mytap mode tap user md
 
@@ -41,6 +45,9 @@ L3-ish
 
 #list ip
 ip addr show
+
+#useful version
+ip addr show | awk '/^[0-9]+:/ {ifname=$2} /^ *inet / {print ifname " " $2; }' | grep ""
 
 #list a particular interface
 ip addr show eth0

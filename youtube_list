@@ -23,10 +23,16 @@ youtube-dl
 -----------
 
 #List all available formats to download
-youtube-dl -F <11-char-id>
+export videoid=<11-char-id>
+youtube-dl -F $videoid
+
+#List all information as json
+youtube-dl -j $videoid
+youtube-dl -j $videoid | pretty_json.py | grep "description"
+
 
 #Typicall 140 has audio
-youtube-dl -f 140 <11-char-id>
+youtube-dl -f 140 $videoid
 
 #options
 -o <filename>  saves in that filename.
