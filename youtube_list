@@ -13,11 +13,11 @@ Get thumbnail Pictures
 ----------------------
 
 small 320x180
-http://img.youtube.com/vi/VIDEOID/mqdefault.jpg
+http://img.youtube.com/vi/$videoid/mqdefault.jpg
 medium 480x360
-http://img.youtube.com/vi/VIDEOID/0.jpg
+http://img.youtube.com/vi/$videoid/0.jpg
 high 1280x720 or 1920x1080 (only if 720p or 1080p)
-http://img.youtube.com/vi/VIDEOID/maxresdefault.jpg
+http://img.youtube.com/vi/$videoid/maxresdefault.jpg
 
 youtube-dl
 -----------
@@ -28,7 +28,7 @@ youtube-dl -F $videoid
 
 #List all information as json
 youtube-dl -j $videoid
-youtube-dl -j $videoid | pretty_json.py | grep "description"
+youtube-dl -j $videoid | pretty_json.py | grep "description" | sed 's#\\n#\n#g' | less
 
 
 #Typicall 140 has audio

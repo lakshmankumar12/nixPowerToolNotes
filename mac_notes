@@ -37,6 +37,7 @@ control + left/right -> switch desktop
 
 ctrl + F2 -> menu bar
 ctrl + F3 -> go to dock, then use up/down arrow
+F8        -> open notification (Is this mine or mac default?)
 
 command + enter -> full-screen/out-of-full-screen
 
@@ -134,10 +135,18 @@ AWESOME in mac
 * Speed with which its ready to work on -- both sleep/boot
 * weight of the laptop
 * its full-screen mode
+  Exactly how i want it.
   * you still get system notifications popped up.
-  * you hover mouse up and see the desktop status icons (and access everything off there)
+  * you hover mouse up and see the desktop status icons (and access system stuff off there)
 * iterm integration with opening files by Command+click
 * mouse gestures
+
+small cute things in mac
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+* native ability to map caplock (i mapped to command)
+* native ability to switch to another app - spotlight (i although use quick-silver)
+   -- typing the app, just opens the running instance, instead of spawning a new one!
 
 Big Bummers in that order:
 ---------------------------
@@ -146,7 +155,6 @@ Big Bummers in that order:
 * Auto-hotkey (karabiner seems unavailable in mac-os, that is suggested as alternative)
   I basically just need scrollup/down, and hjkl navigation
 * zoom/maximize sometimes only vertically maximizes (eg: iTerm, chrome!, no option/shift/command click doesn't work either)
-* mission control should have a way to keyboard-select app of choice.
 * Absence of a application-key that emulates a right click at a location.
 
 Other inconveniences:
@@ -161,4 +169,8 @@ Other inconveniences:
 * How to auto adjust font-size for iTerm based on display?
    -- I am just manually cmd- +/-'ing everytime
 
+Turned out to be non-issues
+--------------------------
 
+* mission control should have a way to keyboard-select app of choice.
+  -- Just use spotlight.
