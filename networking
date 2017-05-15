@@ -52,6 +52,10 @@ ip addr show | awk '/^[0-9]+:/ {ifname=$2} /^ *inet / {print ifname " " $2; }' |
 #list a particular interface
 ip addr show eth0
 
+#add/del a ip
+ip addr add 192.168.50.5 dev eth1
+ip addr del 192.168.50.5 dev eth1
+
 Routing-ish
 ------------
 

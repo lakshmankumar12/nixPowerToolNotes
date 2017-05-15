@@ -30,6 +30,19 @@ dirname=$(dirname "$fullpathfile")
 extension="${filename##*.}"
 filename="${filename%.*}"
 
+http://tldp.org/LDP/abs/html/string-manipulation.html
+
+# mnemonic #-knocks-of-prefix (remember vi-back)
+# remove the shortest/longest prefix
+${varHavingYourBigString#prefix}
+${varHavingYourBigString##prefix}
+
+# remove the shortest/longest suffix
+${varHavingYourBigString%suffix}
+${varHavingYourBigString%%suffix}
+
+
+
 Passing Arguments
 -----------------
 

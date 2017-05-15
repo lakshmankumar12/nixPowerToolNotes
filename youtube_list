@@ -19,6 +19,15 @@ http://img.youtube.com/vi/$videoid/0.jpg
 high 1280x720 or 1920x1080 (only if 720p or 1080p)
 http://img.youtube.com/vi/$videoid/maxresdefault.jpg
 
+Link in browser
+---------------
+
+#normal
+https://www.youtube.com/watch?v=$videoid
+
+#start at a time
+https://www.youtube.com/watch?v=$videoid&t=100s
+
 youtube-dl
 -----------
 

@@ -37,7 +37,8 @@ control + left/right -> switch desktop
 
 ctrl + F2 -> menu bar
 ctrl + F3 -> go to dock, then use up/down arrow
-F8        -> open notification (Is this mine or mac default?)
+ctrl + F8 -> status-buttons (volume/one-drive)
+F8        -> open notification
 
 command + enter -> full-screen/out-of-full-screen
 
