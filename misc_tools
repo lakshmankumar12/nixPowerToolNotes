@@ -162,3 +162,11 @@ curl 'http://...link' -o out_file
 
 
 wget '..' -O out_file
+
+
+dpkg
+-----
+
+#list files in a package
+dpkg-query -L <package-name>
+

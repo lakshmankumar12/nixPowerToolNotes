@@ -44,6 +44,17 @@ command + enter -> full-screen/out-of-full-screen
 
 show desktop - F11 (doest work on mac keyboard though)
 
+
+command + shift + 3 -> full screen
+command + shift + 4 -> arbitrary screen shot
+command + shift + 4, and then space -> screen shot of one app
+
+my-maps
+^^^^^^^
+
+ctrl + command + F7  -> launchpad
+
+
 Tabby-stuff (for iTerm/Chrome)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -87,6 +98,11 @@ command+l           -> address bar
 
 command+up/down     -> Goto top of page/bottom of page.   # Useful suprising more often.
 
+command+option+i    -> developer tools
+command+option+u    -> see source
+
+command+left/right  -> back/forward
+
 iTerm
 -----
 
@@ -129,6 +145,12 @@ YET TO FIND:
 
 * how to shift tabs (as in 3 finger scroll in chromebook) with gesture
 
+Wish List
+~~~~~~~~~
+
+* Some nice way to sepearate 2 chrome windows and go to a paritcular instance on choice.
+   Thus work-related tabs is in one chrome, while personal tabs are in another
+
 AWESOME in mac
 --------------
 
@@ -139,7 +161,7 @@ AWESOME in mac
   Exactly how i want it.
   * you still get system notifications popped up.
   * you hover mouse up and see the desktop status icons (and access system stuff off there)
-* iterm integration with opening files by Command+click
+* iterm integration with opening files by "open"
 * mouse gestures
 
 small cute things in mac

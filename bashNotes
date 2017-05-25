@@ -53,6 +53,8 @@ $@    -- all args are intact, as invidivual quoted strings
 Arrays
 ------
 
+Read on array: http://stackoverflow.com/a/18136920/2587153
+
 Initialize an array literal using paranthsesis
 array=(one two three)
 
@@ -293,6 +295,16 @@ ps
 
 #with long names
 ps -e -o "pid,user:16,command"
+
+
+Give multi-line input as stdin to a command
+--------------------------------------------
+
+command <<EOF
+your multi line1
+your multi line2
+...
+EOF
 
 
 Argument referencing

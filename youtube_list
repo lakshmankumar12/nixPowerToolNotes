@@ -1,10 +1,17 @@
 Retrieve a list
 ----------------
 
+To create key (to run in shell)
+https://console.developers.google.com
+ -> credentials
+   -> API key
+     (Remember to delete this once you are done, to avoid quota theft!)
+
 developer console https://console.developers.google.com
 -> youtube-data-api
   ->  Try this api in a explorer
     ->  youtube.playlistItems.list
+      -> Make sure you use playlistId and not plain Id. (just scroll down for it)
       -> part=snippet & playlistId = "id" & maxResults = 50
         -> execute
     
@@ -13,35 +20,40 @@ Get thumbnail Pictures
 ----------------------
 
 small 320x180
-http://img.youtube.com/vi/$videoid/mqdefault.jpg
+http://img.youtube.com/vi/$VIDEOID/mqdefault.jpg
 medium 480x360
-http://img.youtube.com/vi/$videoid/0.jpg
+http://img.youtube.com/vi/$VIDEOID/0.jpg
 high 1280x720 or 1920x1080 (only if 720p or 1080p)
-http://img.youtube.com/vi/$videoid/maxresdefault.jpg
+http://img.youtube.com/vi/$VIDEOID/maxresdefault.jpg
 
 Link in browser
 ---------------
 
-#normal
-https://www.youtube.com/watch?v=$videoid
+#normal just watch a video
+https://www.youtube.com/watch?v=$VIDEOID
 
 #start at a time
-https://www.youtube.com/watch?v=$videoid&t=100s
+https://www.youtube.com/watch?v=$VIDEOID&t=100s
+
+#start a list at a particular index (you need to know the video-id of the N-th video too!)
+https://www.youtube.com/watch?v=$VIDEOID&list=$LISTID&index=N
 
 youtube-dl
 -----------
 
+export LISTID=<13-char-id>
+export VIDEOID=<11-char-id>
+
 #List all available formats to download
-export videoid=<11-char-id>
-youtube-dl -F $videoid
+youtube-dl -F $VIDEOID
 
 #List all information as json
-youtube-dl -j $videoid
-youtube-dl -j $videoid | pretty_json.py | grep "description" | sed 's#\\n#\n#g' | less
+youtube-dl -j $VIDEOID
+youtube-dl -j $VIDEOID | pretty_json.py | grep "description" | sed 's#\\n#\n#g' | less
 
 
 #Typicall 140 has audio
-youtube-dl -f 140 $videoid
+youtube-dl -f 140 $VIDEOID
 
 #options
 -o <filename>  saves in that filename.

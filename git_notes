@@ -550,3 +550,6 @@ svn log filename
 
 #get a particular version of file
 svn cat -r 3 http://svn.red-bean.com/repos/test/readme.txt
+
+#reset to a particular revision
+svn update -r <earlier_revision_number>
