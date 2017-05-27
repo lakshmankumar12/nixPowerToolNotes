@@ -86,3 +86,13 @@ List all open ports
 
 
 ss -l -p -n
+
+
+/sys
+----------
+
+/sys/class/net/<interface>/type
+
+-> http://lxr.free-electrons.com/source/include/uapi/linux/if_arp.h
+
+
