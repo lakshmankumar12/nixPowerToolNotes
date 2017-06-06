@@ -79,6 +79,7 @@ command + option + l -- iTerm
 command + option + u -- Chrome
 command + option + p -- Play-Music-App
 command + option + b -- iBooks
+command + option + n -- preview
 
 #dont use i -> its for chrome dev options.
 
@@ -119,10 +120,12 @@ command+up/down     -> Goto top of page/bottom of page.   # Useful suprising mor
 command+option+i    -> developer tools
 command+option+u    -> see source
 
+command+[   /]      -> back/forward
 command+left/right  -> back/forward
 
 iTerm
 -----
+
 
 Command +   +/-  -->  Font size increase decrease
 

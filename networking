@@ -96,3 +96,55 @@ ss -l -p -n
 -> http://lxr.free-electrons.com/source/include/uapi/linux/if_arp.h
 
 
+
+Tcpdump commands
+----------------
+
+https://danielmiessler.com/study/tcpdump/
+
+-i <interface>   # use any for all interfaces
+-D               # show all available interfaces
+-n               # Don’t resolve hostnames.
+-nn              # Don’t resolve hostnames or port names.
+-q               # Be less verbose (more quiet) with your output.
+-t               # Give human-readable timestamp output.
+-tttt            # Give maximally human-readable timestamp output.
+-X               # Show the packet’s contents in both hex and ASCII.
+-XX              # Same as -X, but also shows the ethernet header.
+-v, -vv, -vvv    # Increase the amount of packet information you get back.
+-c               # Only get x number of packets and then stop.
+-s               # Define the snaplength (size) of the capture in bytes. Use -s0 to get everything, unless you are intentionally capturing less. (default is typically 96, older: 68)
+-S               # Print absolute sequence numbers.
+-e               # Get the ethernet header as well.
+-q               # Show less protocol information.
+-E               # Decrypt IPSEC traffic by providing an encryption key.
+
+-w <file>        # write to a file
+-r <file>        # read from file
+
+Filter expressions
+------------------
+
+<type> <dir> <proto>
+
+type - host, net, port
+dir  - src, dst
+prot - tcp, udp, icmp, ah, ip6 ..
+
+less <n-byte-size>
+greater <>
+<= <n>
+
+
+src 10.5.2.3 and dst port 3389
+src net 192.168.0.0/16 and dst net 10.0.0.0/8 or 172.16.0.0/16     # or is for the dst net ( .. or .. )
+src mars and not dst port 22
+'src 10.0.2.4 and (dst port 3389 or 22)'
+
+#shows all urgent
+'tcp[13] & 32!=0'
+
+#shows all ack
+'tcp[13] & 16!=0'
+
+

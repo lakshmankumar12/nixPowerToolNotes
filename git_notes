@@ -542,6 +542,12 @@ PREV     -> COMMITED-1.
 branches are represented as sub-folders in repos/your_repo_name/branches/branch_name
 master is under                            repos/your_repo_name/trunk/
 
+svn-status symbols
+
+M modified
+X untracked
+~ file-type has changed (very likely a file became a link etc..)
+
 Commands
 ---------
 
@@ -553,3 +559,23 @@ svn cat -r 3 http://svn.red-bean.com/repos/test/readme.txt
 
 #reset to a particular revision
 svn update -r <earlier_revision_number>
+
+#dump contents of a commit
+
+
+***********
+
+git-svn
+--------
+
+export CPPFLAGS="-I$HOME/local/include -I$HOME/local/lib/libffi-3.0.13rc1/include -I$HOME/install/ra_serf/include/serf-1"
+export LD_FLAGS="-L$HOME/local/include -L$HOME/local/include/ncurses -L$HOME/local/lib -L$HOME/local/lib64 -L$HOME/install/ra_serf/lib"
+export LDFLAGS="-L$HOME/local/include -L$HOME/local/include/ncurses -L$HOME/local/lib -L$HOME/local/lib64 -L$HOME/install/ra_serf/lib"
+export LD_LIBRARY_PATH="$HOME/local/lib64:$HOME/local/lib:$HOME/install/ra_serf/lib"
+
+git svn clone --stdlayout --authors-file=./authors.txt "http://depot/repo/asn" git_asn
+git checkout -b R_1_8_0-svn origin/R_1_8_0
+git checkout -b R_1_6_5-svn origin/R_1_6_5
+
+git checkout R_1_8_0-svn && git svn rebase
+git checkout R_1_6_5-svn && git svn rebase
