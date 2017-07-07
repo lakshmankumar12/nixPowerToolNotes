@@ -12,6 +12,8 @@ target: $(var_having_prereq)
 
 ----
 
+$$=$$ expands the variable everytime, while := expands just once.
+
 Targets
 ------
 

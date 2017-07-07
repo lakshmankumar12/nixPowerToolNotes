@@ -170,3 +170,21 @@ dpkg
 #list files in a package
 dpkg-query -L <package-name>
 
+yum
+---
+
+yum install yum-utils
+
+#list files in a package
+repoquery -l <package-name>
+
+tar
+---
+
+#create
+tar cf newtarball.tar some_folder1/ some_folder2/ file3
+tar cf newtarball.tar -T filelist.txt
+find . -name 'whatsoever' | tar cf newtarball.tar -T -
+
+#list
+tar tf tarball.tar

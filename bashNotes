@@ -3,11 +3,52 @@ constructs
 
 if [ condition  ] ; then
   statement
-elif [ condition ] ; then
+elif [ condition ] ; then            # else if
   statement
 else
   statement
 fi
+
+Use [[ condition ]] instead of [ ... ]
+See https://stackoverflow.com/a/3427931
+
+Operators
+---------
+
+http://tldp.org/HOWTO/Bash-Prog-Intro-HOWTO-11.html
+
+string
+~~~~~~
+
+#note - only one equal sign
+[[ $s1 = $s2 ]]
+[[ $s1 != $s2 ]]
+[[ -n $s1 ]]
+[[ -z $s1 ]]
+
+arithmetic
+~~~~~~~~~~~
+
+[[ $n1 -eq $n2 ]]
+-lt (<)
+-gt (>)
+-le (<=)
+-ge (>=)
+-eq (==)
+-ne (!=)
+
+logical
+~~~~~~~
+
+# 3 options!
+# use -o for ||
+[ $condition1 -a $condition2 ]
+[ $condition1 ] && [ $condition2 ]
+[[ $condition1 && $condition2 ]]
+
+[ ! $condition ]
+
+
 
 substring
 ----------
@@ -21,6 +62,11 @@ if [[ $haystack == *"$needle"* ]]
 then
   echo "It's there!";
 fi
+
+#to lowercase
+lower=${a,,}
+#to uppercase
+upper=${a^^}
 
 Filenames and extractions
 ------------------------
@@ -48,6 +94,19 @@ Passing Arguments
 
 $*    -- all args as a single word
 $@    -- all args are intact, as invidivual quoted strings
+
+pass arg as reference / pass a name to which value is to be assigned
+-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+function implementor()
+{
+  var_name_passed=$1
+  ...
+  eval ${var_name_passed}="Value from here"
+}
+
+implementor var_name
+echo "got var_name set to $var_name"
 
 
 Arrays
@@ -78,6 +137,23 @@ ${a[@]/%/XY}  #adds a XY to the end of all members
 gobble a command's line into a array:
 
 IFS=$'\r\n' GLOBIGNORE='*' XYZ=($(command))
+
+Associative array / dict / hash
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+declare -A aa
+aa["key"]="value"
+echo ${aa["key"]}
+echo ${aa[$var_expanding_to_key]}
+
+declare -A bb_from_list
+bb_from_list=(["key1"]="value1" ["key2"]="value2")
+
+#Mind the exclamantion! W/o it it gives values
+for key in ${!aa[@]} ; do
+  echo "value at $key is ${aa[$key]}"
+done
+
 
 In zsh
 ~~~~~~

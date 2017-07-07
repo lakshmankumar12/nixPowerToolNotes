@@ -65,6 +65,16 @@ Strip leading/trailing white spaces
 
 function stripw(var) { gsub(/^[ \t]+/,"",var); gsub(/[ \t]+$/,"",var); return var }
 
+Get uniq lines w/o spoiling order
+---------------------------------
+
+cat whatever | awk '!x[$0]++'
+
+Get non-empty lines alone
+-------------------------
+
+cat whatever | awk 'NF'
+
 
 Not exactly awk, but text processing
 ===================================

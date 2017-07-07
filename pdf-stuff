@@ -61,3 +61,9 @@ pdftk 1.pdf output 1.128.pdf owner_pw foo user_pw baz allow printing
 #Get no of pages
 pdftk my.pdf dump_data | grep NumberOfPages
 
+#reduce size of pdf
+see gs file
+
+#pdf to text
+apt-get  install poppler-utils
+pdftotext -layout a.pdf a.txt

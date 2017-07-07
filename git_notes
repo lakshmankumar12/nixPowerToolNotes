@@ -64,6 +64,9 @@ git branch --set-upstream-to=upstream/remote_branch_name
 # to set the refspec right.
 git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 
+# if remote deleted branches, then use this to clear if off ur local repo too
+git remote prune origin
+
 TO see all changes to a file across all branch
 ----------------------------------------------
 
@@ -162,6 +165,9 @@ stash
 
 #create a stash
 git stash
+
+#create a stash with a custom message
+git stash save "some custom message"
 
 #re-apply a stash
 git stash pop
@@ -579,3 +585,35 @@ git checkout -b R_1_6_5-svn origin/R_1_6_5
 
 git checkout R_1_8_0-svn && git svn rebase
 git checkout R_1_6_5-svn && git svn rebase
+
+#on a new branch
+branch=R_1_8_2
+git_wt_dir_name=182_first_git
+
+#these are standard - no need to edit.
+git_root=/home/lakshman_narayanan/ws/git-dir-for-svn
+git_work_tree_dir=/home/lakshman_narayanan/ws/git-clones
+wt_asn=${git_work_tree_dir}/git_asn_worktree_main
+wt_import=${git_work_tree_dir}/git_import_worktree_main
+
+svn_added_name=${branch}-svn
+cd ${git_root}/git_asn
+git checkout -b ${svn_added_name} origin/${branch}
+cd ${git_root}/git_import
+git checkout -b ${svn_added_name} origin/${branch}
+
+cd ${wt_asn}
+git fetch
+git worktree add -b $svn_added_name ../${git_wt_dir_name}/${branch} remotes/origin/${svn_added_name}
+
+cd ${wt_import}
+git fetch
+git worktree add -b $svn_added_name ../${git_wt_dir_name}/${branch}/import remotes/origin/${svn_added_name}
+
+cd ${git_work_tree_dir}/${git_wt_dir_name}
+echo ${branch} > .branch_name
+echo "${branch} worktree" > .comments
+
+#update aryaka-new-clone/shiftclone.py of the dir-names both normal and git.
+#update aryaka-new-clone/update_git_root_clones.sh of the new branch
+

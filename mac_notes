@@ -76,12 +76,28 @@ ctrl + command + options + 5 - start break now
 ctrl + command + options + 6 - skip this break
 
 command + option + l -- iTerm
+command + option + k -- terminal
+
 command + option + u -- Chrome
-command + option + p -- Play-Music-App
+command + option + y -- Safari
+
 command + option + b -- iBooks
 command + option + n -- preview
 
+command + option + p -- Play-Music-App
+command + option + a -- audacity
+
 #dont use i -> its for chrome dev options.
+#dont use f -> its for find in outlook
+
+Spectacle-window-shortcuts
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ctrl + command + options + left   - change monitor
+ctrl + command + options + right  - change monitor
+
+ctrl + options + shift + left   - minimize (make smaller)
+ctrl + options + shift + right  - maximize (make larger)
 
 ----
 
@@ -132,7 +148,9 @@ Command +   +/-  -->  Font size increase decrease
 Outlook
 --------
 
-Comman + T  --> mark an item as read.
+Command + T          --> mark an item as read.
+Command + Option + F --> search
+Command + Shift  + F --> Advanced search
 
 Finder
 -------
@@ -228,3 +246,14 @@ Quick-Silver
 ------------
 
 http://mac.appstorm.net/how-to/productivity-how-to/mastering-quicksilver-the-basics/
+
+Command line tools
+-------------------
+
+diskutil list
+diskutil eject /dev/disk2
+diskutil unmountDisk /dev/disk2
+
+hdiutil convert -format UDRW -o dest.img origen.iso
+sudo dd if=dest.img.dmg of=/dev/rdisk2 bs=1m
+
