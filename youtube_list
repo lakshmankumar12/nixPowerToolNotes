@@ -7,14 +7,15 @@ https://console.developers.google.com
    -> API key
      (Remember to delete this once you are done, to avoid quota theft!)
 
-developer console https://console.developers.google.com
--> youtube-data-api
-  ->  Try this api in a explorer
-    ->  youtube.playlistItems.list
-      -> Make sure you use playlistId and not plain Id. (just scroll down for it)
-      -> part=snippet & playlistId = "id" & maxResults = 50
-        -> execute
-    
+developer console
+https://console.developers.google.com
+-> library
+    -> youtube-data-api
+      ->  Try this api in a explorer
+        ->  youtube.playlistItems.list
+          -> Make sure you use playlistId and not plain Id. (just scroll down for it)
+          -> part=snippet & playlistId = "id" & maxResults = 50
+            -> execute
 
 Get thumbnail Pictures
 ----------------------

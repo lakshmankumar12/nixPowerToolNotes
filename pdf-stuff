@@ -35,7 +35,7 @@ InfoValue: DocBook,writing,documentation,background
 # ... You can change only the following metadata items with pdftk: title, author, subject, producer, and keywords.
 #
 
-# extract a jpeg/picture from a pdf
+# extract a image/jpeg/picture from a pdf
 convert -verbose -density 150 -trim file.pdf -quality 100 -sharpen 0x1.0 output.jpg
 
 # Add password

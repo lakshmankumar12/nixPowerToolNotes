@@ -55,6 +55,13 @@ colour196 <- reddish
 #Note too many fd/files open issue in tmux
 Ensure your original tmux and the attached-client version are same!
 
+#change layout .. for vsplits
+:select-layout even-horizontal
+# for h-splits
+:select-layout even-vertical
+# otherones
+main-vertical
+
 ssh
 ---
 

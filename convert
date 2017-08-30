@@ -84,6 +84,61 @@ https://asciinema.org/
 https://github.com/asciinema/asciinema
 https://github.com/asciinema/asciinema-player
 
+#to edit
+https://asciinema.org/a/7445
+
+script -f myfile.scr -ttimings
+teseq -t timings myfile.scr > myfile.tsq
+#vi myfile.tsq
+#   | ..plain-text |
+#   . or :  spl chars
+#   & or "  you can safely delete these  ..   sed -i -e '/^&/d' -e '/^"/d' yourfile.tsq
+#   @ delay. You can adjust this number!
+#   add space in beginning to make them comments!
+reseq --replay myfile.tsq
+# to pack in asciinema
+asciinema rec -c "reseq ..." -t "title" file.json
+asciinema auth
+asciinema upload file.json
+docker run --rm -v $(pwd):/data asciinema/asciicast2gif -t solarized-dark demo.json demo.gif
+
+#asciinema shipped with ubuntu is older
+#best is 
+* git clone the repo  .. cd asciinema
+* sudo python3 ./setup.py install
+* python3 -m asciinema rec -t "title" -w 2.0 file.json  # -w is the max wait arg
+* python3 -m asciinema play file.json
+* vi file.json                               # rinse repeat as many times as you want.
+* python3 -m asciinema upload file.json      # you will get a url
+* python3 -m asciinema auth                  # you will another url. If you click this url after logging in a browser, all recording uploaded will be claimed.
+
+
+Editing asciinema
+-----------------
+
+Popular escape sequences
+
+CSI - \u001b[  or \033[  or ESC[
+
+CSI ?25l         -> hide cursor
+CSI ?25h         -> show cursor
+CSI n ; m H      -> move cursor to n,m
+CSI ..;..;.. m   -> various. First number controls what next, typical are 30-37,40-47,38,48
+
+CSI 34h          -> not clear
+CSI ?<n>l        -> ??
+
+Search and filter in vim - Highlight mark this:
+
+\\u001b\[[0-9;]\{-}m
+\\u001b\[?\?\d\{-}\(l\|h\)
+\\u001b\[\d\{-};\d\{-}H
+
+#gwy and elimitate the escape-char to see what's in.
+%s/\\u001b\[[0-9;]\{-}m/‧/g
+%s/\\u001b\[?\?\d\{-}\(l\|h\)/‧/g
+%s/\\u001b\[\d\{-};\d\{-}H/‧/g
+
 
 16:9 sizes
 ----------

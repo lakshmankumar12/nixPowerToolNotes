@@ -383,6 +383,9 @@ git rebase -i
 git commit --amend --date="Wed Feb 16 14:00 2011 +0100"
 git rebase --continue
 
+#rebase w/o a tracking branch or if u have pushed
+git rebase -i parent_of_commit_to_rebase master
+
 Bisect
 -------
 
@@ -556,6 +559,11 @@ X untracked
 
 Commands
 ---------
+#see what's changed - just filenames
+svn status
+
+#see what's locally changed - patches
+svn diff
 
 #log a file
 svn log filename
@@ -566,7 +574,28 @@ svn cat -r 3 http://svn.red-bean.com/repos/test/readme.txt
 #reset to a particular revision
 svn update -r <earlier_revision_number>
 
+#revert any modifications (or merge) - WARN changes are LOST
+svn revert -R .
+
 #dump contents of a commit
+svn log --verbose -r <commit>
+svn diff --summarize -r<rev>:<rev-1>
+
+#check what files have changed in remote w/o updating
+svn status -u
+
+#commit
+svn commit -m "ASN-XXXX: commit message"
+
+#merge
+cd target_repository
+svn merge -c <commit-no> /path/to/src/branch/repository
+
+#conflict
+* pospostone during update
+* conflict files are marked with C.
+* Work on it.
+* svn resolve --accept=working
 
 
 ***********

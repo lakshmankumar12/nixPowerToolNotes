@@ -32,11 +32,18 @@ docker login
 # -t  is the name of the image
 docker build -t friendlyhello .
 
+#get a shell to some running container
+#get container name using docker ps -a
+docker exec -i -t <container-name> /bin/bash
+
 #push a image to repo
 #if :tag is omitted, it tagged as :latest and existing :latest is lost.
 docker tag local_image_name lakshmankumar/repo_name:tag_to_this_version_of_image
 
 docker push lakshmankumar/repo_name:tag
+
+#kill a container
+docker kill container_name
 
 Running a image
 ~~~~~~~~~~~~~~~~

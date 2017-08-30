@@ -14,7 +14,6 @@ See https://stackoverflow.com/a/3427931
 
 Operators
 ---------
-
 http://tldp.org/HOWTO/Bash-Prog-Intro-HOWTO-11.html
 
 string
@@ -48,6 +47,12 @@ logical
 
 [ ! $condition ]
 
+Doing a integer based arithmetic expression
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+$(($var1 * $var2))
+#even associating with paranthesis works
+$(( ($var1 + $var2) * $var3 ))
 
 
 substring
@@ -55,6 +60,9 @@ substring
 
 ${i:index}     .. substring of i starting at index(0-based)
 ${i:index:len} .. substring of i starting at index(0-based) for length len
+
+(note)
+${i:-val} .. will give i or val if is unset
 
 is substring in string
 ----------------------
@@ -67,6 +75,16 @@ fi
 lower=${a,,}
 #to uppercase
 upper=${a^^}
+
+Parameter expansion
+-------------------
+
+#substitution
+#  lonest pattern is substituted with string
+#  pattern == # , matches start.
+#  pattern == % , matches end.
+${parameter/pattern/string}
+
 
 Filenames and extractions
 ------------------------
@@ -88,9 +106,26 @@ ${varHavingYourBigString%suffix}
 ${varHavingYourBigString%%suffix}
 
 
+Expansions
+~~~~~~~~~~
+
+#Note the absence of dollar sign .. just plain curly brace!
+{a,b}          -> expands to a b
+{a,b}${c,d}    -> expands to ac ad bc bd
+{1..100}       -> expands to 1 2 ... 100
+{a,b}{1..5}    -> expands to a1 a2 a3 a4 a5 b1 b2 b3 b4 b5
+
 
 Passing Arguments
 -----------------
+
+Read: https://unix.stackexchange.com/a/41595
+
+#note without quotes, $* and $@ are same. Dont every use it this way.
+$* - join all args as one with first char of IFS(usually space)
+$@ - each arg is a separate word , "$1" "$2"
+
+Inside a function, to another function
 
 $*    -- all args as a single word
 $@    -- all args are intact, as invidivual quoted strings
@@ -126,8 +161,11 @@ ${Array[index]}
 eg:
 a=("hello" "world")
 echo ${a[0]}   # prints hello
-echo ${#a[@]}  # prints 2. Note where # appears
+echo ${#a[@]}  # length of array. Note where # appears
+echo ${a[*]}   # To confirm: space separated single string of entire array
 for i in ${a[@]} ; do echo happy $i ; done #  iterates.
+
+a+=("hola")   #append to a array
 
 reference: http://www.tldp.org/LDP/abs/html/arrays.html#ARRAYSTROPS
 
@@ -161,6 +199,9 @@ In zsh
 sentence="Space separated collection of words"
 eval "arrayOfWords=($sentence)"
 for i in $arrayOfWords ; do echo "word in this iteration is $i"; done
+
+for i (word1 word2) { cmd1 $i ; cmd2 $i }
+for i (word1 word2) only_cmd $i
 
 
 Iterating over each line of a  file
@@ -204,13 +245,19 @@ set:
 '\033[1;35m'
 
 \033[ x;y;z m
-x=1 or leave.. bold text ( This doesn't work very well in solarized)
+x=1 or leave.. bold text ( This doesn't work very well in solarized - only red & magenta are accentuated. Rest all fall to greyish or whitish on bolding)
   4 or leave.. underline
 y=30-37  .. for text color        90..97 increased intensity
 z=40-47  .. for background color  100..107 increased intensity
 
     0  1  ..     2 3      ....    4 5       ..    6 7
 Black Red .. Green Yellow .... Blue Magenta .. Cyan White
+
+in the 256 color format
+~~~~~~~~~~~~~~~~~~~~~~
+
+'\033[38;5;<n>m'   where <n> is one of the 256 values. for foreground
+'\033[48;5;<n>m'   where <n> is one of the 256 values. for foreground
 
 Getting yes/no or other inputs from user
 ----------------------------------------
@@ -411,5 +458,15 @@ h - like dirname
 t - like basename
 
 
+To see list of all binding
+--------------------------
+
+bash$ bind -p
+
+zsh$ bindkey -L
+zsh$ zle -la
+
+#query existing binding
+zsh$ bindkey '\C-y'
 
 

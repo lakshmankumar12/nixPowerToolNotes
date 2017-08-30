@@ -80,18 +80,31 @@ command + option + k -- terminal
 
 command + option + u -- Chrome
 command + option + y -- Safari
+command + option + o -- Outlook
 
-command + option + b -- iBooks
+command + option + b -- adobe
 command + option + n -- preview
 
 command + option + p -- Play-Music-App
 command + option + a -- audacity
 
+command + option + ; -- lockscreen
+command + option + ' -- chrome-tabs
+command + option + [ -- chrome-bookmarks
+
+Available:
+...j
+
 #dont use i -> its for chrome dev options.
-#dont use f -> its for find in outlook
+#dont use f -> its for find in outlook & full-size in spectacle.
 
 Spectacle-window-shortcuts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+command + option + f  - full screen
+command + option + left   - make window left side
+command + option + right  - make window right side
+
 
 ctrl + command + options + left   - change monitor
 ctrl + command + options + right  - change monitor
@@ -158,6 +171,11 @@ Finder
 Command-up   -> one folder up
 Command-down -> go into selected foler (like enter)
 
+command +backsapce -> move to trash
+command + option + backsapce -> direct delete /w/o trash
+
+command + shift + n -> create new folder
+
 Dont make mac go to sleep
 --------------------------
 
@@ -172,6 +190,14 @@ Pop-up a message
 ------------------
 
 osascript -e 'display notification "Lorem ipsum dolor sit amet" with title "Title"'
+
+
+View pictures
+--------------
+
+* Open folder in finder
+* Press spacebar on a picture. This will open the picture in finder itself
+* Then use up/down to scroll pictures!
 
 Restart dock
 ------------
@@ -189,58 +215,6 @@ Wish List
 
 * Some nice way to sepearate 2 chrome windows and go to a paritcular instance on choice.
    Thus work-related tabs is in one chrome, while personal tabs are in another
-
-AWESOME in mac
---------------
-
-* Screen Resolution :)
-* Speed with which its ready to work on -- both sleep/boot
-* weight of the laptop
-* its full-screen mode
-  Exactly how i want it.
-  * you still get system notifications popped up.
-  * you hover mouse up and see the desktop status icons (and access system stuff off there)
-    instead of having to exit full-screen first!
-* iterm integration with opening files by "open"
-* mouse gestures
-* terminal + desktop - both are first class citizens
-
-small cute things in mac
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-* native ability to map caplock (i mapped to command)
-* native ability to O(1) switch to another app by typing its name - spotlight
-  (i although use quick-silver) 
-  -- typing the app, just opens the running instance, instead of spawning a new one!
-
-Big Bummers in that order:
----------------------------
-
-* Outlook has no format painter! [ :( ] And doesn't paste-text with formatting preserved. Yikes!
-* Auto-hotkey (karabiner seems unavailable in mac-os, that is suggested as alternative)
-  I basically just need scrollup/down, and hjkl map for arrow.
-* zoom/maximize sometimes only vertically maximizes (eg: iTerm, chrome!, no option/shift/command click doesn't work either)
-* Absence of a application-key that emulates a right click at a location.
-
-Other inconveniences:
------------------------
-
-* how to shut display of mac with a second monitor, with mac lid open?
-  * how to move all windows to another display in dual monitor case, where i haven't closed my mac-lid
-   (using mirroring for now)
-* Hotkey to open up iTerm sucks at best, very unpredictable working sometimes and not working at times.
-  Hotkey to lock too has same flaky behavior
-    -- For one, we need to ensure every service-shortcut shows up in (apple) -> app -> services list.
-* How to auto adjust font-size for iTerm based on display?
-   -- I am just manually cmd- +/-'ing everytime
-* I would like to change the lock-up screen - com.apple.desktop.admin.png keeps reverting after some time!
- 
-
-Turned out to be non-issues
---------------------------
-
-* mission control should have a way to keyboard-select app of choice.
-  -- Just use spotlight.
 
 Quick-Silver
 ------------

@@ -40,6 +40,9 @@ ip link delete bridge_name type bridge
 ip link set eth0 master bridge_name
 ip link set eth0 nomaster
 
+#better link show
+ip link show | awk ' /^[0-9]+:/ { link = $2 ; getline ; print link " " $0 } '
+
 L3-ish
 ------
 
@@ -80,6 +83,22 @@ ip route show table local
 
 # dump all iptables rule
 iptables-save
+
+Tunnels
+-------
+
+ip tun show
+
+vti
+~~~
+
+
+
+Ip-Routing-Tables
+-----------------
+
+blackhole -> pkt is discarded. No icmp is generated
+throw     -> routing stops at this table. Further tables are taken up. Note: default - throw exists for all tables!
 
 List all open ports
 --------------------
@@ -148,3 +167,40 @@ src mars and not dst port 22
 'tcp[13] & 16!=0'
 
 
+Ping args
+----------
+
+ping <ip>
+
+-c <n>              # send n ping pkts
+-s <pktsize>        # pkt-size in bytes
+
+
+hping3 args
+-----------
+
+hping3
+
+#default is tcp
+--icmp/-1
+--udp/-2
+
+#port mgmt
+--baseport/-s (choose src port, def: random)
+--keep/-k  (dont increase src-port. Def is to incrase)
+--destport/-p (def: 0, choose dest prot. Use + to increase on every reply, ++ to increase on every sending)
+
+-c <count>
+-a <src-ip>
+-i <interval>   #how long to wait between each pkt X in s or uX in microsec
+-I <interface>  #interface to bind to
+
+
+IPsec configuration
+-------------------
+
+#list all Security Policy. SPD
+ip xfrm policy show
+
+#list all security assocations. SAD
+ip xfrm state show
