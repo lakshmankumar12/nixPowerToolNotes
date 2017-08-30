@@ -1,126 +1,181 @@
 
-iproute2
+# iproute2
 
-http://lartc.org/howto/
+[Good link to read on](http://lartc.org/howto/)
 
-L2-ish
-------
+## L2-ish
 
-#list all interfaces
+### list all interfaces
+
+```
 ip link list
+```
 
-#arp
+### arp
+
+```
 ip neigh show
-#actual info is in /proc/net/arp
+```
 
-#delete a apr cache
+* actual info is in /proc/net/arp
+
+#### delete a apr cache
+
+```
 ip neigh delete 9.3.76.43 dev eth0
+```
 
-#add a vlan
+## vlans
+
+### add a vlan
+
+```
 ip link add link eth0 name eth0.2 type vlan id 2
-## The loose_binding flag stops the VLAN interface from tracking the line protocol status of the underlying device.
-## Also note the .2 name is not mandatory. But its nice to have that for convention!
+```
+
+* The loose_binding flag stops the VLAN interface from tracking the line protocol status of the underlying device.
+* Also note the .2 name is not mandatory. But its nice to have that for convention!
+
+```
 ip link add link eth0 name myvlan type vlan id 2 loose_binding on
 ip link delete myvlan type vlan
 ip link add foo type vlan help
+```
 
-#old/deprecated
+#### old/deprecated
+
+```
 vconfig add lan ${id}
 vconfig rem ${ifname}
+```
 
-#create a tun/tap interface
+### create a tun/tap interface
+
+```
 ip tuntap add dev mytap mode tap user md
+```
 
-#create a bridge
+### create a bridge
+
+```
 ip link add name bridge_name type bridge
 ip link set bridge_name up
 ip link delete bridge_name type bridge
+```
 
-#add/del a interface to a bridge
+### add/del a interface to a bridge
+
+```
 ip link set eth0 master bridge_name
 ip link set eth0 nomaster
+```
 
-#better link show
+### better link show
+
+```
 ip link show | awk ' /^[0-9]+:/ { link = $2 ; getline ; print link " " $0 } '
+```
 
-L3-ish
-------
+## L3-ish
 
-#list ip
+### list ip
+
+```
 ip addr show
+```
 
-#useful version
+### useful version
+
+```
 ip addr show | awk '/^[0-9]+:/ {ifname=$2} /^ *inet / {print ifname " " $2; }' | grep ""
+```
 
-#list a particular interface
+### list a particular interface
+
+```
 ip addr show eth0
+```
 
-#add/del a ip
+### add/del a ip
+
+```
 ip addr add 192.168.50.5 dev eth1
 ip addr del 192.168.50.5 dev eth1
+```
 
-Routing-ish
-------------
+## Routing-ish
 
-#list routes
+### list routes
+
+```
 ip route show
+```
 
-#find local ip used for a route
+### find local ip used for a route
+
+```
 ip route get <ip>
 ip route get <ip> | awk ' {print $NF; exit}'
+```
 
-#routing policy
+### routing policy
+
+```
 ip rule list
 ---
   0:      from all lookup local
   32766:  from all lookup main
   32767:  from all lookup default
 ---
+```
 
-#show a routing-table
+### show a routing-table
+
+```
 ip route show table all
 ip route show table local
+```
 
-# dump all iptables rule
+### dump all iptables rule
+
+```
 iptables-save
+```
 
-Tunnels
--------
+### Tunnels
 
+```
 ip tun show
+```
 
-vti
-~~~
+* vti related:
 
 
 
-Ip-Routing-Tables
------------------
+# Ip-Routing-Tables
 
-blackhole -> pkt is discarded. No icmp is generated
-throw     -> routing stops at this table. Further tables are taken up. Note: default - throw exists for all tables!
+* blackhole -> pkt is discarded. No icmp is generated
+* throw     -> routing stops at this table. Further tables are taken up. Note: default - throw exists for all tables!
 
-List all open ports
---------------------
-
+# List all open ports
 
 ss -l -p -n
 
 
-/sys
-----------
+# /sys folder
 
+```
 /sys/class/net/<interface>/type
+```
 
--> http://lxr.free-electrons.com/source/include/uapi/linux/if_arp.h
+[Link to kernel for various interface types](http://lxr.free-electrons.com/source/include/uapi/linux/if_arp.h)
 
 
-
-Tcpdump commands
-----------------
+# Tcpdump commands
 
 https://danielmiessler.com/study/tcpdump/
 
+```
 -i <interface>   # use any for all interfaces
 -D               # show all available interfaces
 -n               # Don’t resolve hostnames.
@@ -140,10 +195,11 @@ https://danielmiessler.com/study/tcpdump/
 
 -w <file>        # write to a file
 -r <file>        # read from file
+```
 
-Filter expressions
-------------------
+## Filter expressions
 
+```
 <type> <dir> <proto>
 
 type - host, net, port
@@ -165,42 +221,50 @@ src mars and not dst port 22
 
 #shows all ack
 'tcp[13] & 16!=0'
+```
 
 
-Ping args
-----------
+## Ping args
 
+```
 ping <ip>
 
 -c <n>              # send n ping pkts
 -s <pktsize>        # pkt-size in bytes
+```
 
 
-hping3 args
------------
+## hping3 args
 
 hping3
 
-#default is tcp
---icmp/-1
---udp/-2
+* default is tcp
+* --icmp/-1
+* --udp/-2
 
-#port mgmt
---baseport/-s (choose src port, def: random)
---keep/-k  (dont increase src-port. Def is to incrase)
---destport/-p (def: 0, choose dest prot. Use + to increase on every reply, ++ to increase on every sending)
+* port mgmt
+  * --baseport/-s (choose src port, def: random)
+  * --keep/-k  (dont increase src-port. Def is to incrase)
+  * --destport/-p (def: 0, choose dest prot. Use + to increase on every reply, ++ to increase on every sending)
 
+```
 -c <count>
 -a <src-ip>
 -i <interval>   #how long to wait between each pkt X in s or uX in microsec
 -I <interface>  #interface to bind to
+```
 
 
-IPsec configuration
--------------------
+# IPsec configuration
 
-#list all Security Policy. SPD
+## list all Security Policy. SPD
+
+```
 ip xfrm policy show
+```
 
-#list all security assocations. SAD
+## list all security assocations. SAD
+
+```
 ip xfrm state show
+```
