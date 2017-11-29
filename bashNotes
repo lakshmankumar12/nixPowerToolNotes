@@ -257,7 +257,7 @@ in the 256 color format
 ~~~~~~~~~~~~~~~~~~~~~~
 
 '\033[38;5;<n>m'   where <n> is one of the 256 values. for foreground
-'\033[48;5;<n>m'   where <n> is one of the 256 values. for foreground
+'\033[48;5;<n>m'   where <n> is one of the 256 values. for background
 
 Getting yes/no or other inputs from user
 ----------------------------------------

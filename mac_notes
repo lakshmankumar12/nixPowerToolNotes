@@ -40,6 +40,9 @@ command + enter -> full-screen/out-of-full-screen
 
 show desktop - F11 (doest work on mac keyboard though)
 
+#force-quit
+command + option + Esc ->  Like ctrl-alt-del. Bring up Force-Quit manager.
+
 
 screen shots
 +++++++++++++
@@ -66,6 +69,8 @@ F8        -> open notification
 
 control + shift + power  -  display off
 
+control + command + q    -  lock
+
 custom-set ones / my maps / global-hotkeys:
 ----------------------------------------
 
@@ -88,12 +93,11 @@ command + option + n -- preview
 command + option + p -- Play-Music-App
 command + option + a -- audacity
 
-command + option + ; -- lockscreen
-command + option + ' -- chrome-tabs
-command + option + [ -- chrome-bookmarks
+command + option + , -- qutebrowser
 
 Available:
-...j
+j
+,
 
 #dont use i -> its for chrome dev options.
 #dont use f -> its for find in outlook & full-size in spectacle.
@@ -102,7 +106,7 @@ Spectacle-window-shortcuts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 command + option + f  - full screen
-command + option + left   - make window left side
+command + option + left   - make window left side  / cycle between half-left, one-third left, 2-3rd left
 command + option + right  - make window right side
 
 
@@ -158,12 +162,19 @@ iTerm
 
 Command +   +/-  -->  Font size increase decrease
 
+mine:
+shift-command-d  --> create new split-pane vertical
+command+shift +/-  -> size of pane
+shit+command+enter --> zoom out pane
+
 Outlook
 --------
 
 Command + T          --> mark an item as read.
 Command + Option + F --> search
 Command + Shift  + F --> Advanced search
+
+Control + Shift + [ / ] --> next/prev panes
 
 Finder
 -------
@@ -192,7 +203,7 @@ Pop-up a message
 osascript -e 'display notification "Lorem ipsum dolor sit amet" with title "Title"'
 
 
-View pictures
+View pictures/photos
 --------------
 
 * Open folder in finder
@@ -204,6 +215,10 @@ Restart dock
 
 #when some icon has notification info stuck
 killall Dock
+
+windirstat for mac:
+
+omnidisksweeper
 
 YET TO FIND:
 ~~~~~~~~~~~~
@@ -221,6 +236,11 @@ Quick-Silver
 
 http://mac.appstorm.net/how-to/productivity-how-to/mastering-quicksilver-the-basics/
 
+Login wall paper
+----------------
+
+sudo chflags nouchg /Library/Caches/com.apple.desktop.admin.png
+
 Command line tools
 -------------------
 
@@ -230,4 +250,45 @@ diskutil unmountDisk /dev/disk2
 
 hdiutil convert -format UDRW -o dest.img origen.iso
 sudo dd if=dest.img.dmg of=/dev/rdisk2 bs=1m
+
+
+hdiutil convert a.img -format UDRW -o writable.img
+#hdiutil attach -imagekey diskimage-class=CRawDiskImage -nomount filename
+hdiutil attach -nomount filename
+diskutil list
+diskutil mountDisk /dev/disk<N>
+
+Xterm from other machines
+-------------------------
+
+open up DISPLAY from other machines.
+xhost +
+
+
+cpu info
+~~~~~~~~~~
+
+sysctl -a | grep machdep.cpu
+
+Whcih apps start at startup
+-----------------------------
+
+System-Preferences -> Users&Groups -> You -> LoginItems
+
+
+NFS in mac
+-----------
+
+showmount -e mforge2
+
+sudo mount -t nfs mforge2:/export/home/lakshman_narayanan /Users/lakshman.narayanan/forge_home
+
+sudo umount /Users/lakshman.narayanan/forge_home
+
+
+Access the docker installed linux-VM:
+-------------------------------------
+
+#note this is tty:
+screen ~/Library/Containers/com.docker.docker/Data/com.docker.driver.amd64-linux/tty
 

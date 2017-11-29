@@ -76,6 +76,7 @@ ip link set eth0 nomaster
 ip link show | awk ' /^[0-9]+:/ { link = $2 ; getline ; print link " " $0 } '
 ```
 
+
 ## L3-ish
 
 ### list ip
@@ -101,6 +102,15 @@ ip addr show eth0
 ```
 ip addr add 192.168.50.5 dev eth1
 ip addr del 192.168.50.5 dev eth1
+```
+
+### add a gre tunnel
+
+```
+ip tunnel add netb mode gre remote 172.19.20.21 local 172.16.17.18 ttl 255 dev eth1
+ip link set netb up
+ip addr add 10.0.1.1 dev netb
+ip route add 10.0.2.0/24 dev netb
 ```
 
 ## Routing-ish
@@ -221,6 +231,9 @@ src mars and not dst port 22
 
 #shows all ack
 'tcp[13] & 16!=0'
+
+#gre packets
+protochain GRE && proto IP
 ```
 
 
@@ -231,6 +244,7 @@ ping <ip>
 
 -c <n>              # send n ping pkts
 -s <pktsize>        # pkt-size in bytes
+-I <interface>      # Use this interface or ip-address
 ```
 
 
@@ -268,3 +282,16 @@ ip xfrm policy show
 ```
 ip xfrm state show
 ```
+
+# netcat commands
+
+* As a tcp server
+    ```
+        nc -l -s <src-add> -p <src-port>
+    ```
+* As a tcp client
+    ```
+        nc -s <src-addr> -p <src-port> <tgt-add> <tgt-port>
+    ```
+
+

@@ -213,4 +213,5 @@ Width      Height      Standard
     4096   x    3072
     6400   x    4800
 
-
+# get meta-data frrm jpg
+identify -verbose image.jpg

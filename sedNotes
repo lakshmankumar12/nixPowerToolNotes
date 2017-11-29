@@ -38,6 +38,13 @@ Delete empty lines
 
 sed '/^$/d' myFile > tt
 
+sed '/^[[:space:]]*$/d' myFile > tt
+
+Delete nth line
+------------------
+
+sed -d '5d'
+
 
 Not really SED but text stuff with other tools
 ==============================================
@@ -98,3 +105,6 @@ find . -maxdepth 2
 
 #ls just dirs
 find . -maxdepth 1 ! -path . -type d
+
+#prune a few dirs from search
+find . -type f \( -path dir1 -o -path dir2 -o -path -dir3 \) -prune -o -print

@@ -62,6 +62,9 @@ Ensure your original tmux and the attached-client version are same!
 # otherones
 main-vertical
 
+#swithc off window rename
+set-option allow-rename off
+
 ssh
 ---
 
@@ -109,6 +112,8 @@ Highlight non-ascii chars
 
 Draw ascii figures in web
 ---------------------------
+
+#tag: ascii diagram
 
 textik.com
 
@@ -195,3 +200,52 @@ find . -name 'whatsoever' | tar cf newtarball.tar -T -
 
 #list
 tar tf tarball.tar
+
+Linux Hard-disk related tools
+-----------------------------
+
+#list all partitions/hard-disks
+fdisk -l
+
+#linux volumes
+lsblk
+
+#get UUIDs of all disks
+blkid
+
+#get pci device list
+lspci
+
+
+Vimium shortcuts
+----------------
+
+https://vimium.github.io/
+
+j/k -> move up or down
+gg/G -> top/end of page
+H  -> back page
+J/K -> tabs
+f -> open in current tab
+F -> open in new tab
+
+
+qutebrowser
+-----------
+
+go  -> edit current url
+O   -> type and open a url in a new tab
++/- -> zoom
+d   -> close a tab
+
+To switch focus to different scrolling area:
+#try
+;i -> if there are images in the other tab
+
+;y -> highlight links and yank the link
+
+To find:
+
+open a url in a new tab
+
+

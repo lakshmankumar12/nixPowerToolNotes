@@ -244,10 +244,10 @@ rolldown:
 
 git forest pull
 
-Getting a tag
---------------
+Creating a simple tag
+----------------------
 
-git-ws --tag  buildnumber_54290 asr5k/master master
+git tag <tagname> <commit>
 
 creating a annotated tag
 -----------------------
@@ -577,9 +577,12 @@ svn update -r <earlier_revision_number>
 #revert any modifications (or merge) - WARN changes are LOST
 svn revert -R .
 
-#dump contents of a commit
+#dump file names of a commit
 svn log --verbose -r <commit>
 svn diff --summarize -r<rev>:<rev-1>
+
+#dump actual contents of a commit with diffs
+svn diff -r<rev-1>:<rev>
 
 #check what files have changed in remote w/o updating
 svn status -u
