@@ -89,6 +89,19 @@ Networking
 docker network ls
 docker network inspect bridge
 
+#create an isoated bridge
+docker network create networkNameX --driver=bridge --subnet=192.168.100.0/24
+
+#connect a container to a bridge
+docker network connect networkNameX container_name
+
+#reading more on networking in docker
+https://success.docker.com/article/Multiple_Docker_Networks
+https://docs.docker.com/engine/reference/commandline/network_create/#bridge-driver-options
+
+#to know about a network
+docker network inspect networkNameX
+
 Volumes
 ~~~~~~~~
 
@@ -157,3 +170,5 @@ systemctl enable docker
 systemctl start docker
 -----
 
+Mac host from docker containers:
+docker.for.mac.localhost

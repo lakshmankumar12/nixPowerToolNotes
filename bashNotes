@@ -423,6 +423,9 @@ ps -e -o "pid,user:16,command"
 Give multi-line input as stdin to a command
 --------------------------------------------
 
+# this is refered as heredoc
+# Note variable expansion happens inside of heredoc as long as you put in quotes(!)
+
 command <<EOF
 your multi line1
 your multi line2

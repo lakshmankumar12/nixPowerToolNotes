@@ -43,7 +43,7 @@ sed '/^[[:space:]]*$/d' myFile > tt
 Delete nth line
 ------------------
 
-sed -d '5d'
+sed -e '5d'
 
 
 Not really SED but text stuff with other tools

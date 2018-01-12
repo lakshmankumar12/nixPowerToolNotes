@@ -15,6 +15,13 @@ ip link list
 
 ```
 ip neigh show
+
+#old
+#display table
+arp
+
+#add a static entry
+apr -s <ip> <mac>
 ```
 
 * actual info is in /proc/net/arp
@@ -75,6 +82,13 @@ ip link set eth0 nomaster
 ```
 ip link show | awk ' /^[0-9]+:/ { link = $2 ; getline ; print link " " $0 } '
 ```
+
+### brctl
+
+```
+brctl show
+```
+
 
 
 ## L3-ish
@@ -268,6 +282,31 @@ hping3
 -I <interface>  #interface to bind to
 ```
 
+# iptables
+
+Adding a rule
+```
+-t nat         Operate on the nat table...
+-A PREROUTING  ... by appending the following rule to its PREROUTING chain.
+-i eth1        Match packets coming in on the eth1 network interface...
+-p tcp         ... that use the tcp (TCP/IP) protocol
+--dport 80     ... and are intended for local port 80.
+-j DNAT        Jump to the DNAT target...
+--to-destination 192.168.1.3:8080 ... and change the destination address to 192.168.1.3 and destination port to 8080.
+```
+
+Load a dump of iptables-save
+```
+#Dump first
+iptables-save > /tmp/a.iptables
+#edit
+#reload
+iptables-restore -c < /tmp/a.iptables
+
+```
+
+
+
 
 # IPsec configuration
 
@@ -287,11 +326,19 @@ ip xfrm state show
 
 * As a tcp server
     ```
-        nc -l -s <src-add> -p <src-port>
+        nc -l -s <src-add> -p <src-port>  # might be wrong. The -l automatically takes the <ip> <port> args as local values.
+        nc -l <src-add> <src-port>
     ```
 * As a tcp client
     ```
         nc -s <src-addr> -p <src-port> <tgt-add> <tgt-port>
     ```
-
+* As a udp server
+    ```
+        nc -u -l <optional-src-addr> <mandatory-src-port>   # ip-addr if not mentioned, is any
+    ```
+* As a udp server and client at same time
+    ```
+        nc -u -s 192.2.53.2 -p 19000 192.15.2.2 8090
+    ```
 

@@ -41,3 +41,10 @@ shell:startup
 shell:common startup
 shell:Start Menu
 shell:Profile
+
+
+Good windows-Programs
+=====================
+
+* Driver Talent -- finds the drivers needed for a computer
+* Rufus -- Burn a iso into a usb

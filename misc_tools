@@ -237,6 +237,9 @@ go  -> edit current url
 O   -> type and open a url in a new tab
 +/- -> zoom
 d   -> close a tab
+T   -> next tab (also J, but keeps confusing with J/K, so use T and K)
+nT  -> nth tab
+K   -> prev tab
 
 To switch focus to different scrolling area:
 #try
@@ -246,6 +249,17 @@ To switch focus to different scrolling area:
 
 To find:
 
-open a url in a new tab
+config
+:set
+
+
+xargs
+------
+
+#To supply one arg at a time for find
+find . -print 0 | xargs -0 your_command
+
+
+
 
 

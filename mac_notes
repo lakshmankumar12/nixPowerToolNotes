@@ -31,7 +31,6 @@ command + w - close tab/window
 command + option + w - close all windows/tabs
 
 
-control + up - Mission control (also use F3 in mac-keyboard)
 control + down - show all windows of the current application (when u have multiple tabs of the same app)
 control + left/right -> switch desktop
 
@@ -66,16 +65,21 @@ ctrl + F2 -> menu bar
 ctrl + F3 -> go to dock, then use up/down arrow
 ctrl + F8 -> status-buttons (volume/one-drive)
 F8        -> open notification
+F11       -> show desktop (Not exactly minimize all windows - useful if u feel like seeing the desktop picture!)
+control + up   -> Mission control (3 finger up in trackpad) (all windows splashing) (also use F3 in mac-keyboard)
+control + down -> show all windows of current app (3 finger down in trackpad)
 
-control + shift + power  -  display off
 
-control + command + q    -  lock
+control + shift   + power  -  display off
+control + command + q      -  lock
+
 
 custom-set ones / my maps / global-hotkeys:
 ----------------------------------------
 
 
 ctrl + F7  -> launchpad            (Apparently this conflicts with way-tab moves focus.. But i dont think i care about this)
+
 ctrl + command + options + 4 - restart break timer
 ctrl + command + options + 5 - start break now
 ctrl + command + options + 6 - skip this break
@@ -89,11 +93,15 @@ command + option + o -- Outlook
 
 command + option + b -- adobe
 command + option + n -- preview
+command + option + r -- finder
 
 command + option + p -- Play-Music-App
 command + option + a -- audacity
 
 command + option + , -- qutebrowser
+command + option + / -- pandora-play pause
+
+command + option + e -- Global hot-key for iterm's hotkey-profile
 
 Available:
 j
@@ -101,6 +109,9 @@ j
 
 #dont use i -> its for chrome dev options.
 #dont use f -> its for find in outlook & full-size in spectacle.
+#dont use d -> its toggle for auto-hide in dock
+
+#dont use left/right arrow -> they are used for resize in spectacle
 
 Spectacle-window-shortcuts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -162,6 +173,8 @@ iTerm
 
 Command +   +/-  -->  Font size increase decrease
 
+The current-line highlight gets enabled because of command + option + ;
+
 mine:
 shift-command-d  --> create new split-pane vertical
 command+shift +/-  -> size of pane
@@ -175,6 +188,8 @@ Command + Option + F --> search
 Command + Shift  + F --> Advanced search
 
 Control + Shift + [ / ] --> next/prev panes
+
+Command +  +/-       --> Font size increase
 
 Finder
 -------
@@ -236,6 +251,13 @@ Quick-Silver
 
 http://mac.appstorm.net/how-to/productivity-how-to/mastering-quicksilver-the-basics/
 
+Open chrome tabs from quick-silver
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Type chrome in quick-silver, right-arrow -> open-web-page --> (You should see your tabs here!)
+*  Now press-tab to the execute item
+  * Here, you should choose reveal tab
+
 Login wall paper
 ----------------
 
@@ -250,6 +272,9 @@ diskutil unmountDisk /dev/disk2
 
 hdiutil convert -format UDRW -o dest.img origen.iso
 sudo dd if=dest.img.dmg of=/dev/rdisk2 bs=1m
+
+#another way is to gui-format the disk to Master-boot-record + FAT32 using disk-utility
+# ensure to have "devices shown" in options.
 
 
 hdiutil convert a.img -format UDRW -o writable.img
@@ -292,3 +317,9 @@ Access the docker installed linux-VM:
 #note this is tty:
 screen ~/Library/Containers/com.docker.docker/Data/com.docker.driver.amd64-linux/tty
 
+Paint in MAC
+------------
+
+Just use preview.
+
+You can open a blank white image and start drawing on it. Click the icon left ot search window in top right corner.

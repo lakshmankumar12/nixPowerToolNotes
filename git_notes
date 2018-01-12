@@ -154,6 +154,16 @@ git diff <lhs-commit> <rhs-commit> <file-path>
 git diff HEAD -- <all-files>
 
 
+backup
+------
+
+#get a beautiful list of all local commits as a mail format
+git format-patch --stdout <Any-range>   # eg: base..
+
+#apply the generated file
+git am <file>
+
+
 
 Difftool with a different tool
 ------------------------------
@@ -561,6 +571,9 @@ Commands
 ---------
 #see what's changed - just filenames
 svn status
+
+#list all files that are revision controlled
+svn ls --recursive
 
 #see what's locally changed - patches
 svn diff
