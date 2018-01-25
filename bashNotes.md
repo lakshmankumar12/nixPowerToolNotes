@@ -517,4 +517,13 @@ zsh$ zle -la
 zsh$ bindkey '\C-y'
 ```
 
+# Ubuntu pkg mgmt
 
+https://askubuntu.com/questions/170348/how-to-create-a-local-apt-repository
+
+# Centos pkg mgmt
+
+* Force install a rpm
+    ```sh
+    rpm -ivh --force --nodeps whatever.rpm
+    ```
