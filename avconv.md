@@ -38,6 +38,12 @@ avconv -strict experimental -i ~/Lakshman/rhymes/12345-once-i.webm -f avi -s qvg
 ```
 avconv -i 'concat:first.mp3|second.mp3|third.mp3' final.mp3
 ```
+For video files (mp4 files) this doesn't work. use MP4Box from `sudo apt-get install gpac` instead.
+
+```
+MP4Box -cat video1.mp4 -cat video2.mp4 -cat video3.mp4 -new final.mp4
+```
+
 
 ## Extract subset of time
 

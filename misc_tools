@@ -207,6 +207,9 @@ Linux Hard-disk related tools
 #list all partitions/hard-disks
 fdisk -l
 
+#list filetype of all partiions
+df -T
+
 #linux volumes
 lsblk
 

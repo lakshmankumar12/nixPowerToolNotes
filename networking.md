@@ -26,6 +26,13 @@ apr -s <ip> <mac>
 
 * actual info is in /proc/net/arp
 
+### Tell the type of the interface
+
+ethtool -i devicename
+driver-info: igb/tun(for both tun/tap)/ip_gre
+
+bus-info: tun/tap/pci-value
+
 #### delete a apr cache
 
 ```

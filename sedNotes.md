@@ -54,7 +54,7 @@ sed '/^[[:space:]]*$/d' myFile > tt
 ### delete trailing white spaces
 
 ```sh
-sed 's/[[:space:]]\+$//' /tmp/errors
+sed -i 's/[[:space:]]\+$//' myfile
 ```
 
 ## Delete nth line

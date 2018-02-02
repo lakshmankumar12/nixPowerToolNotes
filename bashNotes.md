@@ -527,3 +527,8 @@ https://askubuntu.com/questions/170348/how-to-create-a-local-apt-repository
     ```sh
     rpm -ivh --force --nodeps whatever.rpm
     ```
+
+* List files in  a rpm
+    ```sh
+    rpm -qpl whatever.rpm
+    ```

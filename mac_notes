@@ -57,6 +57,8 @@ command+t                       -- new tab
 Command + 1..9                  -- nth tab
 command + shift + [  ]          -- shift tabs
 command + shift + options [  ]  -- move tabs (doesn't work in chrome, but works for iterm)
+  also
+  cmd   + shift + left/right    -- move tabs
 
 Mac Default shortcuts / global-hotkeys
 ----------------------------------------
@@ -97,11 +99,13 @@ command + option + r -- finder
 
 command + option + p -- Play-Music-App
 command + option + a -- audacity
+command + option + c -- slack
 
 command + option + , -- qutebrowser
 command + option + / -- pandora-play pause
 
 command + option + e -- Global hot-key for iterm's hotkey-profile
+
 
 Available:
 j
