@@ -1,57 +1,55 @@
-General Desktop:
-----------------
+# General Desktop:
 
-Gestures:
-~~~~~~~~~
+## Gestures:
 
-#Same like chrombook:
-2 finger for scroll
-2 finger touch for right click
-#New in MAC:
-3 finger up -> show all windows. This is called mission-control
-3 finger down ->
-3 finger left/right -> for window change (like alt-tab)
+* Same like chrombook:
+   * 2 finger for scroll
+   * 2 finger touch for right click
+* New in MAC:
+   * 3 finger up -> show all windows. This is called mission-control
+   * 3 finger down ->
+   * 3 finger left/right -> for window change (like alt-tab)
 
-Green-button           -- fullscreen
-Double-click on title  -- zoom
-Shift+Green-button     -- maximize w/o full-screen (Doesn't work?)
+## window-top buttons
 
-Keyboard
-~~~~~~~~~
+* Green-button           -- fullscreen
+* Double-click on title  -- zoom
+* Shift+Green-button     -- maximize w/o full-screen (Doesn't work?)
 
-Command + Tab  -- alt tab between windows
-double-click   -- maximize w/o full-screen
+## Keyboard
 
-command + options + d  -> hide/unhide dock
+* Command + Tab  -- alt tab between windows
+* double-click   -- maximize w/o full-screen
 
-command + c - copy
-command + v - paste
-command + x - cut
-command + w - close tab/window
-command + option + w - close all windows/tabs
+* command + options + d  -> hide/unhide dock
 
-
-control + down - show all windows of the current application (when u have multiple tabs of the same app)
-control + left/right -> switch desktop
+* command + c - copy
+* command + v - paste
+* command + x - cut
+* command + w - close tab/window
+* command + option + w - close all windows/tabs
 
 
-command + enter -> full-screen/out-of-full-screen
-
-show desktop - F11 (doest work on mac keyboard though)
-
-#force-quit
-command + option + Esc ->  Like ctrl-alt-del. Bring up Force-Quit manager.
+* control + down - show all windows of the current application (when u have multiple tabs of the same app)
+* control + left/right -> switch desktop
 
 
-screen shots
-+++++++++++++
+* command + enter -> full-screen/out-of-full-screen
+
+* show desktop - F11 (doest work on mac keyboard though)
+
+### force-quit
+
+* command + option + Esc ->  Like ctrl-alt-del. Bring up Force-Quit manager.
+
+
+## screen shots
 
 command + shift + 3 -> full screen
 command + shift + 4 -> arbitrary screen shot
 command + shift + 4, and then space -> screen shot of one app
 
-Tabby-stuff (for iTerm/Chrome)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+## Tabby-stuff (for iTerm/Chrome)
 
 command+t                       -- new tab
 Command + 1..9                  -- nth tab
@@ -60,8 +58,7 @@ command + shift + options [  ]  -- move tabs (doesn't work in chrome, but works 
   also
   cmd   + shift + left/right    -- move tabs
 
-Mac Default shortcuts / global-hotkeys
-----------------------------------------
+# Mac Default shortcuts / global-hotkeys
 
 ctrl + F2 -> menu bar
 ctrl + F3 -> go to dock, then use up/down arrow
@@ -76,8 +73,7 @@ control + shift   + power  -  display off
 control + command + q      -  lock
 
 
-custom-set ones / my maps / global-hotkeys:
-----------------------------------------
+## custom-set ones / my maps / global-hotkeys:
 
 
 ctrl + F7  -> launchpad            (Apparently this conflicts with way-tab moves focus.. But i dont think i care about this)
@@ -111,14 +107,23 @@ Available:
 j
 ,
 
-#dont use i -> its for chrome dev options.
-#dont use f -> its for find in outlook & full-size in spectacle.
-#dont use d -> its toggle for auto-hide in dock
+* dont use i -> its for chrome dev options.
+* dont use f -> its for find in outlook & full-size in spectacle.
+* dont use d -> its toggle for auto-hide in dock
 
-#dont use left/right arrow -> they are used for resize in spectacle
+* dont use left/right arrow -> they are used for resize in spectacle
 
-Spectacle-window-shortcuts
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+### this is retired. I am no longer using it.
+
+(These are set using automator as services. You should see them in App->services in menu-bar for them to work)
+ ..# command + control + option - 7  -- iTerm
+ ..# command + control + option - 8  -- outlook
+ ..# command + control + option - 9  -- chrome
+ ..# command + shift + l --  lock screen
+
+
+
+## Spectacle-window-shortcuts
 
 command + option + f  - full screen
 command + option + left   - make window left side  / cycle between half-left, one-third left, 2-3rd left
@@ -131,33 +136,22 @@ ctrl + command + options + right  - change monitor
 ctrl + options + shift + left   - minimize (make smaller)
 ctrl + options + shift + right  - maximize (make larger)
 
-----
-
 command + shift + m --  zoom/maximize (doesnt work?)
 
-#this is retired. I am no longer using it.
-(These are set using automator as services. You should see them in App->services in menu-bar for them to work)
- ..# command + control + option - 7  -- iTerm
- ..# command + control + option - 8  -- outlook
- ..# command + control + option - 9  -- chrome
- ..# command + shift + l --  lock screen
-
-
-Things to Know/Terminologies
---------------------------
+# Things to Know/Terminologies
 
 Mission Control -> The all windows splashing stuff
 LaunchPad       -> Grid of apps
 
-Text Movements:
-----------------
+# Text Movements:
 
-command + left/right : Jump start of line/end of line
-option  + left/right : Jump start of word      <--- MOST FREQUENT NEED
-command + up/down : Jump para'ish
+* command + left/right : Jump start of line/end of line
+* option  + left/right : Jump start of word      --- MOST FREQUENT NEED
+* command + up/down : Jump para'ish
 
-chrome:
---------
+# App specifics
+
+## chrome
 
 command+click       -> open link in new tab
 command+shift+click -> open link in new tab + focus   # MOST USED
@@ -171,8 +165,7 @@ command+option+u    -> see source
 command+[   /]      -> back/forward
 command+left/right  -> back/forward
 
-iTerm
------
+## iTerm
 
 
 Command +   +/-  -->  Font size increase decrease
@@ -184,8 +177,7 @@ shift-command-d  --> create new split-pane vertical
 command+shift +/-  -> size of pane
 shit+command+enter --> zoom out pane
 
-Outlook
---------
+## Outlook
 
 Command + T          --> mark an item as read.
 Command + Option + F --> search
@@ -195,8 +187,7 @@ Control + Shift + [ / ] --> next/prev panes
 
 Command +  +/-       --> Font size increase
 
-Finder
--------
+## Finder
 
 Command-up   -> one folder up
 Command-down -> go into selected foler (like enter)
@@ -206,70 +197,66 @@ command + option + backsapce -> direct delete /w/o trash
 
 command + shift + n -> create new folder
 
-Dont make mac go to sleep
---------------------------
+## command-line tools
 
+### Dont make mac go to sleep
+```
 #-t <>  time in sec, omit it if u want forever
 #-d     dont display sleep
 #-i     dont idle sleep (Whatever is that from normal sleep)
 #-m     no disk sleep
 #-s     no sleep on ac-power
 caffeinate -t 3600 -d -m -i -s &
+```
 
-Pop-up a message
-------------------
+### Pop-up a message
 
 osascript -e 'display notification "Lorem ipsum dolor sit amet" with title "Title"'
 
 
-View pictures/photos
---------------
+## View pictures/photos
 
 * Open folder in finder
 * Press spacebar on a picture. This will open the picture in finder itself
 * Then use up/down to scroll pictures!
 
-Restart dock
-------------
+## Restart dock
 
+```
 #when some icon has notification info stuck
 killall Dock
+```
 
 windirstat for mac:
 
 omnidisksweeper
 
-YET TO FIND:
-~~~~~~~~~~~~
+# YET TO FIND:
 
 * how to shift tabs (as in 3 finger scroll in chromebook) with gesture
 
-Wish List
-~~~~~~~~~
+# Wish List
 
 * Some nice way to sepearate 2 chrome windows and go to a paritcular instance on choice.
    Thus work-related tabs is in one chrome, while personal tabs are in another
 
-Quick-Silver
-------------
+# Quick-Silver
 
 http://mac.appstorm.net/how-to/productivity-how-to/mastering-quicksilver-the-basics/
 
-Open chrome tabs from quick-silver
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## Open chrome tabs from quick-silver
 
 * Type chrome in quick-silver, right-arrow -> open-web-page --> (You should see your tabs here!)
 *  Now press-tab to the execute item
   * Here, you should choose reveal tab
 
-Login wall paper
-----------------
+# Login wall paper
 
 sudo chflags nouchg /Library/Caches/com.apple.desktop.admin.png
 
-Command line tools
--------------------
+# Command line tools
 
+```
 diskutil list
 diskutil eject /dev/disk2
 diskutil unmountDisk /dev/disk2
@@ -286,27 +273,24 @@ hdiutil convert a.img -format UDRW -o writable.img
 hdiutil attach -nomount filename
 diskutil list
 diskutil mountDisk /dev/disk<N>
+```
 
-Xterm from other machines
--------------------------
+## Xterm from other machines
 
 open up DISPLAY from other machines.
 xhost +
 
 
-cpu info
-~~~~~~~~~~
+## cpu info
 
 sysctl -a | grep machdep.cpu
 
-Whcih apps start at startup
------------------------------
+# Whcih apps start at startup
 
 System-Preferences -> Users&Groups -> You -> LoginItems
 
 
-NFS in mac
------------
+# NFS in mac
 
 showmount -e mforge2
 
@@ -315,14 +299,14 @@ sudo mount -t nfs mforge2:/export/home/lakshman_narayanan /Users/lakshman.naraya
 sudo umount /Users/lakshman.narayanan/forge_home
 
 
-Access the docker installed linux-VM:
--------------------------------------
+# Access the docker installed linux-VM:
 
+```
 #note this is tty:
 screen ~/Library/Containers/com.docker.docker/Data/com.docker.driver.amd64-linux/tty
+```
 
-Paint in MAC
-------------
+# Paint in MAC
 
 Just use preview.
 
