@@ -142,6 +142,16 @@ command + shift + m --  zoom/maximize (doesnt work?)
 
 Mission Control -> The all windows splashing stuff
 LaunchPad       -> Grid of apps
+Spotlight       -> mac's default keyboard-based app laucher on cmd-space (i have mapped to ctrl-space)
+MenuBar         -> Top bar in mac
+  * Apple menu
+  * App menu
+  * status menu
+
+## Folders of interest in mac
+
+* /Applications                      -- all apps are here.1
+* /Users/lakshman.narayanan/.Trash   -- trash!
 
 # Text Movements:
 
@@ -196,6 +206,11 @@ command +backsapce -> move to trash
 command + option + backsapce -> direct delete /w/o trash
 
 command + shift + n -> create new folder
+
+### Get the pwd of current folder
+
+* Simply go one level up, drag the folder icon to terminal.
+  (You can drag it to any where a folder is expected)
 
 ## command-line tools
 
@@ -311,3 +326,19 @@ screen ~/Library/Containers/com.docker.docker/Data/com.docker.driver.amd64-linux
 Just use preview.
 
 You can open a blank white image and start drawing on it. Click the icon left ot search window in top right corner.
+
+
+# Change default app in mac
+
+* Right click the file of the type
+* Click Get-Info
+* Scroll down and exapand open-with
+* Choose your app from drop down and click change-all
+
+# change screenshot location in mac
+
+```
+defaults write com.apple.screencapture location /Users/lakshman.narayanan/Downloads/screenshots
+killall SystemUIServer
+```
+

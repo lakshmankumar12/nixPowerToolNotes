@@ -31,6 +31,7 @@ awk --posix
 ```awk
 cmd = "build your command"
 cmd | getline var_name
+close (cmd)
 ```
 
 ## Peek one line ahead

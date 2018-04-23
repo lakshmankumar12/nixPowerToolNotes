@@ -404,6 +404,8 @@ git bisect run /script
 
 git bisect start HEAD TiMOS-MG_0_0_I1630 --
 
+git bisect reset
+
 worktree
 ---------
 
@@ -594,6 +596,9 @@ svn revert -R .
 svn log --verbose -r <commit>
 svn diff --summarize -r<rev>:<rev-1>
 
+#log commits on one author/user
+svn log | sed -n '/USERNAME/,/-----$/ p'
+
 #dump actual contents of a commit with diffs
 svn diff -r<rev-1>:<rev>
 
@@ -660,11 +665,17 @@ git worktree add -b $svn_added_name ../${git_wt_dir_name}/${branch}/import remot
 cd ${git_work_tree_dir}/${git_wt_dir_name}
 echo ${branch} > .branch_name
 echo "${branch} worktree" > .comments
-cp ~/gitlab/aryaka-new-clone/gitignore_for_git_wt > {branch}/.gitignore
+cp ~/gitlab/aryaka-new-clone/gitignore_for_git_wt $(cat .branch_name)/.gitignore
 
+export SVNGITROOT=$(pwd)
 ~/gitlab/aryaka-new-clone/prepare_git_clone_files.sh
 build_cscope.sh
 
 #update aryaka-new-clone/shiftclone.py of the dir-names both normal and git.
 #update aryaka-new-clone/update_git_root_clones.sh of the new branch
 
+
+## adding a new author:
+
+Just add to /home/lakshman_narayanan/ws/git-dir-for-svn/authors.txt
+and return update_git_root_clones.sh

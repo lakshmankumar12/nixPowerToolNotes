@@ -65,6 +65,13 @@ main-vertical
 #swithc off window rename
 set-option allow-rename off
 
+#new-session
+tmux new-session -s name
+#new-session duplicated to another
+tmux new-session -s dup_name -t exist_name
+#kill a session
+tmux kill-session -t dup_name
+
 ssh
 ---
 
@@ -253,7 +260,14 @@ To switch focus to different scrolling area:
 To find:
 
 config
+#plain set opens up the configurations.
 :set
+
+#whatever i changed
+default page: https://google.com
+
+#search:
+{"DEFAULT": "https://www.google.com/search?q={}"}
 
 
 xargs
@@ -263,6 +277,12 @@ xargs
 find . -print 0 | xargs -0 your_command
 
 
+hexdump/od
+-----------
+
+#dump boht hex and ascii
+
+hexdump -C <file>
 
 
 

@@ -1,4 +1,6 @@
 
+[//]: # (Search / LAg to arrive here: networking)
+
 # iproute2
 
 [Good link to read on](http://lartc.org/howto/)
@@ -15,6 +17,9 @@ ip link list
 
 ```
 ip neigh show
+
+#delete a entry
+ip neigh delete 9.3.76.43 dev eth0
 
 #old
 #display table
@@ -181,12 +186,90 @@ ip tun show
 
 * vti related:
 
+## tc commands
+
+Problem: We have two customers, A and B, both connected to the internet via
+eth0. We want to allocate 60 kbps to B and 40 kbps to A. Next we want to
+subdivide A's bandwidth 30kbps for WWW and 10kbps for everything else. Any
+unused bandwidth can be used by any class which needs it (in proportion of its
+allocated share).
+
+This command attaches queue discipline HTB to eth0 and gives it the "handle"
+1:. This is just a name or identifier with which to refer to it below. The
+default 12 means that any traffic that is not otherwise classified will be
+assigned to class 1:12.
+```
+tc qdisc add dev eth0 root handle 1: htb default 12
+```
+
+The first line creates a "root" class, 1:1 under the qdisc 1:. The definition
+of a root class is one with the htb qdisc as its parent. A root class, like
+other classes under an htb qdisc allows its children to borrow from each other,
+but one root class cannot borrow from another. We could have created the other
+three classes directly under the htb qdisc, but then the excess bandwidth from
+one would not be available to the others.
+```
+tc class add dev eth0 parent 1: classid 1:1 htb rate 100kbps ceil 100kbps 
+tc class add dev eth0 parent 1:1 classid 1:10 htb rate 30kbps ceil 100kbps
+tc class add dev eth0 parent 1:1 classid 1:11 htb rate 10kbps ceil 100kbps
+tc class add dev eth0 parent 1:1 classid 1:12 htb rate 60kbps ceil 100kbps
+```
+
+Now match filters to the classes
+```
+tc filter add dev eth0 protocol ip parent 1:0 prio 1 u32 \
+   match ip src 1.2.3.4 match ip dport 80 0xffff flowid 1:10
+tc filter add dev eth0 protocol ip parent 1:0 prio 1 u32 \
+   match ip src 1.2.3.4 flowid 1:11
+```
+
+## Quickly add a rate limiter to a interface
+
+```
+sudo tc qdisc add dev eth0 root handle 1: htb default 12
+sudo tc class add dev eth0 parent 1:1 classid 1:12 htb rate 15mbit ceil 15mbit
+
+#remove
+sudo tc qdisc del dev eth0 root
+```
 
 
 # Ip-Routing-Tables
 
 * blackhole -> pkt is discarded. No icmp is generated
 * throw     -> routing stops at this table. Further tables are taken up. Note: default - throw exists for all tables!
+
+## Sample iptabes
+
+### Nat A IP hidden behind a machine
+
+```
+#notes:
+# * 172.18.10.240 is the IP that is being front-ended by this machine over eth0
+# * 10.32.100.2 is the real ip of the INSIDE machine. 100.1 is the IP on the local interface of this machine, on eth1
+# * The first rule dnats pkts-from-world to the inside machine (this and 3rd are completments and replace IP one to one)
+# * The second rule snats pkts-from-world with src-ip of this machine. (this is a regular P-NAT and the reverse traffice is auto-NATted)
+# * The thrid rule is for return traffic back from the inside machine
+iptables -A PREROUTING -t nat -i eth0 -d 172.18.10.240 -j DNAT --to-dest 10.32.100.2
+iptables -A POSTROUTING -t nat -o eth1 -d 10.32.100.2 -j SNAT --to-source 10.32.100.1
+iptables -A POSTROUTING -t nat -o eth0 -s 10.32.100.2 -j SNAT --to-source 172.18.10.240
+```
+
+### Regular nat to internet
+
+```
+# * first is the simple rule
+# * second is an enhancement with exceptions.
+# * note that the reverse traffic will auto-nat
+iptables -t nat -A POSTROUTING -o eth0 -j SNAT --to-source 172.18.14.3
+iptables -t nat -A POSTROUTING -o eth0 -d ! 172.16.0.0/12 -j SNAT --to-source 172.18.14.3
+```
+
+### Just drop all pkts
+
+```
+iptables -t mangle -A PREROUTING -s ${ip1} -d ${ip2} -j DROP
+```
 
 # List all open ports
 
@@ -242,6 +325,7 @@ greater <>
 <= <n>
 
 
+host 10.1.2.3
 src 10.5.2.3 and dst port 3389
 src net 192.168.0.0/16 and dst net 10.0.0.0/8 or 172.16.0.0/16     # or is for the dst net ( .. or .. )
 src mars and not dst port 22
@@ -289,6 +373,77 @@ hping3
 -I <interface>  #interface to bind to
 ```
 
+## iperf
+
+### server
+
+```
+-s        Start as server
+-B        bind to this local ip
+-p        listen port
+```
+
+
+### help display
+
+```
+Usage: iperf [-s|-c host] [options]
+       iperf [-h|--help] [-v|--version]
+
+Client/Server:
+  -f, --format    [kmKM]   format to report: Kbits, Mbits, KBytes, MBytes
+  -i, --interval  #        seconds between periodic bandwidth reports
+  -l, --len       #[KM]    length of buffer to read or write (default 8 KB)
+  -m, --print_mss          print TCP maximum segment size (MTU - TCP/IP header)
+  -o, --output    <filename> output the report or error message to this specified file
+  -p, --port      #        server port to listen on/connect to
+  -u, --udp                use UDP rather than TCP
+  -w, --window    #[KM]    TCP window size (socket buffer size)
+  -B, --bind      <host>   bind to <host>, an interface or multicast address
+  -C, --compatibility      for use with older versions does not sent extra msgs
+  -M, --mss       #        set TCP maximum segment size (MTU - 40 bytes)
+  -N, --nodelay            set TCP no delay, disabling Nagle's Algorithm
+  -V, --IPv6Version        Set the domain to IPv6
+
+Server specific:
+  -s, --server             run in server mode
+  -U, --single_udp         run in single threaded UDP mode
+  -D, --daemon             run the server as a daemon
+
+Client specific:
+  -b, --bandwidth #[KM]    for UDP, bandwidth to send at in bits/sec
+                           (default 1 Mbit/sec, implies -u)
+  -c, --client    <host>   run in client mode, connecting to <host>
+  -d, --dualtest           Do a bidirectional test simultaneously
+  -n, --num       #[KM]    number of bytes to transmit (instead of -t)
+  -r, --tradeoff           Do a bidirectional test individually
+  -t, --time      #        time in seconds to transmit for (default 10 secs)
+  -F, --fileinput <name>   input the data to be transmitted from a file
+  -I, --stdin              input the data to be transmitted from stdin
+  -L, --listenport #       port to receive bidirectional tests back on
+  -P, --parallel  #        number of parallel client threads to run
+  -T, --ttl       #        time-to-live, for multicast (default 1)
+  -Z, --linux-congestion <algo>  set TCP congestion control algorithm (Linux only)
+
+Miscellaneous:
+  -x, --reportexclude [CDMSV]   exclude C(connection) D(data) M(multicast) S(settings) V(server) reports
+  -y, --reportstyle C      report as a Comma-Separated Values
+  -h, --help               print this message and quit
+  -v, --version            print version information and quit
+
+[KM] Indicates options that support a K or M suffix for kilo- or mega-
+
+The TCP window size option can be set by the environment variable
+TCP_WINDOW_SIZE. Most other options can be set by an environment variable
+IPERF_<long option name>, such as IPERF_BANDWIDTH.
+
+
+```
+
+
+
+
+
 # iptables
 
 Adding a rule
@@ -311,6 +466,14 @@ iptables-save > /tmp/a.iptables
 iptables-restore -c < /tmp/a.iptables
 
 ```
+
+## Sample commands
+
+```
+#nat everything leaving eth0
+iptables -t nat -A POSTROUTING -o eth0 -d ! 172.16.0.0/12 -j SNAT --to-source 172.18.14.3
+```
+
 
 
 

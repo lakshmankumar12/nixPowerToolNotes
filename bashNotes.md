@@ -521,6 +521,13 @@ zsh$ bindkey '\C-y'
 
 https://askubuntu.com/questions/170348/how-to-create-a-local-apt-repository
 
+## remove a pkg
+
+```
+apt-get remove --purge libav-tools
+```
+
+
 # Centos pkg mgmt
 
 * Force install a rpm
@@ -532,3 +539,11 @@ https://askubuntu.com/questions/170348/how-to-create-a-local-apt-repository
     ```sh
     rpm -qpl whatever.rpm
     ```
+
+## chomp last line in file
+
+```
+perl -pe 'chomp if eof' filename > new_filename
+perl -pi -e 'chomp if eof' inline_filename
+```
+
