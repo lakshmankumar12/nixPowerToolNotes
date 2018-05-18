@@ -46,6 +46,7 @@ this_line=$0
 
 ## Detect duplicate lines in 2 files.
 
+* Note that the `==` ensures the dups are printed just once.
 ```awk
 sort file1 file2 | awk ' seen[$0]++ == 1' > dups
 ```
