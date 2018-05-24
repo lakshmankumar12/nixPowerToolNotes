@@ -61,6 +61,20 @@ sed -i 's/[[:space:]]\+$//' myfile
 
 sed -e '5d'
 
+## Add at nth line
+
+* You should use n-1 in script.
+
+```sh
+sed -n '3a' "you line content"
+```
+
+* Or add before
+
+```sh
+sed -n '3i' "you line content"
+```
+
 # Not really SED but text stuff with other tools
 
 ## Use perl when sed doesn't cut it
