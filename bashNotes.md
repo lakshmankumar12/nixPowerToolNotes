@@ -558,6 +558,12 @@ apt-get remove --purge libav-tools
     rpm -qpl whatever.rpm
     ```
 
+* Just extract files of a rpm
+    ```sh
+    rpm2cpio ./your-rpm.rpm | cpio -idmv
+    ```
+
+
 ## chomp last line in file
 
 ```

@@ -45,105 +45,105 @@
 
 ## screen shots
 
-command + shift + 3 -> full screen
-command + shift + 4 -> arbitrary screen shot
-command + shift + 4, and then space -> screen shot of one app
+* command + shift + 3 -> full screen
+* command + shift + 4 -> arbitrary screen shot
+* command + shift + 4, and then space -> screen shot of one app
 
 ## Tabby-stuff (for iTerm/Chrome)
 
-command+t                       -- new tab
-Command + 1..9                  -- nth tab
-command + shift + [  ]          -- shift tabs
-command + shift + options [  ]  -- move tabs (doesn't work in chrome, but works for iterm)
+* command+t                       -- new tab
+* Command + 1..9                  -- nth tab
+* command + shift + [  ]          -- shift tabs
+* command + shift + options [  ]  -- move tabs (doesn't work in chrome, but works for iterm)
   also
-  cmd   + shift + left/right    -- move tabs
+  * cmd   + shift + left/right    -- move tabs
 
 # Mac Default shortcuts / global-hotkeys
 
-ctrl + F2 -> menu bar
-ctrl + F3 -> go to dock, then use up/down arrow
-ctrl + F8 -> status-buttons (volume/one-drive)
-F8        -> open notification
-F11       -> show desktop (Not exactly minimize all windows - useful if u feel like seeing the desktop picture!)
-control + up   -> Mission control (3 finger up in trackpad) (all windows splashing) (also use F3 in mac-keyboard)
-control + down -> show all windows of current app (3 finger down in trackpad)
+* ctrl + F2 -> menu bar
+* ctrl + F3 -> go to dock, then use up/down arrow
+* ctrl + F8 -> status-buttons (volume/one-drive)
+* F8        -> open notification
+* F11       -> show desktop (Not exactly minimize all windows - useful if u feel like seeing the desktop picture!)
+* control + up   -> Mission control (3 finger up in trackpad) (all windows splashing) (also use F3 in mac-keyboard)
+* control + down -> show all windows of current app (3 finger down in trackpad)
 
 
-control + shift   + power  -  display off
-control + command + q      -  lock
+* control + shift   + power  -  display off
+* control + command + q      -  lock
 
 
 ## custom-set ones / my maps / global-hotkeys:
 
 
-ctrl + F7  -> launchpad            (Apparently this conflicts with way-tab moves focus.. But i dont think i care about this)
+* ctrl + F7  -> launchpad            (Apparently this conflicts with way-tab moves focus.. But i dont think i care about this)
 
-ctrl + command + options + 4 - restart break timer
-ctrl + command + options + 5 - start break now
-ctrl + command + options + 6 - skip this break
+* ctrl + command + options + 4 - restart break timer
+* ctrl + command + options + 5 - start break now
+* ctrl + command + options + 6 - skip this break
 
-command + option + l -- iTerm
-command + option + k -- terminal
+* command + option + l -- iTerm
+* command + option + k -- terminal
 
-command + option + u -- Chrome
-command + option + y -- Safari
-command + option + o -- Outlook
+* command + option + u -- Chrome
+* command + option + y -- Safari
+* command + option + o -- Outlook
 
-command + option + b -- adobe
-command + option + n -- preview
-command + option + r -- finder
+* command + option + b -- adobe
+* command + option + n -- preview
+* command + option + r -- finder
 
-command + option + p -- Play-Music-App
-command + option + a -- audacity
-command + option + c -- slack
+* command + option + p -- Play-Music-App
+* command + option + a -- audacity
+* command + option + c -- slack
 
-command + option + , -- qutebrowser
-command + option + / -- pandora-play pause
+* command + option + , -- qutebrowser
+* command + option + / -- pandora-play pause
 
-command + option + e -- Global hot-key for iterm's hotkey-profile
+* command + option + e -- Global hot-key for iterm's hotkey-profile
 
 
-Available:
-j
-,
+### Available:
+* j
+* ,
 
-* dont use i -> its for chrome dev options.
-* dont use f -> its for find in outlook & full-size in spectacle.
-* dont use d -> its toggle for auto-hide in dock
+### Dont use
 
-* dont use left/right arrow -> they are used for resize in spectacle
+* i -> its for chrome dev options.
+* f -> its for find in outlook & full-size in spectacle.
+* d -> its toggle for auto-hide in dock
+* left/right arrow -> they are used for resize in spectacle
 
 ### this is retired. I am no longer using it.
 
 (These are set using automator as services. You should see them in App->services in menu-bar for them to work)
- ..# command + control + option - 7  -- iTerm
- ..# command + control + option - 8  -- outlook
- ..# command + control + option - 9  -- chrome
- ..# command + shift + l --  lock screen
-
+* command + control + option - 7  -- iTerm
+* command + control + option - 8  -- outlook
+* command + control + option - 9  -- chrome
+* command + shift + l --  lock screen
 
 
 ## Spectacle-window-shortcuts
 
-command + option + f  - full screen
-command + option + left   - make window left side  / cycle between half-left, one-third left, 2-3rd left
-command + option + right  - make window right side
+* command + option + f  - full screen
+* command + option + left   - make window left side  / cycle between half-left, one-third left, 2-3rd left
+* command + option + right  - make window right side
 
 
-ctrl + command + options + left   - change monitor
-ctrl + command + options + right  - change monitor
+* ctrl + command + options + left   - change monitor
+* ctrl + command + options + right  - change monitor
 
-ctrl + options + shift + left   - minimize (make smaller)
-ctrl + options + shift + right  - maximize (make larger)
+* ctrl + options + shift + left   - minimize (make smaller)
+* ctrl + options + shift + right  - maximize (make larger)
 
-command + shift + m --  zoom/maximize (doesnt work?)
+* command + shift + m --  zoom/maximize (doesnt work?)
 
 # Things to Know/Terminologies
 
-Mission Control -> The all windows splashing stuff
-LaunchPad       -> Grid of apps
-Spotlight       -> mac's default keyboard-based app laucher on cmd-space (i have mapped to ctrl-space)
-MenuBar         -> Top bar in mac
+* Mission Control -> The all windows splashing stuff
+* LaunchPad       -> Grid of apps
+* Spotlight       -> mac's default keyboard-based app laucher on cmd-space (i have mapped to ctrl-space)
+* MenuBar         -> Top bar in mac
   * Apple menu
   * App menu
   * status menu
@@ -163,49 +163,49 @@ MenuBar         -> Top bar in mac
 
 ## chrome
 
-command+click       -> open link in new tab
-command+shift+click -> open link in new tab + focus   # MOST USED
-command+l           -> address bar
+* command+click       -> open link in new tab
+* command+shift+click -> open link in new tab + focus   # MOST USED
+* command+l           -> address bar
 
-command+up/down     -> Goto top of page/bottom of page.   # Useful suprising more often.
+* command+up/down     -> Goto top of page/bottom of page.   # Useful suprising more often.
 
-command+option+i    -> developer tools
-command+option+u    -> see source
+* command+option+i    -> developer tools
+* command+option+u    -> see source
 
-command+[   /]      -> back/forward
-command+left/right  -> back/forward
+* command+[   /]      -> back/forward
+* command+left/right  -> back/forward
 
 ## iTerm
 
 
-Command +   +/-  -->  Font size increase decrease
+* Command +   +/-  -->  Font size increase decrease
 
 The current-line highlight gets enabled because of command + option + ;
 
 mine:
-shift-command-d  --> create new split-pane vertical
-command+shift +/-  -> size of pane
-shit+command+enter --> zoom out pane
+* shift-command-d  --> create new split-pane vertical
+* command+shift +/-  -> size of pane
+* shit+command+enter --> zoom out pane
 
 ## Outlook
 
-Command + T          --> mark an item as read.
-Command + Option + F --> search
-Command + Shift  + F --> Advanced search
+* Command + T          --> mark an item as read.
+* Command + Option + F --> search
+* Command + Shift  + F --> Advanced search
 
-Control + Shift + [ / ] --> next/prev panes
+* Control + Shift + [ / ] --> next/prev panes
 
-Command +  +/-       --> Font size increase
+* Command +  +/-       --> Font size increase
 
 ## Finder
 
-Command-up   -> one folder up
-Command-down -> go into selected foler (like enter)
+* Command-up   -> one folder up
+* Command-down -> go into selected foler (like enter)
 
-command +backsapce -> move to trash
-command + option + backsapce -> direct delete /w/o trash
+* command +backsapce -> move to trash
+* command + option + backsapce -> direct delete /w/o trash
 
-command + shift + n -> create new folder
+* command + shift + n -> create new folder
 
 ### Get the pwd of current folder
 
@@ -226,7 +226,9 @@ caffeinate -t 3600 -d -m -i -s &
 
 ### Pop-up a message
 
+```
 osascript -e 'display notification "Lorem ipsum dolor sit amet" with title "Title"'
+```
 
 
 ## View pictures/photos
@@ -242,7 +244,7 @@ osascript -e 'display notification "Lorem ipsum dolor sit amet" with title "Titl
 killall Dock
 ```
 
-windirstat for mac:
+### windirstat for mac
 
 omnidisksweeper
 
