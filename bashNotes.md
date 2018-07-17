@@ -133,7 +133,7 @@ ${varHavingYourBigString%%suffix}
 ```sh
 #Note the absence of dollar sign .. just plain curly brace!
 {a,b}          -> expands to a b
-{a,b}${c,d}    -> expands to ac ad bc bd
+{a,b}{c,d}     -> expands to ac ad bc bd
 {1..100}       -> expands to 1 2 ... 100
 {a,b}{1..5}    -> expands to a1 a2 a3 a4 a5 b1 b2 b3 b4 b5
 ```
@@ -571,3 +571,6 @@ perl -pe 'chomp if eof' filename > new_filename
 perl -pi -e 'chomp if eof' inline_filename
 ```
 
+# To read links
+
+http://chneukirchen.org/blog/archive/2008/02/10-zsh-tricks-you-may-not-know.html

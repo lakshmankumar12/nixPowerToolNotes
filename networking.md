@@ -53,11 +53,11 @@ ip link add link eth0 name eth0.2 type vlan id 2
 ```
 
 * The loose_binding flag stops the VLAN interface from tracking the line protocol status of the underlying device.
-* Also note the .2 name is not mandatory. But its nice to have that for convention!
+* Also note the .2 name is not mandatory (you can call eth0.2 as myvlan, say). But its nice to have that for convention!
 
 ```
-ip link add link eth0 name myvlan type vlan id 2 loose_binding on
-ip link delete myvlan type vlan
+ip link add link eth0 name eth0.2 type vlan id 2 loose_binding on
+ip link delete eth0.2 type vlan
 ip link add foo type vlan help
 ```
 
@@ -165,12 +165,28 @@ ip rule list
 ---
 ```
 
+#### add a ip rule
+
+```
+ip rule add from 192.168.100.17 tos 0x08 fwmark 4 table 7
+
+ip rule del prio {rule #}
+```
+
+
 ### show a routing-table
 
 ```
 ip route show table all
 ip route show table local
 ```
+
+### flush a table
+
+```
+ip route flush table myTable
+```
+
 
 ### dump all iptables rule
 
@@ -270,6 +286,10 @@ iptables -t nat -A POSTROUTING -o eth0 -d ! 172.16.0.0/12 -j SNAT --to-source 17
 ```
 iptables -t mangle -A PREROUTING -s ${ip1} -d ${ip2} -j DROP
 ```
+
+### Log a pkt
+
+iptables -t mangle -I PREROUTING -s ${ip} whatever-else-tomatch -j LOG --log-prefix "foo:"
 
 # List all open ports
 

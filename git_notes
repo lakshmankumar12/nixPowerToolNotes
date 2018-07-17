@@ -193,6 +193,11 @@ git stash drop stash@{1}
 git stash show -p
 git stash show -p stash@{1}
 
+#stash only certain files
+files_list=<files-that-shouldn't-be-staged>
+git add $files_list
+git stash save --keep-index
+git reset HEAD $files_list
 
 ***********
 
@@ -396,6 +401,11 @@ git rebase --continue
 #rebase w/o a tracking branch or if u have pushed
 git rebase -i parent_of_commit_to_rebase master
 
+Reflog
+-------
+
+git reflog --date=relative
+
 Bisect
 -------
 
@@ -583,7 +593,7 @@ svn diff
 #log a file
 svn log filename
 
-#get a particular version of file
+#get a particular version of file .. equivalent of git show
 svn cat -r 3 http://svn.red-bean.com/repos/test/readme.txt
 
 #reset to a particular revision

@@ -147,6 +147,7 @@
   * Apple menu
   * App menu
   * status menu
+* Dashboard       -> Grid of widgets. I have switched this off. Useless for me.
 
 ## Folders of interest in mac
 
