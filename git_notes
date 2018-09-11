@@ -565,7 +565,7 @@ Concepts
 Revisions
 ~~~~~~~~~
 
-HEAD     -> the top one in the repo
+HEAD     -> the top one in the repo(remote/origin)
 BASE     -> the one in my working-dir, before my changes
 COMMITED -> the actual revision starting from BASE(inclusive) in which the file changed.
 PREV     -> COMMITED-1.
@@ -621,6 +621,13 @@ svn commit -m "ASN-XXXX: commit message"
 #merge
 cd target_repository
 svn merge -c <commit-no> /path/to/src/branch/repository
+
+#properties
+svn proplist -v
+
+#list branches
+svn ls http://url/to/repo/root/branches --verbose
+
 
 #conflict
 * pospostone during update

@@ -219,9 +219,16 @@ declare -A bb_from_list
 bb_from_list=(["key1"]="value1" ["key2"]="value2")
 
 #Mind the exclamantion! W/o it it gives values
-for key in ${!aa[@]} ; do
+#Mind the Quotes - otherwise, if your key is "key with space", for will loop each word!
+for key in "${!aa[@]}" ; do
   echo "value at $key is ${aa[$key]}"
 done
+
+if [ ${aa[key]+_} ] ; then
+    echo "key found"
+else
+    echo "key not found"
+fi
 ```
 
 
@@ -468,13 +475,44 @@ done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 ```
 
+# Quick notes on common commands 
 
-# ps
+## ps
 
 ```sh
 #with long names
 ps -e -o "pid,user:16,command"
 ```
+
+## date
+
+```sh
+#date in a given format
+date '+%Y-%m-%d'
+
+%Y - XXXX
+%m - NN
+%d - DD
+%B - Month in Aaa form
+
+#get epoch seconds
+date '+%s'
+```
+
+date also supports addition in linux!
+```
+start=20141001
+end=20181201
+date=$start
+while [ $date != $end ] ; do
+    date=$(date --date="$date + 1 month" +'%Y%m%d') ;
+    yy=${date:0:4} ; mm=${date:4:2} ;
+    prefix="$yy-$mm-eStmt_$yy-$mm-21" ;
+    pdftotext -layout ../${prefix}.pdf ${prefix}.txt ;
+done
+```
+
+
 
 # Give multi-line input as stdin to a command
 

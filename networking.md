@@ -95,6 +95,11 @@ ip link set eth0 nomaster
 ip link show | awk ' /^[0-9]+:/ { link = $2 ; getline ; print link " " $0 } '
 ```
 
+```
+#show a bridge
+bridge link show
+```
+
 ### brctl
 
 ```
@@ -279,6 +284,12 @@ iptables -A POSTROUTING -t nat -o eth0 -s 10.32.100.2 -j SNAT --to-source 172.18
 # * note that the reverse traffic will auto-nat
 iptables -t nat -A POSTROUTING -o eth0 -j SNAT --to-source 172.18.14.3
 iptables -t nat -A POSTROUTING -o eth0 -d ! 172.16.0.0/12 -j SNAT --to-source 172.18.14.3
+```
+
+* you can also masquerade, but this is slower than SNAT.
+
+```
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 ```
 
 ### Just drop all pkts
@@ -527,6 +538,11 @@ ip xfrm state show
     ```
         nc -u -l <optional-src-addr> <mandatory-src-port>   # ip-addr if not mentioned, is any
     ```
+* As a udp client
+    ```
+        nc -u -s <optional-src-addr> <mandatory-srv-ip> <mandatory-srv-port>
+    ```
+
 * As a udp server and client at same time
     ```
         nc -u -s 192.2.53.2 -p 19000 192.15.2.2 8090

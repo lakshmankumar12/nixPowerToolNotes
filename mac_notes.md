@@ -49,6 +49,8 @@
 * command + shift + 4 -> arbitrary screen shot
 * command + shift + 4, and then space -> screen shot of one app
 
+* command + control + shift + 4 -> screen-shot in clipboard!
+
 ## Tabby-stuff (for iTerm/Chrome)
 
 * command+t                       -- new tab
@@ -292,6 +294,15 @@ hdiutil attach -nomount filename
 diskutil list
 diskutil mountDisk /dev/disk<N>
 ```
+
+http://darraghking.com/create-a-bootable-windows-10-usb-installer-with-a-mac/
+
+```
+sudo dd conv=notrunc bs=440 count=1 if=mbr.bin of=/dev/diskN
+```
+
+
+unetbootin is POISON. it adds a unet menu to all linux files.
 
 ## Xterm from other machines
 
