@@ -81,6 +81,48 @@ then
 fi
 ```
 
+## other string manipulations
+
+* Deletes shortest match of $substring from front of $string.
+```sh
+${string#substring}
+```
+
+* Deletes longest match of $substring from front of $string.
+```sh
+${string##substring}
+```
+
+* Deletes shortest match of $substring from back of $string.
+```sh
+${string%substring}
+```
+
+* Deletes longest match of $substring from back of $string.
+```sh
+${string%%substring}
+```
+
+* Replace first match of $substring with $replacement
+```sh
+${string/substring/replacement}
+```
+
+* Replace all matches of $substring with $replacement.
+```sh
+${string//substring/replacement}
+```
+
+* If $substring matches front end of $string, substitute $replacement for $substring.
+```sh
+${string/#substring/replacement}
+```
+
+* If $substring matches back end of $string, substitute $replacement for $substring.
+```sh
+${string/%substring/replacement}
+```
+
 ## Changing cases for strings
 
 ```sh
@@ -201,7 +243,7 @@ ${a[@]/#/XY}  #adds a XY to the beginning of all members
 ${a[@]/%/XY}  #adds a XY to the end of all members
 ```
 
-* gobble a command's line into a array:
+* gobble a file or command's line into a array:
 
 ```sh
 IFS=$'\r\n' GLOBIGNORE='*' XYZ=($(command))
@@ -249,6 +291,17 @@ for i (word1 word2) only_cmd $i
 ```sh
 while read i ; do echo "one line: $i" ; done < file
 ```
+
+## zsh way of getting lines of file into array
+
+```
+array_of_lines=("${(@f)$(my_command)}")
+for i in ${array_of_lines[@]} ; do
+    #do with i
+    echo $i
+done
+```
+
 
 Note: for i in $(cat line) .. will interate over each word of the file, not line!
 Note: cat file | while     .. wont cut it as while will work in a bash of its own and variables modifed inside
@@ -494,6 +547,9 @@ date '+%Y-%m-%d'
 %m - NN
 %d - DD
 %B - Month in Aaa form
+%H - hour
+%M - minute
+%S - second
 
 #get epoch seconds
 date '+%s'
@@ -540,7 +596,7 @@ Event Designator - chooses which command
 
 ```sh
 !! last comand
-!-n last nth command .. !-1 is same as !-2
+!-n last nth command .. !-1 is same as !!
 !# current command so far
 ```
 Word Designator - if blank, entire command.

@@ -338,11 +338,33 @@ https://danielmiessler.com/study/tcpdump/
 -q               # Show less protocol information.
 -E               # Decrypt IPSEC traffic by providing an encryption key.
 
+less useful
+-A               # print each pkt in ascii.. (Useful for text-based prot like HTTP having HTML)
+
 -w <file>        # write to a file
 -r <file>        # read from file
 ```
 
 ## Filter expressions
+
+* popular expressions
+```
+host <ip>
+src  <ip>
+dst  <ip>
+net  <net>/<mask>
+port <port>
+src port <port>
+dst port <port>
+portrange <start>-<end>
+icmp
+ip6
+less <size>
+greater <size>
+
+
+
+```
 
 ```
 <type> <dir> <proto>
@@ -373,7 +395,7 @@ protochain GRE && proto IP
 ```
 
 
-## Ping args
+## ping args
 
 ```
 ping <ip>
@@ -381,6 +403,7 @@ ping <ip>
 -c <n>              # send n ping pkts
 -s <pktsize>        # pkt-size in bytes
 -I <interface>      # Use this interface or ip-address
+-M do|dont          # do=>set DF bit, dont=>dont set DF
 ```
 
 

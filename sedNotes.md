@@ -4,6 +4,8 @@
     * will suppress the default printing.
 * `-i` 
     * in place replacement (ensure to have backup!)
+* `-r` 
+    * use extended regex in script.
 
 Basic syntax
 

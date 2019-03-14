@@ -39,7 +39,10 @@ tmux save-buffer <path-to-dest-filename>
 
 * clipboard
 ```
+#copy into tmux
 ... | tmux loadb -
+
+#paste from tmux
 tmux saveb - | ...
 ```
 
@@ -81,6 +84,12 @@ Ensure your original tmux and the attached-client version are same!
 # otherones
 main-vertical
 ```
+
+* To resize a pane
+```
+C-S up/down/left/right (my own maps)
+```
+
 
 * switch off window rename
 ```
@@ -245,6 +254,13 @@ yum install yum-utils
 repoquery -l <package-name>
 ```
 
+* find rpm that installed a binary
+```
+# rpm -q --whatprovides /usr/bin/ssh
+openssh-clients-5.5p1-24.fc14.2.i686
+```
+
+
 # tar
 
 * create
@@ -311,6 +327,7 @@ d   -> close a tab
 T   -> next tab (also J, but keeps confusing with J/K, so use T and K)
 nT  -> nth tab
 K   -> prev tab
+Sq  -> list all quickmarks and bookmarks
 ```
 
 * To switch focus to different scrolling area:

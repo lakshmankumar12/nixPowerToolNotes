@@ -37,6 +37,9 @@
 * command + enter -> full-screen/out-of-full-screen
 
 * show desktop - F11 (doest work on mac keyboard though)
+               - Command + F3 in mac keyboard)
+
+* command + control + spacebar  - character viewer/type emoji/unicode/uni-code chars
 
 ### force-quit
 
@@ -62,7 +65,7 @@
 
 # Mac Default shortcuts / global-hotkeys
 
-* ctrl + F2 -> menu bar
+* ctrl + F9 -> menu bar ( changed from F2.. doesn't work consistently on F2! )
 * ctrl + F3 -> go to dock, then use up/down arrow
 * ctrl + F8 -> status-buttons (volume/one-drive)
 * F8        -> open notification
@@ -101,13 +104,25 @@
 
 * command + option + , -- qutebrowser
 * command + option + / -- pandora-play pause
+* command + option + m -- t-mobile digits
 
 * command + option + e -- Global hot-key for iterm's hotkey-profile
 
 
 ### Available:
 * j
-* ,
+
+### not sure
+
+* g
+* h
+* q
+* s
+* t
+* v
+* w
+* x
+* z
 
 ### Dont use
 
@@ -200,6 +215,8 @@ mine:
 
 * Command +  +/-       --> Font size increase
 
+* ctrl + option + 1    --> Move to folder
+
 ## Finder
 
 * Command-up   -> one folder up
@@ -270,6 +287,21 @@ http://mac.appstorm.net/how-to/productivity-how-to/mastering-quicksilver-the-bas
 *  Now press-tab to the execute item
   * Here, you should choose reveal tab
 
+# blueutil
+
+```
+blueutil --recent
+
+blueutil --connect 38-a2-8c-bf-32-e6
+
+#status
+blueutil -p
+#on/off
+blueutil -p 0
+blueutil -p 1
+```
+
+
 # Login wall paper
 
 sudo chflags nouchg /Library/Caches/com.apple.desktop.admin.png
@@ -295,9 +327,22 @@ diskutil list
 diskutil mountDisk /dev/disk<N>
 ```
 
+## Create linux/win bootable iso-usb
+
 http://darraghking.com/create-a-bootable-windows-10-usb-installer-with-a-mac/
 
+* Disk-utility .. erase MBR(Fat)
 ```
+diskutil unmountDisk /dev/SOMEdisk2
+
+sudo fdisk -e /dev/SOMEdisk2
+print
+f 1
+write
+print
+exit
+diskutil unmountDisk /dev/SOMEdisk2
+
 sudo dd conv=notrunc bs=440 count=1 if=mbr.bin of=/dev/diskN
 ```
 
@@ -355,4 +400,6 @@ You can open a blank white image and start drawing on it. Click the icon left ot
 defaults write com.apple.screencapture location /Users/lakshman.narayanan/Downloads/screenshots
 killall SystemUIServer
 ```
+# Printers
 
+http://localhost:631/printers/

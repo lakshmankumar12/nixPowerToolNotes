@@ -55,3 +55,6 @@ virsh net-list --all
 #get info of a network
 virsh net-dumpxml <name>
 virsh net-info <name>
+
+# gui
+virt-manager

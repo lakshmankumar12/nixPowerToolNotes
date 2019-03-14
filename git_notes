@@ -145,6 +145,9 @@ Normally, @{u} is enuf. However, if you did a git fetch, chances are @{u} has ad
 
 git merge-base @{u} $(git symbolic-ref --short -q HEAD)
 
+#find the most-common-ancestor /parent of 2 commits
+git merge-base <commt1> <commit2>
+
 
 git diff args
 --------------
@@ -501,6 +504,7 @@ bk changes -/text/           git log --grep=<text>
 Create a new branch
 
 git checkout -b branch_name
+git checkout -b newbranch some_tag
 
 Switch to a branch
 
@@ -609,6 +613,7 @@ svn diff --summarize -r<rev>:<rev-1>
 #log commits on one author/user
 svn log | sed -n '/USERNAME/,/-----$/ p'
 
+#export
 #dump actual contents of a commit with diffs
 svn diff -r<rev-1>:<rev>
 
@@ -628,12 +633,24 @@ svn proplist -v
 #list branches
 svn ls http://url/to/repo/root/branches --verbose
 
+#find where a branch was created
+svn log --verbose --stop-on-copy $REPOSITORY/branches/feature
+The last line of will say something like this:
+		Changed paths:
+		   A /branches/feature (from /trunk:1234)
+link: https://stackoverflow.com/a/6258369
+
 
 #conflict
 * pospostone during update
 * conflict files are marked with C.
 * Work on it.
 * svn resolve --accept=working
+
+# link on svn-concept
+http://svnbook.red-bean.com/en/1.7/svn.advanced.externals.html
+http://wordaligned.org/articles/a-subversion-pre-commit-hook
+
 
 
 ***********
@@ -690,6 +707,7 @@ build_cscope.sh
 
 #update aryaka-new-clone/shiftclone.py of the dir-names both normal and git.
 #update aryaka-new-clone/update_git_root_clones.sh of the new branch
+#update /home/lakshman_narayanan/bitbucket/aryaka-notes/commands_to_refer.md
 
 
 ## adding a new author:
