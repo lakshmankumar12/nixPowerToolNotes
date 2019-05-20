@@ -106,7 +106,8 @@
 * command + option + / -- pandora-play pause
 * command + option + m -- t-mobile digits
 
-* command + option + e -- Global hot-key for iterm's hotkey-profile
+* command + option + e -- Global hot-key for iterm's hotkey-profile (set in iterm)
+* command + option + t -- itsyscal (set directly in this app)
 
 
 ### Available:
@@ -118,7 +119,6 @@
 * h
 * q
 * s
-* t
 * v
 * w
 * x
@@ -210,6 +210,8 @@ mine:
 * Command + T          --> mark an item as read.
 * Command + Option + F --> search
 * Command + Shift  + F --> Advanced search
+
+* Command + ctrl + k   --> link'ize a text
 
 * Control + Shift + [ / ] --> next/prev panes
 
