@@ -44,6 +44,13 @@ For video files (mp4 files) this doesn't work. use MP4Box from `sudo apt-get ins
 MP4Box -cat video1.mp4 -cat video2.mp4 -cat video3.mp4 -new final.mp4
 ```
 
+### Merge audio and video
+
+```
+avconv -i audio.mp3 -i video.mp4 -acodec copy -vcodec copy mixed.mp4
+```
+
+
 
 ## Extract subset of time
 
@@ -153,3 +160,10 @@ Create a folder and extract the image to that folder
 ```
 mkdir -p check; eyeD3 --write-images=check *.mp3
 ```
+
+## mac aiff to mp3
+
+```
+avconv -i "1 Audio Track.aiff" -acodec libmp3lame -ab 192k "1 Audio Track.mp3"
+```
+

@@ -606,12 +606,16 @@ svn update -r <earlier_revision_number>
 #revert any modifications (or merge) - WARN changes are LOST
 svn revert -R .
 
+#unedit checkout revert just one file
+svn revert path/to/file
+
 #dump file names of a commit
 svn log --verbose -r <commit>
 svn diff --summarize -r<rev>:<rev-1>
 
 #log commits on one author/user
-svn log | sed -n '/USERNAME/,/-----$/ p'
+user=
+svn log | sed -n "/${user}/,/-----$/ p"
 
 #export
 #dump actual contents of a commit with diffs

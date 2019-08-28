@@ -56,6 +56,8 @@ sort file1 file2 | awk ' seen[$0]++ == 1' > dups
 ```awk
 awk 'NR==FNR{a[$0];next}!($0 in a)' file1 file2 > diff.txt
 ```
+* NR is record(i.e line) number being processed by awk as a whole
+* FNR is like NR, but gets reset back to 1 for every file. So the cond NR==FNR is true for first file only.
 
 ## Get rid of 1st field
 

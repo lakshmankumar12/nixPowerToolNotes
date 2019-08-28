@@ -244,6 +244,24 @@ tc filter add dev eth0 protocol ip parent 1:0 prio 1 u32 \
    match ip src 1.2.3.4 flowid 1:11
 ```
 
+### Notes on handles
+
+* handle are simply IDs to the tree-hierarchy. A handle can identify either a qdisc itself or one class of a qdisc.
+* qdisc can be classful(HTB,prio) or classless (pfifo_fast,bfifo_fast,netem)
+* The handle has one major-number and one minor-number.
+* You are free to assign any major-number.
+* All classes sharing the same major-number should be attached against the same parent!
+* Minor numbers of qdiscs/classes under the same parent must be different.
+
+### Notes on filters
+
+* Sample catch-all filter
+```
+#Notice the dst 0/0. Priority of this should be less than other filters!
+tc filter add dev ${ifname} protocol ip parent 1: prio 2 u32 match ip dst 0.0.0.0/0 flowid 1:3
+```
+
+
 ## Quickly add a rate limiter to a interface
 
 ```
@@ -254,11 +272,71 @@ sudo tc class add dev eth0 parent 1:1 classid 1:12 htb rate 15mbit ceil 15mbit
 sudo tc qdisc del dev eth0 root
 ```
 
-
 # Ip-Routing-Tables
+
+Adding a rule
+```
+-t nat         Operate on the nat table...
+-A PREROUTING  ... by appending the following rule to its PREROUTING chain.
+-i eth1        Match packets coming in on the eth1 network interface...
+-p tcp         ... that use the tcp (TCP/IP) protocol
+--dport 80     ... and are intended for local port 80.
+-j DNAT        Jump to the DNAT target...
+--to-destination 192.168.1.3:8080 ... and change the destination address to 192.168.1.3 and destination port to 8080.
+```
+
+Load a dump of iptables-save
+```
+#Dump first
+iptables-save > /tmp/a.iptables
+#edit
+#reload
+iptables-restore -c < /tmp/a.iptables
+
+```
 
 * blackhole -> pkt is discarded. No icmp is generated
 * throw     -> routing stops at this table. Further tables are taken up. Note: default - throw exists for all tables!
+
+## args expln
+
+```sh
+-s source_ip_with_mask_in_slash_style
+-d dest_ip_with_mask_in_slash_style
+-p protocol
+-p prot --sport port_num
+-p prot --dport port_num
+
+# usually
+-m some_action --some_keyword some_value
+# just comment, otherwise nothing really done
+-m comment --comment "some comment for why this rule is done"
+# match tcp pkts with ACK in them
+-m tcp --tcp-flags ACK
+# match a conn-tracker state
+-m state --state NEW
+
+```
+
+## chains and tables to use
+
+* To drop incoming pkts
+```
+-A PREROUTING -t raw -j DROP
+```
+* To drop outgoing pkts
+```
+-A POSTROUTING -t mangle -j DROP
+```
+
+
+## Sample commands
+
+```
+#nat everything leaving eth0
+iptables -t nat -A POSTROUTING -o eth0 -d ! 172.16.0.0/12 -j SNAT --to-source 172.18.14.3
+```
+
 
 ## Sample iptabes
 
@@ -493,44 +571,6 @@ IPERF_<long option name>, such as IPERF_BANDWIDTH.
 
 
 ```
-
-
-
-
-
-# iptables
-
-Adding a rule
-```
--t nat         Operate on the nat table...
--A PREROUTING  ... by appending the following rule to its PREROUTING chain.
--i eth1        Match packets coming in on the eth1 network interface...
--p tcp         ... that use the tcp (TCP/IP) protocol
---dport 80     ... and are intended for local port 80.
--j DNAT        Jump to the DNAT target...
---to-destination 192.168.1.3:8080 ... and change the destination address to 192.168.1.3 and destination port to 8080.
-```
-
-Load a dump of iptables-save
-```
-#Dump first
-iptables-save > /tmp/a.iptables
-#edit
-#reload
-iptables-restore -c < /tmp/a.iptables
-
-```
-
-## Sample commands
-
-```
-#nat everything leaving eth0
-iptables -t nat -A POSTROUTING -o eth0 -d ! 172.16.0.0/12 -j SNAT --to-source 172.18.14.3
-```
-
-
-
-
 
 # IPsec configuration
 

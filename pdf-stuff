@@ -18,10 +18,10 @@ pdftk input.pdf background mark.pdf output marked-file.pdf
 java -jar ./jpdftweak.jar
 
 
-# Rotate the first PDF page to 90 degrees clockwise
+# rotate the first PDF page to 90 degrees clockwise
 pdftk in.pdf cat 1east 2-end output out.pdf
 
-# Rotate an entire PDF document to 180 degrees
+# rotate an entire PDF document to 180 degrees
 pdftk in.pdf cat 1-endsouth output out.pdf
 
 # Modify meta-data

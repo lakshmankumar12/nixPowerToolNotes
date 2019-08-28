@@ -303,12 +303,18 @@ blueutil -p 0
 blueutil -p 1
 ```
 
+# Installing console / serial port on mac
+
+Search: usb console serial terminal tty.serial usb.serial
+
+https://plugable.com/2011/07/12/installing-a-usb-serial-adapter-on-mac-os-x/
+
 
 # Login wall paper
 
 sudo chflags nouchg /Library/Caches/com.apple.desktop.admin.png
 
-# Command line tools
+# Drive related tools
 
 ```
 diskutil list
@@ -347,9 +353,23 @@ diskutil unmountDisk /dev/SOMEdisk2
 
 sudo dd conv=notrunc bs=440 count=1 if=mbr.bin of=/dev/diskN
 ```
-
-
 unetbootin is POISON. it adds a unet menu to all linux files.
+
+## Take a simple iso copy of a dvd or cd
+
+```
+diskutil list
+#find out your diskN
+diskutil umount /dev/diskN
+dd if=/dev/disk2 of=pt1.iso
+```
+
+### Mounting a cd-iso image in mac
+
+```
+hdiutil mount /path/to/iso
+```
+
 
 ## Xterm from other machines
 

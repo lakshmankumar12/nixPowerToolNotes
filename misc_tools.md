@@ -260,6 +260,12 @@ repoquery -l <package-name>
 openssh-clients-5.5p1-24.fc14.2.i686
 ```
 
+* List all installed packages
+```
+rpm -qa
+```
+
+
 
 # tar
 
@@ -292,7 +298,7 @@ df -T
 lsblk
 ```
 
-* get UUIDs of all disks
+* get UUIDs of all disks. Also lists the partition-type and fs-type!
 ```
 blkid
 ```
@@ -301,6 +307,24 @@ blkid
 ```
 lspci
 ```
+
+* commandline for gparted
+```
+parted
+```
+
+link on getting partition aligned right - https://blog.hqcodeshop.fi/archives/273-GNU-Parted-Solving-the-dreaded-The-resulting-partition-is-not-properly-aligned-for-best-performance.html
+
+* other cmds
+```
+lshw
+lspci
+lsusb
+lsbk
+lscpu
+lsdev
+```
+
 
 
 # Vimium shortcuts
@@ -373,4 +397,15 @@ hexdump -C <file>
 ```
 
 
+
+# outlook msg files
+
+open msg files in mac/linux
+
+Src: https://superuser.com/a/979603/544330
+
+```
+sudo apt-get install libemail-outlook-message-perl libemail-sender-perl
+msgconvert outlooksavedmail.msg
+```
 

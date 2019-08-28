@@ -56,5 +56,8 @@ virsh net-list --all
 virsh net-dumpxml <name>
 virsh net-info <name>
 
+virsh net-destory <name>
+virsh net-undefine <name>
+
 # gui
 virt-manager

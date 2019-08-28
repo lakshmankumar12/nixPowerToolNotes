@@ -53,6 +53,14 @@ info proc mappings
 
 # Miscellaneous Stuff
 
+## Prompt handling
+
+```
+set pagination off
+set confirm off
+```
+
+
 * ptype (or) using a class-type will not work in a frame of a member function. Just come out
 
 ## disassemble with source
@@ -65,3 +73,20 @@ disassemble /m
 handle SIGPIPE nostop noprint pass
 ```
 
+## thread
+
+```
+thread <n>
+thread apply all bt
+```
+
+* $_thread is a gdb convenience variable for current thread.
+  For eg: the following makes breakpoint 2 not stop for thread-57
+  ```
+  cond 2 $_thread != 57
+  ```
+  
+
+## Interpreting kernel log lines on seg-fault.
+
+https://stackoverflow.com/questions/2549214/interpreting-segfault-messages/2549363
