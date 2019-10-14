@@ -32,6 +32,8 @@ virsh
 
 https://libvirt.org/sources/virshcmdref/html-single/
 
+https://blog.programster.org/kvm-cheatsheet
+
 virt-host-validate
 
 virsh nodeinfo
@@ -58,6 +60,11 @@ virsh net-info <name>
 
 virsh net-destory <name>
 virsh net-undefine <name>
+
+virsh pool-list --all
+virsh pool-info <pool-name>
+
+virsh vol-list <pool-name>
 
 # gui
 virt-manager

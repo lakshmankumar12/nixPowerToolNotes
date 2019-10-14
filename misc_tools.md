@@ -325,7 +325,41 @@ lscpu
 lsdev
 ```
 
+* mounting a cd
+```
+mount -o loop /path/to/file.iso /mnt/cd-contents
+```
 
+
+* bring in a iso file as block-device
+```
+#add a loop dev
+losetup -Pf  CentOS-7-x86_64-Minimal-1810.iso
+#remove the loop dev
+losetup -d /dev/loop0
+```
+
+* usb-serial in linux
+```
+lsusb
+...
+Bus 005 Device 002: ID 067b:2303 Prolific Technology, Inc. PL2303 Serial Port
+... get the xxxx:yyyy detail from above.
+sudo modprobe usbserial vendor=0x067b product=0x2303
+dmesg
+...
+[83780.104313] usb 2-1.2: new full-speed USB device number 13 using ehci-pci
+[83780.186687] usb 2-1.2: New USB device found, idVendor=067b, idProduct=2303
+[83780.193659] usb 2-1.2: New USB device strings: Mfr=1, Product=2, SerialNumber=0
+[83780.201044] usb 2-1.2: Product: USB-Serial Controller D
+[83780.206377] usb 2-1.2: Manufacturer: Prolific Technology Inc.
+[83780.236187] usbcore: registered new interface driver pl2303
+[83780.241867] usbserial: USB Serial support registered for pl2303
+[83780.247856] pl2303 2-1.2:1.0: pl2303 converter detected
+[83780.254926] usb 2-1.2: pl2303 converter now attached to ttyUSB0
+...
+screen /dev/ttyUSB0 115200
+```
 
 # Vimium shortcuts
 
@@ -407,5 +441,23 @@ Src: https://superuser.com/a/979603/544330
 ```
 sudo apt-get install libemail-outlook-message-perl libemail-sender-perl
 msgconvert outlooksavedmail.msg
+```
+
+## mac and outlook
+
+https://answers.microsoft.com/en-us/msoffice/forum/all/outlook-2016-mac-search-matching-x-or-y/982e61eb-0f41-4aa6-8815-8a0cef22adbf
+https://tech.setepontos.com/2017/06/13/how-to-aggregate-folderse-mail-with-smart-folders-on-outlook-for-mac-advanced-search-with-raw-queries/
+
+```
+com_microsoft_outlook_unread == 1
+kMDItemAuthors == "Joe Cool"
+kMDItemRecipients == "John Smith"c
+kMDItemTextContent == "*commented on*"
+com_microsoft_outlook_folderID == 146 && com_microsoft_outlook_messageSent < $time.iso("2019-07-01 00:00:00Z")
+com_microsoft_outlook_messageSent < $time.iso("2018-12-31 00:00:00Z")
+
+com_microsoft_outlook_folderID == 146 && (kMDItemTextContent == "commented on"  || kMDItemTextContent == "edited a comment" || kMDItemTextContent == "created an issue" || kMDItemTextContent == "Status:" || kMDItemTextContent == "reopened an" || kMDItemTextContent == "resolved as")
+com_microsoft_outlook_folderID == 146 && com_microsoft_outlook_unread == 1 && (kMDItemTextContent == "commented on"  || kMDItemTextContent == "edited a comment" || kMDItemTextContent == "created an issue" || kMDItemTextContent == "Status:")
+"Change By:	Asn Automation"
 ```
 

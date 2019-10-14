@@ -312,7 +312,11 @@ iptables-restore -c < /tmp/a.iptables
 # just comment, otherwise nothing really done
 -m comment --comment "some comment for why this rule is done"
 # match tcp pkts with ACK in them
--m tcp --tcp-flags ACK
+## tcp-flags have this peculiar --tcp-flags flag mask (i.e the first say the list of flags we are bothered about, and the second says set/unset )
+###  thus the first is to match all pkts with ACK set
+-m tcp --tcp-flags ACK ACK
+###  this is to match all pkts with ACK set, RST unset, SYN unset
+-m tcp --tcp-flags SYN,ACK,RST ACK
 # match a conn-tracker state
 -m state --state NEW
 
@@ -375,6 +379,12 @@ iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 ```
 iptables -t mangle -A PREROUTING -s ${ip1} -d ${ip2} -j DROP
 ```
+* Drop pkts from local-app/kernel
+```
+iptables -t filter -A OUTPUT -s 192.170.246.1/32 -p tcp -m tcp --tcp-flags RST RST -j DROP
+```
+
+ssh -nNT -R 9222:localhost:22 lakshman_narayanan@mforge3.corp.aryaka.com &
 
 ### Log a pkt
 
@@ -571,6 +581,18 @@ IPERF_<long option name>, such as IPERF_BANDWIDTH.
 
 
 ```
+
+## ab tool
+
+```
+#start
+ab -n 1000 -c 10 -s 30 https://${pip}/${file_to_download}
+
+-n   : number of requests
+-c   : number of concurrent requests
+-s   : timeout
+```
+
 
 # IPsec configuration
 

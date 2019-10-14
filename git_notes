@@ -407,6 +407,7 @@ git rebase -i parent_of_commit_to_rebase master
 Reflog
 -------
 
+#track how HEAD moved
 git reflog --date=relative
 
 Bisect

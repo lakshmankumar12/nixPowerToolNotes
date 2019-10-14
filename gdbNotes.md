@@ -60,6 +60,11 @@ set pagination off
 set confirm off
 ```
 
+## Print a full array
+
+```
+set print elements 0
+```
 
 * ptype (or) using a class-type will not work in a frame of a member function. Just come out
 
