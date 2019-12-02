@@ -249,10 +249,25 @@ dpkg-query -L <package-name>
 yum install yum-utils
 ```
 
-* list files in a package
-```
-repoquery -l <package-name>
-```
+* list files in a package that is installed
+    ```
+    rpm -ql <package-name>
+    ```
+* list files in a rpm-package
+    ```
+    rpm -qlp <file.rpm>
+    ```
+* Force install a rpm
+    ```sh
+    rpm -ivh --force --nodeps whatever.rpm
+    ```
+* Just extract files of a rpm
+    ```sh
+    rpm2cpio ./your-rpm.rpm | cpio -idmv
+    rpm2cpio ./your-rpm.rpm | cpio -iv --to-stdout ./some/specfic/file/mind/the/dot > your_file
+    ```
+
+
 
 * find rpm that installed a binary
 ```
@@ -373,6 +388,25 @@ J/K -> tabs
 f -> open in current tab
 F -> open in new tab
 ```
+
+## build a usb-raw image
+
+```
+dd if=/dev/zero of=usb.img bs=1M count=8192
+losetup -f usb.img
+
+parted /dev/loop0
+(parted) mklabel msdos
+(parted) mkpart primary 63s 100%
+(parted) set 1 boot on
+(parted) quit
+
+mkfs.ext2 /dev/loop0p1
+e2label /dev/loop0p1 'CentOS 7 x86_64'
+sync
+
+```
+
 
 
 # qutebrowser

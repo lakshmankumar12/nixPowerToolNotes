@@ -156,6 +156,9 @@ git diff <lhs-commit> <rhs-commit> <file-path>
 
 git diff HEAD -- <all-files>
 
+#show staged changes
+git diff --cached
+
 
 backup
 ------

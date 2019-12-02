@@ -109,6 +109,8 @@
 * command + option + e -- Global hot-key for iterm's hotkey-profile (set in iterm)
 * command + option + t -- itsyscal (set directly in this app)
 
+* command + option + x -- irvue add photo to blacklist
+
 
 ### Available:
 * j
@@ -121,7 +123,6 @@
 * s
 * v
 * w
-* x
 * z
 
 ### Dont use
@@ -197,6 +198,8 @@
 
 
 * Command +   +/-  -->  Font size increase decrease
+
+* Shift + Command + t  --> Toggle showing the freaking tab bar.
 
 The current-line highlight gets enabled because of command + option + ;
 

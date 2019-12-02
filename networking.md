@@ -209,6 +209,24 @@ ip tun show
 
 ## tc commands
 
+### Quick reference
+```
+tc [-s] qdisc show
+tc [-s] qdisc show dev <intf>
+
+tc qdisc add dev <intf> parent <handle> classid <handle> whatever
+..repl add with del until the classid <handle>
+
+tc [-s] filter show
+tc [-s] filter show dev <intf>
+
+tc filter add dev <intf> parent <handle> prio <number> protocol ip match u32 whatever..  flowid <dest-handle>
+tc filter del dev <intf> prio <number>
+
+```
+
+### Explanation
+
 Problem: We have two customers, A and B, both connected to the internet via
 eth0. We want to allocate 60 kbps to B and 40 kbps to A. Next we want to
 subdivide A's bandwidth 30kbps for WWW and 10kbps for everything else. Any
@@ -270,6 +288,32 @@ sudo tc class add dev eth0 parent 1:1 classid 1:12 htb rate 15mbit ceil 15mbit
 
 #remove
 sudo tc qdisc del dev eth0 root
+```
+
+## prio qdisc
+
+https://serverfault.com/a/841865/442563
+
+* The default qdisc is a pfifo, with 3 bands, serviced in that order.
+* This is not flexible. If you want to offer selective treatment to traffic, we can add a prio qdisc.
+
+```sh
+# Just flush any existing config at root. It reverts back to pfifo_fast
+tc qdisc del dev eth0 root
+
+# change pfifo to prio.
+#   def prio has 3 bands -- 1:1, 1:2, 1:3
+tc qdisc add dev eth0 root handle 1: prio
+
+# set all traffic to hit prio-band 3
+tc qdisc add dev eth0 root handle 1: prio priomap 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+
+# now add say netem to prio-band 1
+tc qdisc add dev eth0 parent 1:1 handle 10: netem delay 200ms
+
+# now choose which traffic experiences delay
+tc filter add dev eth0 protocol ip parent 1:0 prio 1 u32 match ip dst 10.0.0.1/32 match ip dport 80 0xffff flowid 1:1
+
 ```
 
 # Ip-Routing-Tables

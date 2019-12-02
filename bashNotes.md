@@ -1,9 +1,9 @@
 # constructs
 
 ```sh
-if [ condition  ] ; then
+if [[ condition  ]] ; then
   statement
-elif [ condition ] ; then            # else if
+elif [[ condition ]] ; then            # else if
   statement
 else
   statement
@@ -12,6 +12,12 @@ fi
 
 ```sh
 Use [[ condition ]] instead of [ ... ]
+[[ $supports_unadorned ]] vs
+[ "$better_quote_me" ]
+
+(( 1 + 1 ))     #supports arithment and if used in if/while/for,
+                #translates the result-value of the arith-expr
+                #into 0/non-0 for if/while/for to work
 ```
 
 See https://stackoverflow.com/a/3427931
@@ -427,33 +433,30 @@ bad
 * no unix sytle combining of options
 
 ```sh
-#Usage: ./myscript.sh -e conf -s /etc -l /usr/lib /etc/hosts 
-# note: if this is set to > 0 the /etc/hosts part is not recognized ( may be a bug )
-while [[ $# > 1 ]]
-do
-key="$1"
-
-case $key in
-    -e|--extension)
-    EXTENSION="$2"
-    shift # past argument
-    ;;
-    -s|--searchpath)
-    SEARCHPATH="$2"
-    shift # past argument
-    ;;
-    -l|--lib)
-    LIBPATH="$2"
-    shift # past argument
-    ;;
-    --default)
-    DEFAULT=YES
-    ;;
-    *)
-            # unknown option
-    ;;
-esac
-shift # past argument or value
+# poorman's getopt
+while [[ $# > 0 ]] ; do
+    key="$1"
+    shift 1
+    case $key in
+        -e|--extension)
+            EXTENSION="$2"
+            shift # past argument
+            ;;
+        -s|--searchpath)
+            SEARCHPATH="$2"
+            shift # past argument
+            ;;
+        -l|--lib)
+            LIBPATH="$2"
+            shift # past argument
+            ;;
+        --default)
+            DEFAULT=YES
+            ;;
+        *)
+                # unknown option
+        ;;
+    esac
 done
 echo FILE EXTENSION  = "${EXTENSION}"
 echo SEARCH PATH     = "${SEARCHPATH}"
@@ -535,6 +538,15 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 ```sh
 #with long names
 ps -e -o "pid,user:16,command"
+
+#quickly list all pids in this shell
+#  plain ps lists all processes in this shell, with lot of column,
+#  pid= will list just pid's without heading.
+#  but mind you, you also get bash's pid.
+ps -o pid=
+
+#with memory info
+ps -u username -o pid,ppid,tt,%mem,bsdstart,args
 ```
 
 ## date
