@@ -121,12 +121,12 @@
 * h
 * q
 * s
-* v
 * w
 * z
 
 ### Dont use
 
+* v -> its move/paste in finder
 * i -> its for chrome dev options.
 * f -> its for find in outlook & full-size in spectacle.
 * d -> its toggle for auto-hide in dock

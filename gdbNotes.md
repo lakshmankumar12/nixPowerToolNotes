@@ -90,7 +90,15 @@ thread apply all bt
   ```
   cond 2 $_thread != 57
   ```
-  
+
+### print __thread local variables
+
+
+* Just go to the thread and print the variable
+```
+thread 5
+p my_tls_variable
+```
 
 ## Interpreting kernel log lines on seg-fault.
 
