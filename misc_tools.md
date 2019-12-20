@@ -112,9 +112,26 @@ tmux kill-session -t dup_name
 # ssh
 
 * Authenticate only with password
+
 ```
 ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no example.com
 ```
+
+## Forwarding
+
+* Local forwarding
+    ```
+    ssh -L myport:someserver:serverport user@sshed_server
+    ```
+    * listens in client-machine at myport, and whatever is send there will be sent to someserver:serverport as if going out of sshed_server
+    * you can use localhost, which will make sshed_server forward to itself.
+* Remote forwarding
+    ```
+    ssh -R port_at_sshed_server:to_fwd_server:to_fwd_port user@sshed_server
+    ```
+    * listens in sshed_server at port_at_sshed_server, and whatever is sent there will be sent to to_fwd_server:to_fwd_port as if going out of client_machine
+    * you can use localhost, which will make client forward to itself.
+    * This is useful when you wnat to reverse ssh back into thi client mc from server mc.
 
 ## Mosh command to pick a particular port
 

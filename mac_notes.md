@@ -237,6 +237,12 @@ mine:
 * Simply go one level up, drag the folder icon to terminal.
   (You can drag it to any where a folder is expected)
 
+## Teams
+
+* command + .  -> show shortcuts
+* command + 2  -> goto chats
+* command + e  -> after coming to chats, do this and type the person to switch to that window
+
 ## command-line tools
 
 ### Dont make mac go to sleep
