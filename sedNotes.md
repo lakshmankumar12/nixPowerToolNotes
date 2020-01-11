@@ -1,15 +1,50 @@
 # Sed's arguments
 
-* `-n` 
+* `-n`
     * will suppress the default printing.
-* `-i` 
+* `-i`
     * in place replacement (ensure to have backup!)
-* `-r` 
+* `-r`
     * use extended regex in script.
 
-Basic syntax
+* pattern space
+    * Where all sed executation take place
+    * automatically emptied at every line processing
+* hold space
+    * temporary space. doesn't get auto-deleted on every line
 
-'s/match/replace/g'
+## Commands of sed
+
+* `p` `P`
+    * print current pattern space
+    * P - print first line in multi-line pattern space
+* `d` `D`
+    * delete current pattern space
+    * D - delete first line in multi-liine pattern space
+* `s`
+    * sub/replace - 's/match/replace/g'
+    * flags:
+        * g
+* `n` `N`
+    * delete current pattern space. Bring next line to pattern space
+        * depending on `-n` arg, the pat space is printed before deleting.
+    * append line to pattern space. (line count incrases, i.e = will now print the new line)
+* `a` `i` `c`
+    * append, insert, change resp.
+* `l`
+    * print pattern space with hidden chars
+* `=`
+    * print current line number
+* `x`
+    * exchange pattern & hold space
+* `h` `H` `g` `G`
+    * h-copy pattern into hold space
+    * H-append
+    * g/G , copy hold to pattern.
+* 
+
+
+
 
 # Some quick sed scripts
 
@@ -28,6 +63,10 @@ sed -n '/pat/,$p'    # print from pat to end-of-file
 ```
 
 ## prints from 2nd line, every 3rd line.
+
+Search: alternate, step, every
+
+* tilda in sed gives the step value for a address range
 
 ```sh
 sed -n '2~3p' <>

@@ -271,6 +271,13 @@ tc filter add dev eth0 protocol ip parent 1:0 prio 1 u32 \
 * All classes sharing the same major-number should be attached against the same parent!
 * Minor numbers of qdiscs/classes under the same parent must be different.
 
+### Working on ingress instead of egress
+
+All of tc happen only on the egress direction on a interface.
+If you want tc to happen on ingress, you can use a temporary interface so that the traffic will appear to egress on it.
+
+See: https://unix.stackexchange.com/a/463728
+
 ### Notes on filters
 
 * Sample catch-all filter
@@ -289,6 +296,17 @@ sudo tc class add dev eth0 parent 1:1 classid 1:12 htb rate 15mbit ceil 15mbit
 #remove
 sudo tc qdisc del dev eth0 root
 ```
+
+## Add a latency/loss to a interface
+
+```
+# add a delay of 100ms with a 25ms jitter. Loss of 5%
+sudo tc qdisc add dev eth0 root handle 1: netem delay 100ms 25ms loss 5%
+
+#remove
+sudo tc qdisc del dev eth0 root
+```
+
 
 ## prio qdisc
 

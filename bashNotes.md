@@ -216,6 +216,23 @@ implementor var_name
 echo "got var_name set to $var_name"
 ```
 
+## Appending to argument for a command
+
+```
+set --
+
+# Rarely-appreciated property of xargs:  it can understand quotes.
+# We use it to convert var="asdf" into var=asdf
+xargs -n 1 < configfile > /tmp/$$
+
+while read LINE
+do
+        set -- "$@" -v "$LINE"
+done < /tmp/$$
+
+rm -f /tmp/$$
+```
+
 
 # Arrays
 
@@ -530,6 +547,28 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 ```
+
+# Create Temp file in bash
+
+```sh
+tmpfile=$(mktemp /tmp/abc-script.XXXXXX)
+#create 1 fd for writing, and 2 fd's for reading
+exec 3>"$tmpfile" 4<"$tmpfile" 5<"$tmpfile"
+rm "$tmpfile"
+
+
+ifc=$1
+
+while read i ; do
+        echo "what a $i" >&3
+done
+
+cat <&4
+
+```
+* Note that in the above, the name is gone off the file-system.
+* But the file can be read by `/proc/<pid>/fd`
+
 
 # Quick notes on common commands 
 

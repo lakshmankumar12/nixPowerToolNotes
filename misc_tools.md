@@ -424,8 +424,6 @@ sync
 
 ```
 
-
-
 # qutebrowser
 
 ```

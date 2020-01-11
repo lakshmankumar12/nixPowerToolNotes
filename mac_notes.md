@@ -98,7 +98,7 @@
 * command + option + n -- preview
 * command + option + r -- finder
 
-* command + option + p -- Play-Music-App
+* command + option + p -- spotify app
 * command + option + a -- audacity
 * command + option + c -- slack
 
@@ -377,6 +377,20 @@ dd if=/dev/disk2 of=pt1.iso
 
 ```
 hdiutil mount /path/to/iso
+```
+
+* Mounting a usb dd'ed image.
+
+```
+hdiutil attach -imagekey diskimage-class=CRawDiskImage -nomount path/to/dded_image
+hdiutil list
+hdiutil mount /dev/diskN
+```
+
+### Eject a cd-rom drive
+
+```
+drutil tray eject
 ```
 
 
