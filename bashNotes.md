@@ -175,6 +175,18 @@ ${varHavingYourBigString%suffix}
 ${varHavingYourBigString%%suffix}
 ```
 
+# Quoting
+
+* Quoted items are concatenated with non-quoted or other quoted items.
+  The shell turns everything into one argument.
+* Putting a `\` in front of a character quotes that character
+* single quotes protect everything from opening to closing.
+    * It is impossible to embed a single quote within a single quoted string
+* double quotes protects most things.
+    * The following can be escaped in double quotes - `",\,$,`. Note that
+      single quote isn't special inside double quotes
+    * Double qutoes does variable and command substitution
+
 
 # Expansions
 
@@ -456,15 +468,15 @@ while [[ $# > 0 ]] ; do
     shift 1
     case $key in
         -e|--extension)
-            EXTENSION="$2"
+            EXTENSION="$1"
             shift # past argument
             ;;
         -s|--searchpath)
-            SEARCHPATH="$2"
+            SEARCHPATH="$1"
             shift # past argument
             ;;
         -l|--lib)
-            LIBPATH="$2"
+            LIBPATH="$1"
             shift # past argument
             ;;
         --default)

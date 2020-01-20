@@ -41,7 +41,11 @@
     * h-copy pattern into hold space
     * H-append
     * g/G , copy hold to pattern.
-* 
+* `b`
+    * branch to label, given by `: label-name`
+    * without a name goes to end
+* `t`
+    * branch to label, if previous substitution(could have been in a previous command) is successful.
 
 
 
@@ -91,6 +95,12 @@ sed '/^$/d' myFile > tt
 
 sed '/^[[:space:]]*$/d' myFile > tt
 ```
+
+note: awk'y way, much easier:
+```sh
+awk 'NF' myFile >> t
+```
+
 
 ### delete trailing white spaces
 

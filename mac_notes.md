@@ -91,7 +91,7 @@
 * command + option + k -- terminal
 
 * command + option + u -- Chrome
-* command + option + y -- Safari
+* command + option + y -- wireshark
 * command + option + o -- Outlook
 
 * command + option + b -- adobe
@@ -317,6 +317,12 @@ blueutil -p 1
 Search: usb console serial terminal tty.serial usb.serial
 
 https://plugable.com/2011/07/12/installing-a-usb-serial-adapter-on-mac-os-x/
+
+* New mac - I did nothing. This just worked.
+```
+screen /dev/tty.usbserial-40130 115200
+```
+
 
 
 # Login wall paper

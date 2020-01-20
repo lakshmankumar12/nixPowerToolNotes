@@ -510,3 +510,6 @@ com_microsoft_outlook_folderID == 146 && com_microsoft_outlook_unread == 1 && (k
 "Change By:	Asn Automation"
 ```
 
+## advanced search reference
+
+https://www.howto-outlook.com/howto/searchcommands.htm
