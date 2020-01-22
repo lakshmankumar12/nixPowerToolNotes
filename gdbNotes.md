@@ -4,6 +4,16 @@
 
 https://sourceware.org/gdb/onlinedocs/gdb/Continuing-and-Stepping.html
 
+## picking shared library
+
+```
+set solib-absolute-prefix ${curdir}
+set solib-search-path ${curdir}
+
+#did it load rightly
+info shared
+```
+
 ## Remove server
 
 ### At machine where process runs

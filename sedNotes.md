@@ -23,6 +23,7 @@
     * D - delete first line in multi-liine pattern space
 * `s`
     * sub/replace - 's/match/replace/g'
+    * for s command, you can use any of `b/,#,:`
     * flags:
         * g
 * `n` `N`
@@ -125,6 +126,16 @@ sed -n '3a' "you line content"
 ```sh
 sed -n '3i' "you line content"
 ```
+
+## stop sed after a pattern
+
+* The whole block is executed on beg_pattern
+* In the block, we keep getting next line and printing until its end_pattern, where we quit.
+* the :loop is a label, to which we branch (and return that is) if its not end.
+```sh
+sed -n -e "/beg_pattern/{p; :loop  n; p; /end_pattern/ q; b loop}" in_file
+```
+
 
 # Not really SED but text stuff with other tools
 

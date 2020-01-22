@@ -179,13 +179,19 @@ ${varHavingYourBigString%%suffix}
 
 * Quoted items are concatenated with non-quoted or other quoted items.
   The shell turns everything into one argument.
-* Putting a `\` in front of a character quotes that character
 * single quotes protect everything from opening to closing.
     * It is impossible to embed a single quote within a single quoted string
-* double quotes protects most things.
+* double quotes protect most things.
+    * Double qutoes does variable and command substitution
     * The following can be escaped in double quotes - `",\,$,`. Note that
       single quote isn't special inside double quotes
-    * Double qutoes does variable and command substitution
+    * Also if you escape a character that isn't special, then the backslash
+      is retained. This way, you dont have to escape-backslash twice.
+      Eg, in below sed needs escaping `/`, but that escaped-backslash isn't
+      eaten by double-quote expansion.
+      ```sh
+      sed -e "/${var_having_begin}/,/\/notice_no_need_for_extra_backslash/ p" whatever
+      ```
 
 
 # Expansions

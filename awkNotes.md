@@ -62,6 +62,12 @@ awk --posix
     * output field separator.
     * This is used when you modify $0, even a "$2 = $2"
 
+# string stuff
+
+## substr
+
+small_str = substr(big_string_var, begin_idx, length)
+
 
 # Functions
 
