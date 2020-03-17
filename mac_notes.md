@@ -386,11 +386,14 @@ hdiutil mount /path/to/iso
 ```
 
 * Mounting a usb dd'ed image.
+     Hmm.: This doesn't create a read-writale image. I get a perm-denided when writing to the usb image.
 
 ```
 hdiutil attach -imagekey diskimage-class=CRawDiskImage -nomount path/to/dded_image
-hdiutil list
+diskutil list
 hdiutil mount /dev/diskN
+
+hdiutil detach /dev/diskN
 ```
 
 ### Eject a cd-rom drive
@@ -454,3 +457,7 @@ killall SystemUIServer
 # Printers
 
 http://localhost:631/printers/
+
+# Launchctl
+
+https://www.launchd.info/

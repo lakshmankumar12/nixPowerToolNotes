@@ -61,12 +61,26 @@ awk --posix
 * OFS
     * output field separator.
     * This is used when you modify $0, even a "$2 = $2"
+* ORS
+    * output record separator
 
 # string stuff
 
 ## substr
 
+
+```awk
+# idx is 1-based.
 small_str = substr(big_string_var, begin_idx, length)
+```
+
+## match
+
+```awk
+# gawk version - gets the result in 3rd arg
+#  plain awk - sets RSTART and RLENGTH
+mached_result = match(big_string_var, regex_or_literal, result_arr)
+```
 
 
 # Functions
@@ -75,6 +89,14 @@ small_str = substr(big_string_var, begin_idx, length)
 
 * split(string,array,delim)
 * strtonum
+
+## run shell commands
+
+```awk
+system("your command with args")
+
+#see getline below to capture output
+```
 
 # Some quick awk scripts
 
@@ -119,6 +141,26 @@ awk 'NR==FNR{a[$0];next}!($0 in a)' file1 file2 > diff.txt
 ```awk
 awk '{$1=""}sub(FS,"")'
 ```
+
+## Club N lines together
+
+Search: merge
+
+```
+awk '{ORS=NR%10?"\t":"\n";print}' in_file
+```
+
+note: sed-way
+```
+sed 'N;N;N; s/\n/\t/g;' in_file
+```
+
+note: paste
+```
+paste -d'\t' - - - - < in_file
+```
+
+
 
 ## Strip leading/trailing white spaces
 

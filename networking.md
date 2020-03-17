@@ -287,7 +287,7 @@ tc filter add dev ${ifname} protocol ip parent 1: prio 2 u32 match ip dst 0.0.0.
 ```
 
 
-## Quickly add a rate limiter to a interface
+### Quickly add a rate limiter to a interface
 
 ```
 sudo tc qdisc add dev eth0 root handle 1: htb default 12
@@ -297,7 +297,7 @@ sudo tc class add dev eth0 parent 1:1 classid 1:12 htb rate 15mbit ceil 15mbit
 sudo tc qdisc del dev eth0 root
 ```
 
-## Add a latency/loss to a interface
+### Add a latency/loss to a interface
 
 ```
 # add a delay of 100ms with a 25ms jitter. Loss of 5%
@@ -308,7 +308,7 @@ sudo tc qdisc del dev eth0 root
 ```
 
 
-## prio qdisc
+### prio qdisc
 
 https://serverfault.com/a/841865/442563
 
@@ -333,6 +333,42 @@ tc qdisc add dev eth0 parent 1:1 handle 10: netem delay 200ms
 tc filter add dev eth0 protocol ip parent 1:0 prio 1 u32 match ip dst 10.0.0.1/32 match ip dport 80 0xffff flowid 1:1
 
 ```
+
+## Network namespace
+
+network namespaces in linux is a bit quirky
+* You can create them using the ip netns add command. And list it using the list command.
+* Each process belongs to a namespace of every kind. This is visible in its /proc/{pid}/task/{pid}/ns or /proc/{pid}/ns info.
+* the netns created namespaces are visible in the /proc listing only if atleast one active process is mounting that ns.
+    * hence lsns (or any proc-walk) might not show up the netns add'ed namespace.
+
+Good answer at https://unix.stackexchange.com/a/113561/345152
+
+```
+# list namespace
+ip netns list
+
+# add and del.. when adding, lo gets created for that namespace
+ip netns add mynamespace
+ip netns del mynamespace
+```
+
+* do anything under that namespace
+```
+ip netns exec mynamespace ip link list
+```
+
+* move a ifc to  a namespace
+```
+ip link set ens33 netns mynamespace
+```
+
+* tell which namespace a pid belongs. If this is empty.. its the default namespace.
+```
+ip netns identify ${PID}
+```
+
+* lsns if available
 
 # Ip-Routing-Tables
 
@@ -393,6 +429,10 @@ iptables-restore -c < /tmp/a.iptables
 * To drop outgoing pkts
 ```
 -A POSTROUTING -t mangle -j DROP
+```
+* To reject tcp
+```
+-A INPUT -t filter -j REJECT --reject-with tcp-reset
 ```
 
 

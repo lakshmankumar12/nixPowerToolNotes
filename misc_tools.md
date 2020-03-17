@@ -328,6 +328,9 @@ df -T
 * linux volumes
 ```
 lsblk
+
+#lsblk with filetypes
+lsblk -f
 ```
 
 * get UUIDs of all disks. Also lists the partition-type and fs-type!
@@ -391,6 +394,25 @@ dmesg
 [83780.254926] usb 2-1.2: pl2303 converter now attached to ttyUSB0
 ...
 screen /dev/ttyUSB0 115200
+```
+
+## Eject a cdrom
+
+```
+eject /dev/cdrom
+```
+
+
+## cdrom commands in linux
+
+* audio-cd
+
+```
+#list the tracks in a audio cd
+cdparanoia -vsQ
+
+#rip
+cdparanoia -B
 ```
 
 # Vimium shortcuts
@@ -509,6 +531,13 @@ com_microsoft_outlook_folderID == 146 && (kMDItemTextContent == "commented on"  
 com_microsoft_outlook_folderID == 146 && com_microsoft_outlook_unread == 1 && (kMDItemTextContent == "commented on"  || kMDItemTextContent == "edited a comment" || kMDItemTextContent == "created an issue" || kMDItemTextContent == "Status:")
 "Change By:	Asn Automation"
 ```
+
+```
+# get the folder-id. Select the folder in outlook and run this:
+osascript -e 'tell application "Microsoft Outlook" to get selected folder'
+```
+Current Assignments
+
 
 ## advanced search reference
 

@@ -14,11 +14,19 @@ fi
 Use [[ condition ]] instead of [ ... ]
 [[ $supports_unadorned ]] vs
 [ "$better_quote_me" ]
-
-(( 1 + 1 ))     #supports arithment and if used in if/while/for,
-                #translates the result-value of the arith-expr
-                #into 0/non-0 for if/while/for to work
 ```
+
+## double parenthesis
+
+```
+(( 1 + 1 ))
+```
+* If used without any assignment or other expr, just does arithmetic
+    * This is useful when you want to assign values to variables inside that construct
+    * `$` to variables inside seems optional. Not sure on this.
+* If you want that statment to return its arithmetic result, put a `$(( .. ))`.
+    * old bash is to do `$[ .. ]`. Use the newer one instead.
+* If used in a if or while, the 0/non-0 value of the expr works normally
 
 See https://stackoverflow.com/a/3427931
 
@@ -89,6 +97,11 @@ fi
 
 ## other string manipulations
 
+http://tldp.org/LDP/abs/html/string-manipulation.html
+
+* mnemonic #-knocks-of-prefix (remember vi-back)
+
+
 * Deletes shortest match of $substring from front of $string.
 ```sh
 ${string#substring}
@@ -155,24 +168,6 @@ filename=$(basename "$fullpathfile")
 dirname=$(dirname "$fullpathfile")
 extension="${filename##*.}"
 filename="${filename%.*}"
-```
-
-http://tldp.org/LDP/abs/html/string-manipulation.html
-
-* mnemonic #-knocks-of-prefix (remember vi-back)
-
-## remove the shortest/longest prefix
-
-```sh
-${varHavingYourBigString#prefix}
-${varHavingYourBigString##prefix}
-```
-
-## remove the shortest/longest suffix
-
-```sh
-${varHavingYourBigString%suffix}
-${varHavingYourBigString%%suffix}
 ```
 
 # Quoting
@@ -274,8 +269,24 @@ echo ${#a[@]}  # length of array. Note where # appears
 echo ${a[*]}   # To confirm: space separated single string of entire array
 for i in ${a[@]} ; do echo happy $i ; done #  iterates.
 
+a=()
 a+=("hola")   #append to a array
+a+=("wold")   #append to a array
 ```
+
+* Iterate over an array
+```sh
+for i in ${array_var[@]} ; do
+    do_what_you_want $i
+done
+```
+* Iterate over an array literal
+```sh
+for i in over these individual words ; do
+    do_what_you_want $i
+done
+```
+
 
 reference: http://www.tldp.org/LDP/abs/html/arrays.html#ARRAYSTROPS
 
@@ -292,18 +303,25 @@ IFS=$'\r\n' GLOBIGNORE='*' XYZ=($(command))
 
 # Associative array / dict / hash
 
+* Quoting keys should make no diff. But i find them not working in zsh.
+* Even if you have spaces it is okay to not quote as the key is protectd by `[]`
+
 ```sh
 declare -A aa
-aa["key"]="value"
-echo ${aa["key"]}
+aa[key]="value"
+echo ${aa[key]}
 echo ${aa[$var_expanding_to_key]}
 
 declare -A bb_from_list
-bb_from_list=(["key1"]="value1" ["key2"]="value2")
+bb_from_list=([key1]="value1" [key2]="value2")
 
 #Mind the exclamantion! W/o it it gives values
 #Mind the Quotes - otherwise, if your key is "key with space", for will loop each word!
 for key in "${!aa[@]}" ; do
+  echo "value at $key is ${aa[$key]}"
+done
+# in zsh you do:
+for key in "${(@k)aa}" ; do
   echo "value at $key is ${aa[$key]}"
 done
 
@@ -586,6 +604,11 @@ cat <&4
 ```
 * Note that in the above, the name is gone off the file-system.
 * But the file can be read by `/proc/<pid>/fd`
+* It seems the script can either read or write into such numbered-fd's.
+* Thus we do a `3>` or a `4<` depending on if we need to write or read
+* Further, one numbered-fd can be read only once looks like. Its like a
+  stream devide for this script. We cant seek back. So open as many
+  numbered fd's as you want to read.
 
 
 # Quick notes on common commands 
@@ -605,6 +628,18 @@ ps -o pid=
 #with memory info
 ps -u username -o pid,ppid,tt,%mem,bsdstart,args
 ```
+
+* useful headings in ps -o
+* args, cmd, command  -- full list of command and args. Keep it last
+* comm, ucmd, ucomm   -- just the command.
+* time, cputime       -- cumulative cpu time
+* etime               -- elapsed time since process started in hh:mm:ss.sss format
+* etimes              -- etime in secs.
+* bsdstart            -- start-time in Month/Day or HH:MM
+* lstart              -- full blow up of start time.
+* tt                  -- terminal
+* pid,ppid            -- pid and parent pid resp
+*
 
 ## date
 

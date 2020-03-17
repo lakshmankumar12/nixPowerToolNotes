@@ -621,6 +621,9 @@ svn diff --summarize -r<rev>:<rev-1>
 user=
 svn log | sed -n "/${user}/,/-----$/ p"
 
+#log all comments between 2 points
+svn log --verbose -r29720:29733
+
 #export
 #dump actual contents of a commit with diffs
 svn diff -r<rev-1>:<rev>
@@ -654,6 +657,9 @@ link: https://stackoverflow.com/a/6258369
 * conflict files are marked with C.
 * Work on it.
 * svn resolve --accept=working
+
+conflict resolved tree
+svn resolve --accept working -R path/to/deleted/conflict/folder
 
 # link on svn-concept
 http://svnbook.red-bean.com/en/1.7/svn.advanced.externals.html
