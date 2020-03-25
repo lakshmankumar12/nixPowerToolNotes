@@ -1,41 +1,35 @@
+# git stuff
 
-List all tracked files
-----------------------
+## List all tracked files
 
 git ls-files
 git ls-tree --full-tree -r HEAD   # too complex for the above?
 
-List all untracked files
-------------------------
+## List all untracked files
 
 git ls-files --others --exclude-standard
 
-Get a particular revision
--------------------------
+## Get a particular revision
 
 git show treeish:path/to/file
 
 use HEAD to get the tip.
 
-Git bring back a file discarding chagnes
----------------------------------------
+## Git bring back a file discarding chagnes
 
 git checkout -- path/to/file
 
-restore to head discarding all changes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+### restore to head discarding all changes
 
 git checkout -- .
 
-getting rid of the top-commit
------------------------------
+### getting rid of the top-commit
 
 git reset --hard HEAD~1
 
-# you can get it back as long as its in the same repo with git reflog (git pack may erase it after some time..)
+* you can get it back as long as its in the same repo with git reflog (git pack may erase it after some time..)
 
-List all branches in server and clone
-----------------------------
+## List all branches in server and clone
 
 git branch -a
 
@@ -43,15 +37,17 @@ If you dont see remotes/origin branches here, then your refspec isn't good.
 
 Check repo_root/.git/config and see if you have this:
 
+```
 [remote "origin"]
     url = WHATEVER
     fetch = +refs/heads/*:refs/remotes/origin/*
+```
 
 If you are missing the fetch line, add it.
 
-checkout remote branch with tracking
--------------------------------------
+## checkout remote branch with tracking
 
+```
 git checkout --track -b <local branch> <remote>/<tracked branch>
 
 # if -b <name> is to be same as remote's name, you can skip it
@@ -66,26 +62,28 @@ git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 
 # if remote deleted branches, then use this to clear if off ur local repo too
 git remote prune origin
+```
 
-TO see all changes to a file across all branch
-----------------------------------------------
+## TO see all changes to a file across all branch
 
+```
 git log --all -- <path/to/file>
+```
 
-Various flavors of git-log
---------------------------
+## Various flavors of git-log
 
+```
 git log --author=abc         # show all commits of author
 git log --grep=efg           # show all commits with comments having the string
 git log -S=hij               # show all commits with changed lines having the string. Slower -> so narrow ur commit-list
 git log --name-only          # display names of files changed with every commit
 
 git log --pretty=fuller      # shows both dates
+```
 
+### Various pretty
 
-Various pretty
---------------
-
+```
 git log --pretty=oneline     # <sha1> <title line>
                  short       # 2LH + message, commit/author
                  medium
@@ -103,10 +101,11 @@ git log --pretty=oneline     # <sha1> <title line>
 --name-only   : Adds filenames
 --name-status : Adds a M to filename.
 --stat        : count of lines changed.
+```
 
-To get the tag done on a given date
------------------------------------
+## To get the tag done on a given date
 
+```
 git describe branch_name@{mar.04.2016}  # This uses reflog.. so u may see only available till date.
 
 git log branch_name --until=aug.04.2016
@@ -117,10 +116,11 @@ mgtags 80S | tail -n 100 | while read i ; do npgit log -n 1 --decorate --pretty=
 
 #print every 50th tag.
 mgtags 80S | sed -n '1~50p' | while read i ; do npgit log -n 1 --decorate --pretty=format:"$i %cD" $i ; echo ; ; done
+```
 
-To quickly get the sha-1 of any tag/branch-name/commit-representative!
-----------------------------------------------------------------------
+## To quickly get the sha-1 of any tag/branch-name/commit-representative!
 
+```
 #especially if you are in a script
 git rev-parse HEAD
 git rev-parse tag_name
@@ -131,54 +131,58 @@ if [ $? -eq 0 ] ; then
   echo "you are in a git repo"
 else
   echo "you are NOT in a git repo"
+```
 
-Get upstream info
------------------
+## Get upstream info
 
+```
 git rev-parse --abbrev-ref @{u}
+```
 
 
-To get the commit from where you started working
-------------------------------------------------
+## To get the commit from where you started working
 
-Normally, @{u} is enuf. However, if you did a git fetch, chances are @{u} has advanced.
+Normally, `@{u}` is enuf. However, if you did a git fetch, chances are `@{u}` has advanced.
 
+```
 git merge-base @{u} $(git symbolic-ref --short -q HEAD)
 
 #find the most-common-ancestor /parent of 2 commits
 git merge-base <commt1> <commit2>
+```
 
 
-git diff args
---------------
+## git diff args
 
+```
 git diff <lhs-commit> <rhs-commit> <file-path>
 
 git diff HEAD -- <all-files>
 
 #show staged changes
 git diff --cached
+```
 
 
-backup
-------
+## backup
 
+```
 #get a beautiful list of all local commits as a mail format
 git format-patch --stdout <Any-range>   # eg: base..
 
 #apply the generated file
 git am <file>
+```
 
 
 
-Difftool with a different tool
-------------------------------
+## Difftool with a different tool
 
 git difftool -t meld
 
-stash
-------
+## stash
 
+```
 #create a stash
 git stash
 
@@ -204,14 +208,14 @@ files_list=<files-that-shouldn't-be-staged>
 git add $files_list
 git stash save --keep-index
 git reset HEAD $files_list
+```
 
-***********
 
-Vim-fugitive notes
-=================
+# Vim-fugitive notes
 
 * fugitive works only on a file. So just open a file and then issue any fugitive command
 
+```
 :Gdiff             # diff the current file's changes from index
 :Gdiff HEAD
 :Gdiff any_treeish
@@ -219,12 +223,13 @@ Vim-fugitive notes
 :Gedit <commit>
 :Glog -n 5         #log the current-file, until 5 commits
 :Glog -n 5 --      #log from HEAD to HEAD~4
+```
 
 To get the current commit while watching Gedit - y, then ^g
 
-Equivalents
------------
+## Equivalents
 
+```
 cmd-line           fugitive            Comments
 git anything       :Git anything       Execute any random git command
 
@@ -235,11 +240,11 @@ git anything       :Git anything       Execute any random git command
 
 :Git commit        :Gcommit
 :Git status        :Gst
+```
 
-***********
 
-GIt-notes
---------
+# Git-notes
+
 There are 3 object types
 
 1. blob   - File-contents
@@ -248,13 +253,11 @@ There are 3 object types
 
 A branch is simply a pointer to a commit. HEAD is a pointer to the current branch!
 
-Know type of a sha
-------------------
+## Know type of a sha
 
 git cat-file -t <sha>
 
-Get new clone
------------
+## Get new clone
 
 git-ws --branch v160.main asr5k/master.git master
 
@@ -265,62 +268,66 @@ rolldown:
 
 git forest pull
 
-Creating a simple tag
-----------------------
+## Creating a simple tag
 
 git tag <tagname> <commit>
 
-creating a annotated tag
------------------------
+## creating a annotated tag
 
 git tag -a <tagname> -m '<message>'
 
-Get info of a annotaed tag
----------------------------
+## Get info of a annotaed tag
 
+```
 git tag -l 'prefix*'   # will give all tags that start with prefix
 git tag -l '*substr*'  # will give all tags that have substr
 
 git show <tag-name>    # will show info of tag + the commit as well. Can get the time of the tagging.
+```
 
-Push only one or a few commits when we have more local commits
---------------------------------------------------------------
+## Push only one or a few commits when we have more local commits
 
+```
 git push <remotename> <commit SHA>:<remotebranchname>
 git push <remotename> <commit SHA>:refs/heads/<new-remotebranchname-name>
+```
 
-Push a tag
------------
+## Push a tag
 
+```
 git push origin <tag_name>
+```
 
-delete a tag from remote
-------------------------
+## delete a tag from remote
 
+```
 git push --delete origin tagname
 
 #https://nathanhoad.net/how-to-delete-a-remote-git-tag
 git push origin :refs/tag/tagname
+```
 
-delete commits from remote
----------------------------
+## delete commits from remote
 
+```
 #This will force remote to sync up with us.
 #Assuming all refspecs are set i.e tracking branch is set
 git push remote_name -f
 
 # This will do it wherever u are w/o any tracking branch set.
 git push remote_name +COMMIT_ID:branch
+```
 
+## getting latest /top commit
 
-getting latest /top commit
------------------------
+```
 git log -n 1
 git log -n 1 --pretty=format:"%H"
+```
 
-geting parent commit of a commit
----------------------------------
+## geting parent commit of a commit
 
+```
 git show --quiet --pretty=format:"%P" <commit>
 
 commit~1  .. First Parent of commit
@@ -328,55 +335,62 @@ commit~2  .. Grand(second) Parent of commit
 
 commit^1  .. First left parent of commit
 commit^2  .. second left parent of commit (meaningful for merge commits)
+```
 
 
-which branches contain a commit
-------------------------------
+## which branches contain a commit
 
+```
 git branch -a --contains <commit>
+```
 
-which commit has a certain version of file
-------------------------------------------
+## which commit has a certain version of file
 
+```
 which_commit_has_this_blob.pl <blob-sha>
+```
 
-getting rid of a submodule
----------------------------
+## getting rid of a submodule
 
+```
 git submodule deinit packages/<..>
+```
 
 
-doing a csettool:
------------------
+## doing a csettool:
 
+```
 commit=<whatever>
 parent=$(git show --quiet --pretty=format:"%P" $commit)
 git meld $parent $commit
+```
 
-Getting older revisions of files:
----------------------------------
+## Getting older revisions of files:
 
-Get the revision of a submodule of a particular revision of a super module
+* Get the revision of a submodule of a particular revision of a super module
 
+```
 git ls-tree buildnumber_50269 packages/common
 cd packages/common
 git show <commit>:<file>
+```
 
-getting the commit id of a submodule for a given commit of super-module
-------------------------------------------------------------------------
+## getting the commit id of a submodule for a given commit of super-module
 
+```
 git ls-tree -r <master-commit> | grep 'packages/<package>'
-
 git ls-tree -r HEAD | grep 'packages/<package>'
+```
 
-is a commit in a build-number
------------------------------
+## is a commit in a build-number
 
+```
 git merge-base --is-ancestor <commit> buildnumber_<build>
+```
 
-During merging / merge
---------------
+## During merging / merge
 
+```
 # list conflict files
 git diff --name-only --diff-filter=U
 
@@ -388,15 +402,17 @@ git ls-files -u
   1: common
   2: ours
   3: theirs
+```
 
-Better merge strategy
---------------------
+## Better merge strategy
 
+```
 git merge|rebase|cherry-pick  --strategy=recursive --strategy-option=patience
+```
 
-To amend dates for a bulk of commits
--------------------------------------
+## To amend dates for a bulk of commits
 
+```
 git rebase -i
 #choose edit in the EDITOR
 #and do this when you are prompted in each stage
@@ -406,30 +422,33 @@ git rebase --continue
 
 #rebase w/o a tracking branch or if u have pushed
 git rebase -i parent_of_commit_to_rebase master
+```
 
-Reflog
--------
+## Reflog
 
+```
 #track how HEAD moved
 git reflog --date=relative
+```
 
-Bisect
--------
+## Bisect
 
+```
 git bisect start <bad> <good> --
 git bisect run /script
 
 git bisect start HEAD TiMOS-MG_0_0_I1630 --
 
 git bisect reset
+```
 
-worktree
----------
+## worktree
 
+```
 git worktree add <path> [<branch>]    # add path and checkout branch into it.
+```
 
-Eg:
-----
+```
 $ git worktree add -b emergency-fix ../temp master
 $ pushd ../temp
 # ... hack hack hack ...
@@ -437,13 +456,15 @@ $ git commit -a -m ´emergency fix for boss´
 $ popd
 $ rm -rf ../temp
 $ git worktree prune
-----
+```
 
+```
 git worktree list
+```
 
-goto root of repo
------------------
+## goto root of repo
 
+```
 #gives absolute path
 git rev-parse --show-toplevel
 
@@ -452,35 +473,35 @@ git rev-parse --show-cdup
 
 #useful bash-alias for bashrc
 alias gitroot='cd ./$(git rev-parse --show-cdup)'
+```
 
-panos-flow
-~~~~~~~~~~
+## panos-flow
 
+```
 #to create study only branches off some tag
 git worktree add -b 60R4_study   ../../60R4_study/panos TiMOS-MG_6_0_R4
 
 #to create a regular working branch to push
 git worktree add -b mg80f ../../mg80f/panos remotes/origin/TiMOS-MG_8_0_future
+```
 
 
-Avoid typing passwords
-----------------------
+## Avoid typing passwords
 
+```
 #WARNING: very very weak. All passwords in clear text 
 
 #locally update your repo's config.
 git config credentials.helper store
 
 #your password will bein ~/.git-credentials in clear text.
+```
 
 
 
+# Old commands equivalent
 
-
-
-Old commands equivalent
------------------------
-
+```
 bk -r diffs -u -p            git diff -u -p
 bk sfiles -Ug                git ls-tree -r HEAD --name-only
 bk sfiles -cg                git ls-files --modified
@@ -501,12 +522,11 @@ bk cset -x                   ??
 bk export -tpatch            git show --pretty=format: <commit> | tail -n +2
 bk changes -u<user>          git log --author=<user>
 bk changes -/text/           git log --grep=<text>
+```
 
+## Create a new branch
 
-***********
-
-Create a new branch
-
+```
 git checkout -b branch_name
 git checkout -b newbranch some_tag
 
@@ -518,12 +538,9 @@ Create a new branch that tracks a branch
 
 git branch -t name remotes/origin/name
 git checkout name
+```
 
-
-*****
-
-Info model
------------
+# Info model
 
 files,
 a working tree,
@@ -546,11 +563,9 @@ tracking
 namespaces
 
 
+# cvs commands
 
-*******
-
-cvs commands
-
+```
 #set a CVSROOT
 cvs -d '<...>' co repoName
 
@@ -559,24 +574,22 @@ cat CVS/Root
 
 #update a repo
 cvs update -Pqd
+```
 
-*******
-
-svn commands
-=============
+# svn commands
 
 Reference: http://svnbook.red-bean.com/en/1.7/index.html
 
-Concepts
-----------
+## Concepts
 
-Revisions
-~~~~~~~~~
+### Revisions
 
+```
 HEAD     -> the top one in the repo(remote/origin)
 BASE     -> the one in my working-dir, before my changes
 COMMITED -> the actual revision starting from BASE(inclusive) in which the file changed.
 PREV     -> COMMITED-1.
+```
 
 branches are represented as sub-folders in repos/your_repo_name/branches/branch_name
 master is under                            repos/your_repo_name/trunk/
@@ -587,8 +600,9 @@ M modified
 X untracked
 ~ file-type has changed (very likely a file became a link etc..)
 
-Commands
----------
+## Commands
+
+```
 #see what's changed - just filenames
 svn status
 
@@ -664,14 +678,12 @@ svn resolve --accept working -R path/to/deleted/conflict/folder
 # link on svn-concept
 http://svnbook.red-bean.com/en/1.7/svn.advanced.externals.html
 http://wordaligned.org/articles/a-subversion-pre-commit-hook
+```
 
 
+## git-svn
 
-***********
-
-git-svn
---------
-
+```
 export CPPFLAGS="-I$HOME/local/include -I$HOME/local/lib/libffi-3.0.13rc1/include -I$HOME/install/ra_serf/include/serf-1"
 export LD_FLAGS="-L$HOME/local/include -L$HOME/local/include/ncurses -L$HOME/local/lib -L$HOME/local/lib64 -L$HOME/install/ra_serf/lib"
 export LDFLAGS="-L$HOME/local/include -L$HOME/local/include/ncurses -L$HOME/local/lib -L$HOME/local/lib64 -L$HOME/install/ra_serf/lib"
@@ -722,6 +734,7 @@ build_cscope.sh
 #update aryaka-new-clone/shiftclone.py of the dir-names both normal and git.
 #update aryaka-new-clone/update_git_root_clones.sh of the new branch
 #update /home/lakshman_narayanan/bitbucket/aryaka-notes/commands_to_refer.md
+```
 
 
 ## adding a new author:
