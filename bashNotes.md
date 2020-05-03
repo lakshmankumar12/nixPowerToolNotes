@@ -30,6 +30,16 @@ Use [[ condition ]] instead of [ ... ]
 
 See https://stackoverflow.com/a/3427931
 
+## Various dollar expresssion
+
+* `${}` -  name inside expands that variable.
+    * ${var:start_idx:length} -- start-idx is 0 based.
+    * ${!var} - variable indrection. Expand to var, and then use that as a variable again.
+* `$()` -  execute stuff inside like a command and replace with its output. Note that this can nest to any depth
+* `$((  ))` - execute stuff inside like a arithmentic expression and replace with its result
+* `$[ ]` - Deprecated. Use `$((  ))`
+* `$' '` - The word expands to a string, with backslash-escaped characters replaced as specified by the ANSI-C standard.
+           Used in some siutaiton like IFS=$' ' assignments. To read.
 # Operators
 
 http://tldp.org/HOWTO/Bash-Prog-Intro-HOWTO-11.html
@@ -439,6 +449,10 @@ while true; do
 done
 ```
 
+```sh
+read -p prompt -t timeout variable_that_stores_input
+```
+
 # Find all unique files in 2 folders
 
 ```sh
@@ -486,6 +500,7 @@ bad
 * no unix sytle combining of options
 
 ```sh
+# Search argc argv argparse
 # poorman's getopt
 while [[ $# > 0 ]] ; do
     key="$1"
@@ -610,6 +625,15 @@ cat <&4
   stream devide for this script. We cant seek back. So open as many
   numbered fd's as you want to read.
 
+# debugging in bash
+
+```sh
+# turn on debugging
+set -x
+# turn off debugging
+set +x
+```
+
 
 # Quick notes on common commands 
 
@@ -627,6 +651,9 @@ ps -o pid=
 
 #with memory info
 ps -u username -o pid,ppid,tt,%mem,bsdstart,args
+
+#info on a given pid
+ps -o args= -p pid
 ```
 
 * useful headings in ps -o
@@ -639,7 +666,15 @@ ps -u username -o pid,ppid,tt,%mem,bsdstart,args
 * lstart              -- full blow up of start time.
 * tt                  -- terminal
 * pid,ppid            -- pid and parent pid resp
-*
+
+
+## ls
+
+```sh
+# ls with full path (use abs-path + glob to invoke)
+ls -d $(pwd)/*
+```
+
 
 ## date
 
@@ -672,6 +707,58 @@ while [ $date != $end ] ; do
 done
 ```
 
+## head and tail
+
+* Mnemonic: head is for top part printing, tail is for bottom part printing
+* Mnemonic: for head, - is change behavior, for tail + if change behavior
+
+```sh
+#simple first n. Both of below are synonymous
+head -n 10
+head -n +10
+
+#print except last n
+head -n -10
+
+#print last n. Both are synonymous
+tail -n 10
+tail -n -10
+
+#print except first n (note that you desire to exclude first n, you should issue n+1 in command)
+tail -n +11
+```
+
+## read
+
+* this is a shell builtin
+* this annoyingly is different in bash and zsh. Notably:
+    * `-a` is assign to arr in bash, while its `-A` in zsh
+
+bash:
+```sh
+read -p prompt var_to_assign
+IFC=$':' read -a array_var <<< ${var_to_split}
+```
+
+zsh:
+```
+read "var_to_assign?anything_after_qmark_is_prompt:"
+IFC=$':' read -A array_var <<< ${var_to_split}
+```
+
+## printf
+
+* Very useful to convert hex to dec to oct etc..
+* Has a nifty use to print array one per line
+    ```sh
+    printf "Element: %s\n" ${array[@]}
+    ```
+  The above works, because printf, after matching format-specifier, will repeat the matching all over again.
+* Has a nift use case to repeat a string n times
+    ```sh
+    n=5
+    printf "willrepeat%.0s" {1..${n}}
+    ```
 
 
 # Give multi-line input as stdin to a command

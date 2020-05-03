@@ -21,6 +21,11 @@ convert orig.jpg -rotate "90" rotated.jpg
 # rotate anti-clockwise 90 degrees
 convert orig.jpg -rotate "-90" rotated.jpg
 
+#create a blank white image
+convert -size 800x800 xc:white white.png
+#create a transparent background
+convert -size 800x800 xc:transparent transparent.png
+
 # Details on A4 size:
 A4 is 210 x 297mm. <Millimeters>
 An image is expressed in pixels x pixels.

@@ -161,6 +161,9 @@ git diff HEAD -- <all-files>
 
 #show staged changes
 git diff --cached
+
+#avoid getting the a/ b/
+git diff --no-prefix
 ```
 
 
@@ -615,6 +618,11 @@ svn diff
 #log a file
 svn log filename
 
+# add a new file. Directory is implicitly addede when you add a file.
+svn add path/to/filename
+## undo a add
+svn revert path/to/filename
+
 #get a particular version of file .. equivalent of git show
 svn cat -r 3 http://svn.red-bean.com/repos/test/readme.txt
 
@@ -664,6 +672,12 @@ The last line of will say something like this:
 		Changed paths:
 		   A /branches/feature (from /trunk:1234)
 link: https://stackoverflow.com/a/6258369
+
+#find which branch a commit was put into
+# link : https://stackoverflow.com/a/18446482/2587153
+svn log -v -q <repo-root> -r NNN -l 1
+svn log -v -q $(svn info | grep 'Repository Root' | cut -d: -f2-) -r NNN -l 1
+svn log -v -q http://depot/repo/asn -r 27824 -l 1
 
 
 #conflict

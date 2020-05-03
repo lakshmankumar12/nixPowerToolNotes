@@ -109,6 +109,14 @@ tmux new-session -s dup_name -t exist_name
 tmux kill-session -t dup_name
 ```
 
+* Show all options
+```
+#global
+tmux show-options -g
+#this window
+tmux show-options -w
+```
+
 # ssh
 
 * Authenticate only with password
@@ -542,3 +550,20 @@ Current Assignments
 ## advanced search reference
 
 https://www.howto-outlook.com/howto/searchcommands.htm
+
+## Common adv-search terms I use
+
+```
+hasflag: true
+from:
+to:
+```
+
+# Spotify search
+
+spotify:album:5OVGwMCexoHavOar6v4al5
+spotify:track:
+spotify:playlist:
+
+https://open.spotify.com/album/241F2pNbl6OIJPixynRuiu?si=7UiPMaRXRV-15_TEYbF5PA
+https://open.spotify.com/album/0q3KEEwGPGPPnXJNQ32Wyz?si=osGPcJ4-SnqgFf8xd375JQ

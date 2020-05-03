@@ -31,6 +31,13 @@ apr -s <ip> <mac>
 
 * actual info is in /proc/net/arp
 
+* Add a proxy arp
+```
+#arp -Ds <hostname> <ifname> pub   # pub is for publish
+#Eg:
+arp -Ds 192.168.0.253 eth0 pub
+```
+
 ### Tell the type of the interface
 
 ethtool -i devicename
