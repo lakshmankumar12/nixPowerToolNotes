@@ -25,6 +25,10 @@ docker ps -q
 docker version
 docker info
 
+#where is docker saving all the files
+docker info | grep -i root
+sudo du -sh /var/lib/docker
+
 #login from command-shell
 docker login
 
@@ -117,6 +121,22 @@ Volumes
 * Data volumes have persist lifetime, and not related to container lifetime
 
 (I dont understand this fully - for now -v host-dir:container-dir is good enuf)
+
+
+Compose
+--------
+
+#start for frist time
+docker-compose up -d
+
+#stop
+docker-compose stop
+
+#restart
+docker-compose restart
+
+#down
+docker-compose down
 
 Dockerfile
 ----------

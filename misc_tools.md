@@ -557,6 +557,7 @@ https://www.howto-outlook.com/howto/searchcommands.htm
 hasflag: true
 from:
 to:
+category: blue
 ```
 
 # Spotify search

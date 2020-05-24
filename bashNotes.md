@@ -282,6 +282,7 @@ for i in ${a[@]} ; do echo happy $i ; done #  iterates.
 a=()
 a+=("hola")   #append to a array
 a+=("wold")   #append to a array
+a=("$a[@]" "$b[@]") #append another array to one array.
 ```
 
 * Iterate over an array
@@ -310,6 +311,15 @@ ${a[@]/%/XY}  #adds a XY to the end of all members
 ```sh
 IFS=$'\r\n' GLOBIGNORE='*' XYZ=($(command))
 ```
+
+* pass array by reference
+
+https://stackoverflow.com/a/16461878/2587153
+function array_print() {
+    arrayname=$1[@] ;
+    array=(${!arrayname}) ;
+    printf "elem: %s\n" "${array[@]}" ;
+}
 
 # Associative array / dict / hash
 
@@ -832,6 +842,11 @@ apt-get remove --purge libav-tools
 
 
 # Centos pkg mgmt
+
+* Information from a rpm
+    ```
+    rpm -qip rpname.rpm
+    ```
 
 * Force install a rpm
     ```sh
