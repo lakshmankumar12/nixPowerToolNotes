@@ -26,6 +26,8 @@ convert -size 800x800 xc:white white.png
 #create a transparent background
 convert -size 800x800 xc:transparent transparent.png
 
+convert -size 800x800 -type TrueColor canvas:white white.jpg
+
 # Details on A4 size:
 A4 is 210 x 297mm. <Millimeters>
 An image is expressed in pixels x pixels.

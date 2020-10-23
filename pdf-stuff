@@ -38,6 +38,15 @@ InfoValue: DocBook,writing,documentation,background
 # extract a image/jpeg/picture from a pdf
 convert -verbose -density 150 -trim file.pdf -quality 100 -sharpen 0x1.0 output.jpg
 
+## Note if you get security error: do
+#    attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/408.
+### reference: https://stackoverflow.com/a/53180170/2587153
+# open /etc/ImageMagick-*/policy.xml
+#   edit the line with
+#   <policy domain="coder" rights="none" pattern="PDF" />
+#     to
+#   <policy domain="coder" rights="read | write" pattern="PDF" />
+
 # Add password
 #
 #The user password, if set, is what you need to provide in order to open a PDF.

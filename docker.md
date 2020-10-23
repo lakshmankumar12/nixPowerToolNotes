@@ -56,12 +56,19 @@ docker cp /path/to/file/on/host/file container_name:/path/in/container/
 #get container name using docker ps -a
 docker exec -i -t <container-name> /bin/bash
 
+#attach to a container (you shoul rather exec as quitting that bash wont stop the container)
+#  heopfully the container is running a shell of sort
+docker attach container_name
+
 # stop a container
 #  .. will send a SIGKILL (or any signal passed as arg) to the main process in the container
 docker kill container_name
 
 #cleanup a stopped
 docker rm <container-id>
+
+#cleanup all existed containers
+docker rm $(docker ps -q -f status=exited)
 
 #find the mapped ports
 docker port container_name
@@ -127,6 +134,12 @@ RUN pip install -r requirements.txt
 # Make port 80 available to the world outside this container
 EXPOSE 80
 
+# expose the volumes inside container
+VOLUME /path/inside/container1 /path/inside/container2
+
+# copy a file from host into the container
+COPY rel-or-abs/path/in/host /abs/path/inside/container
+
 # Define environment variable
 ENV NAME World
 
@@ -138,38 +151,38 @@ CMD ["python", "app.py"]
 
 * There are 3 networks - bridge / host / none. By default, all containers run in the bridge network
 
-```
-docker network ls
-docker network inspect bridge
+    ```
+    docker network ls
+    docker network inspect bridge
 
-#create an isoated bridge
-docker network create networkNameX --driver=bridge --subnet=192.168.100.0/24
+    #create an isoated bridge
+    docker network create networkNameX --driver=bridge --subnet=192.168.100.0/24
 
-#connect a container to a bridge
-docker network connect networkNameX container_name
+    #connect a container to a bridge
+    docker network connect networkNameX container_name
 
-#to know about a network
-docker network inspect networkNameX
+    #to know about a network
+    docker network inspect networkNameX
 
-```
+    ```
 * reading more on networking in docker
-https://success.docker.com/article/Multiple_Docker_Networks
-https://docs.docker.com/engine/reference/commandline/network_create/#bridge-driver-options
+    https://success.docker.com/article/Multiple_Docker_Networks
+    https://docs.docker.com/engine/reference/commandline/network_create/#bridge-driver-options
 
 ## Volumes
 
 * Created using docker create or implicitly by docker run
 * A volume is a directly in a container/image that bypasses UFS
   * volumes are initialized when (runtime)containers are created. If the baseimage
-    has data at that location, then that data is copied into the newly initalized
-    volume. (This doesnt apply to host-mounted dir/file)
+      has data at that location, then that data is copied into the newly initalized
+      volume. (This doesnt apply to host-mounted dir/file)
   * Data volumes can be shared and reused among containers.
   * Changes to a data volume are made directly.
   * Changes to a data volume will not be included when you update an image.
   * Data volumes persist even if the container itself is deleted.
 * Data volumes have persist lifetime, and not related to container lifetime
 
-(I dont understand this fully - for now -v host-dir:container-dir is good enuf)
+    (I dont understand this fully - for now -v host-dir:container-dir is good enuf)
 
 
 # Compose
@@ -177,6 +190,9 @@ https://docs.docker.com/engine/reference/commandline/network_create/#bridge-driv
 ```
 #start for frist time
 docker-compose up -d
+
+#build any dockerfiles
+docker-compose build
 
 #stop
 docker-compose stop
@@ -186,6 +202,29 @@ docker-compose restart
 
 #down
 docker-compose down
+```
+
+## Compose file
+
+```
+version: '3'
+services:
+    jenkins:                                          <-- Will the dns-name of the container that runs whereby you can reach from other containers.
+        container_name: jenkins                       <-- Container name
+        image: jenkins/jenkins                        <-- Image for the container (if you are building, this will be the target name used)
+        build:                                        <-- If you are building your own, use this
+            context: centos7                          <-- Directory relative to this yml file as to where the Dockerfile is present
+        ports:
+            - "8080:8080"
+            - "50000:50000"
+        volumes:
+            - "$PWD/jenkins_home:/var/jenkins_home"
+        networks:
+            - net
+        environment:
+            - "MYSQL_ROOT_PASSWORD=1234"              <-- Note quoted.
+networks:
+    net:
 ```
 
 # Centos 7 Installation
@@ -214,3 +253,9 @@ systemctl start docker
 # Mac host from docker containers:
 
 docker.for.mac.localhost
+
+* get into the sheel of the docker-for-mac's linux host:
+
+```
+screen ~/Library/Containers/com.docker.docker/Data/vms/0/tty
+```

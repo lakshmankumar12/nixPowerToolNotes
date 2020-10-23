@@ -647,6 +647,13 @@ set +x
 
 # Quick notes on common commands 
 
+## pwd
+
+* Avoid all symlinks
+```
+pwd -P
+```
+
 ## ps
 
 ```sh
@@ -699,6 +706,7 @@ date '+%Y-%m-%d'
 %H - hour
 %M - minute
 %S - second
+%N - nanosecond
 
 #get epoch seconds
 date '+%s'
@@ -769,6 +777,38 @@ IFC=$':' read -A array_var <<< ${var_to_split}
     n=5
     printf "willrepeat%.0s" {1..${n}}
     ```
+
+## random shuffle
+
+```
+shuf -i lo-hi -n output_count
+```
+
+## top
+
+Arguments
+
+* `-H` - show threads
+* `-d <sec>` - sample so many seconds. Also supports floating points.
+* `-p <pid>` - only these pids. Can repeat
+* `-b` - batch mode. Useful when dumping output
+* `-n <count>` - Only dump count samples
+
+## xargs
+
+* To supply one arg at a time for find
+```
+find . -print 0 | xargs -0 your_command
+```
+
+## hexdump/od
+
+* dump boht hex and ascii
+
+```
+hexdump -C <file>
+```
+
 
 
 # Give multi-line input as stdin to a command
@@ -871,6 +911,33 @@ perl -pe 'chomp if eof' filename > new_filename
 perl -pi -e 'chomp if eof' inline_filename
 ```
 
+# Linux proc file stuff
+
+```
+# typically shows 52 values
+wc /proc/${pid}/stat
+
+values=($(cat /proc/${pid}/stat))
+pid=${values[0]}
+comm=${values[1]}
+state=${values[2]}
+ppid=${values[3]}
+utime_in_ticks=${values[13]}
+stime_in_ticks=${values[14]}
+num_threads=${values[19]}
+vsize_in_bytes=${values[22]}
+```
+
+* How to know page-size in the system
+
+```
+#just pick any process and use /proc/self/smaps
+cat /proc/self/smaps | grep KernelPageSize | head -n 1
+```
+
+
 # To read links
 
 http://chneukirchen.org/blog/archive/2008/02/10-zsh-tricks-you-may-not-know.html
+
+

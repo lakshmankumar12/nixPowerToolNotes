@@ -500,6 +500,10 @@ git config credentials.helper store
 #your password will bein ~/.git-credentials in clear text.
 ```
 
+## grep with git
+
+git grep -nH 'yourGrepPattern' -- '*path/spec/*'
+
 
 
 # Old commands equivalent
@@ -623,6 +627,12 @@ svn add path/to/filename
 ## undo a add
 svn revert path/to/filename
 
+# remove/delete/del/rm a file
+svn delete path/to/file
+svn delete path/to/entire/folder
+## undo the delete
+svn revert path/to/deleted/file_or_folder
+
 #get a particular version of file .. equivalent of git show
 svn cat -r 3 http://svn.red-bean.com/repos/test/readme.txt
 
@@ -641,7 +651,7 @@ svn diff --summarize -r<rev>:<rev-1>
 
 #log commits on one author/user
 user=
-svn log | sed -n "/${user}/,/-----$/ p"
+svn log |  -n "/${user}/,/-----$/ p"
 
 #log all comments between 2 points
 svn log --verbose -r29720:29733

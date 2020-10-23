@@ -45,6 +45,8 @@ driver-info: igb/tun(for both tun/tap)/ip_gre
 
 bus-info: tun/tap/pci-value
 
+* Also circuitously found by `lspci` and `/sys/bus/pci/drivers`
+
 #### delete a apr cache
 
 ```
@@ -540,6 +542,18 @@ less useful
 
 -w <file>        # write to a file
 -r <file>        # read from file
+```
+
+* to rollover
+```
+-w /tmp/trace-%m-%-%H-%M-%S-%s.pcap -W 10 -G 120 -C 100 -n -s 100
+
+-w <tmpl>       file-name-with-template
+-W 10           max of 10 files. Stop after that
+-G 120          rollover at 120s
+-C 100          rollover at 100MB
+-n              no reverse-lookups
+-s 100          snip only 100 bytes of each pkt.
 ```
 
 ## Filter expressions

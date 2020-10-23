@@ -1,10 +1,8 @@
-# ps
+# Stuff in bash file
 
-
-## to list threads
-
-add -L
-
+* ps
+* xargs
+* od
 
 # rdesktop args
 
@@ -247,18 +245,22 @@ openssl enc -in foo.bar -aes-256-cbc -pass stdin > foo.bar.enc
 openssl enc -in foo.bar.enc -d -aes-256-cbc -pass stdin > foo.bar
 ```
 
-# wget/curl
+# curl
 
 ```
 # -f  --> be quiet on failures (Not sure, what failures are okay and what shouldn't be quietened)
 # -s  --> silent or quiet mode. Mute o/p
 # -S  --> when used with -s, -S will show errors
 # -L  --> Track redirects
+# --interface <ip> -- choose a local-bind-ip
 curl 'http://...link' -o out_file
 ```
 
+# wget
+
 ```
 wget '..' -O out_file
+--limit-rate=RATE  .. eg: --limit-rate=20k  (will limit to 20kB/s)
 ```
 
 # dpkg
@@ -423,19 +425,6 @@ cdparanoia -vsQ
 cdparanoia -B
 ```
 
-# Vimium shortcuts
-
-https://vimium.github.io/
-
-```
-j/k -> move up or down
-gg/G -> top/end of page
-H  -> back page
-J/K -> tabs
-f -> open in current tab
-F -> open in new tab
-```
-
 ## build a usb-raw image
 
 ```
@@ -452,6 +441,37 @@ mkfs.ext2 /dev/loop0p1
 e2label /dev/loop0p1 'CentOS 7 x86_64'
 sync
 
+```
+
+# Impitool
+
+```
+yum install -y OpenIPMI OpenIPMI-tools
+
+
+ipmitool lan set 1 ipsrc static
+ipmitool lan set 1 ipaddr 172.18.11.205
+ipmitool lan set 1 netmask 255.255.0.0
+ipmitool lan set 1 defgw ipaddr 172.18.0.1
+ipmitool lan set 1 arp respond on
+ipmitool lan set 1 access on
+
+ipmitool lan print 1
+ipmitool user list 1
+ipmitool user set password 2 ADMIN
+```
+
+# Vimium shortcuts
+
+https://vimium.github.io/
+
+```
+j/k -> move up or down
+gg/G -> top/end of page
+H  -> back page
+J/K -> tabs
+f -> open in current tab
+F -> open in new tab
 ```
 
 # qutebrowser
@@ -490,23 +510,6 @@ default page: https://google.com
 
 #search:
 {"DEFAULT": "https://www.google.com/search?q={}"}
-```
-
-
-# xargs
-
-* To supply one arg at a time for find
-```
-find . -print 0 | xargs -0 your_command
-```
-
-
-# hexdump/od
-
-* dump boht hex and ascii
-
-```
-hexdump -C <file>
 ```
 
 
@@ -554,6 +557,7 @@ https://www.howto-outlook.com/howto/searchcommands.htm
 ## Common adv-search terms I use
 
 ```
+read: no
 hasflag: true
 from:
 to:

@@ -94,7 +94,7 @@
 * command + option + y -- wireshark
 * command + option + o -- Outlook
 
-* command + option + b -- adobe
+* command + option + z -- adobe
 * command + option + n -- preview
 * command + option + r -- finder
 
@@ -126,6 +126,7 @@
 
 ### Dont use
 
+* b -> its bookmark shortcut in chrome
 * v -> its move/paste in finder
 * i -> its for chrome dev options.
 * f -> its for find in outlook & full-size in spectacle.
@@ -216,11 +217,16 @@ mine:
 
 * Command + ctrl + k   --> link'ize a text
 
-* Control + Shift + [ / ] --> next/prev panes
+* Control + { }        --> next/prev panes
 
 * Command +  +/-       --> Font size increase
 
 * ctrl + option + 1    --> Move to folder
+
+* ctrl + =             --> reminder and flag
+* command + option + ' --> clear flag
+
+https://shortcutworld.com/Outlook/mac/Microsoft-Outlook_2016_Shortcuts
 
 ## Finder
 
@@ -349,6 +355,10 @@ hdiutil attach -nomount filename
 diskutil list
 diskutil mountDisk /dev/disk<N>
 ```
+
+* good link/reference on diskutil:
+  http://www.theinstructional.com/guides/disk-management-from-the-command-line-part-1
+  http://www.theinstructional.com/guides/disk-management-from-the-command-line-part-2
 
 ## Create linux/win bootable iso-usb
 

@@ -59,6 +59,7 @@ reload
 
 ```
 show running-config
+show interface status       # quick listing of ifcs
 show interfaces
 show interfaces brief
 show ip interfaces brief
@@ -166,3 +167,94 @@ IOS.
 Lan switches, with say 24 ports.
 
 ## 1941 ISR (Integrated Services Router)
+
+
+# Juniper commands
+
+* You will get a bash'y prompt on login
+* To get cli-like prompt
+    ```
+    root@:RE:0% cli
+    {master:0}
+    root>
+    ```
+* And to enter configure mode
+    ```
+    root> configure
+    Entering configuration mode
+    Users currently editing the configuration:
+      root terminal pts/1 (pid 75946) on since 2020-07-08 07:05:52 UTC, idle 00:33:34
+          {master:0}[edit]
+
+    {master:0}[edit]
+    root#
+    ```
+* In configure mode, its `set ...` or `delete ...`
+* In configure mode, type `commit` to save.
+
+## useful commands
+
+* Unconfigured ifc
+
+    ```
+    xe-0/0/10 {
+        unit 0 {
+            family inet {
+                dhcp {
+                    vendor-id Juniper-qfx5110-48s-4c;
+                }
+            }
+        }
+    }
+    ```
+
+* simple ethernet ifc
+
+    ```
+    ge-0/0/11 {
+        description to-sjct-e1;
+        unit 0 {
+            family ethernet-switching {
+                interface-mode access;
+                vlan {
+                    members SJC-Edge;
+                }
+            }
+        }
+    }
+    ```
+
+* bond ifc
+
+    ```
+    ae6 {
+        description to-sjcr;
+        native-vlan-id 11;
+        aggregated-ether-options {
+            link-speed 1g;
+            lacp {
+                periodic fast;
+            }
+        }
+        unit 0 {
+            family ethernet-switching {
+                interface-mode trunk;
+                vlan {
+                    members [ SJC-Edge SJC-Wan ];
+                }
+            }
+        }
+    }
+    ```
+
+    * bond member
+
+        ```
+        ge-0/0/6 {
+            description to-sjcr-e2;
+            ether-options {
+                802.3ad ae6;
+            }
+        }
+        ```
+

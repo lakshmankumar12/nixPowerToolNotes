@@ -81,6 +81,9 @@ sed -n '2~3p' <>
 
 ```sh
 sed -r 's:\x1B\[[0-9;]*[mK]::g'
+
+#vim.. remove
+%s/\\033.\{-}m//g
 ```
 
 ## Remove the unix'ish ctrl-m ^m

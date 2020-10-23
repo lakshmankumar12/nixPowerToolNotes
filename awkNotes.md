@@ -164,6 +164,8 @@ paste -d'\t' - - - - < in_file
 
 ## Strip leading/trailing white spaces
 
+Search: trim strip
+
 ```awk
 function stripw(var) {
     gsub(/^[ \t]+/,"",var);
