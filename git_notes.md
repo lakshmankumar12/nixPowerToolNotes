@@ -23,6 +23,10 @@ git checkout -- path/to/file
 
 git checkout -- .
 
+### unstage
+
+git reset
+
 ### getting rid of the top-commit
 
 git reset --hard HEAD~1
@@ -651,7 +655,7 @@ svn diff --summarize -r<rev>:<rev-1>
 
 #log commits on one author/user
 user=
-svn log |  -n "/${user}/,/-----$/ p"
+svn log | sed  -n "/${user}/,/-----$/ p"
 
 #log all comments between 2 points
 svn log --verbose -r29720:29733

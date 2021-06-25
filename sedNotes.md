@@ -30,6 +30,8 @@
     * delete current pattern space. Bring next line to pattern space
         * depending on `-n` arg, the pat space is printed before deleting.
     * append line to pattern space. (line count incrases, i.e = will now print the new line)
+    * the line count increases effect is pronounced, when you have a `b<label>` down the
+      rule somewhere where you are looping and want to act on line-numbers in the loop.
 * `a` `i` `c`
     * append, insert, change resp.
 * `l`
@@ -44,7 +46,8 @@
     * g/G , copy hold to pattern.
 * `b`
     * branch to label, given by `: label-name`
-    * without a name goes to end
+    * without a name goes to end - as in stops this line, and goes to
+      next line processing (like next in awk)
 * `t`
     * branch to label, if previous substitution(could have been in a previous command) is successful.
 
@@ -81,6 +84,9 @@ sed -n '2~3p' <>
 
 ```sh
 sed -r 's:\x1B\[[0-9;]*[mK]::g'
+
+#sed remove screen-captured chars
+sed -r 's:\\033\[[0-9;]*[mK]::g'
 
 #vim.. remove
 %s/\\033.\{-}m//g
@@ -139,6 +145,35 @@ sed -n '3i' "you line content"
 sed -n -e "/beg_pattern/{p; :loop  n; p; /end_pattern/ q; b loop}" in_file
 ```
 
+## Print both first 10 and last 10 with a separator in between
+
+```sh
+gsed -ne'1,9{p;b};10{x;s/$/--/;x;G;p;b};:a;$p;N;21,$D;ba'
+```
+Explnation
+* `1,9{p;b}` - first 9 lines are printed without any further processing
+* `10{x;s/../;x;G;p;b}`
+    * 10th line is special. Goal is to add a -- and print.
+    * x - first put the line in hold-space (which is empty now)
+    * s/../ - replace nothing (in pattern space) with --
+    * x - swap patt/hold. orig-lines come to patter, -- goes to hold.
+    * G - append hold to pattern. so -- comes after the 10th line.
+    * p - print both.
+    * b - next line.
+* `:a` - set a label here.
+* `$p` - if you are end, print whatever is the pattern space
+    * our goal is to have the patter space, have the last 10 lines at this point.
+* `N` - slurp the next line
+* `21,$` - starting from 21st line, start delete the oldest line.
+    * Note that this rule itself will be working only after 10 lines. Until
+      then we have been doing b.
+    * net-net that means, 11th line will be deleted when 21st line is processed
+      and so on.
+    * thus pattern space holds the last N lines.
+* `ba`
+    * loop back to label a.
+    * Note that `N` also incrases line-numbers so that `$p` will eventually match
+      on end of file and `N` will also exit the loop at EOF.
 
 # Not really SED but text stuff with other tools
 

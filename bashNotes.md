@@ -161,6 +161,15 @@ lower=${a,,}
 upper=${a^^}
 ```
 
+## Trim white space
+
+```sh
+var="  one two three  "
+trimmed_var=$(echo "$var" | xargs)
+#trimmed_var="one two three"
+```
+
+
 # Parameter expansion
 
 ```sh
@@ -232,6 +241,7 @@ function implementor()
 {
   var_name_passed=$1
   ...
+  #note the eval. Missing it wont work
   eval ${var_name_passed}="Value from here"
 }
 
@@ -315,11 +325,16 @@ IFS=$'\r\n' GLOBIGNORE='*' XYZ=($(command))
 * pass array by reference
 
 https://stackoverflow.com/a/16461878/2587153
+```sh
 function array_print() {
-    arrayname=$1[@] ;
-    array=(${!arrayname}) ;
-    printf "elem: %s\n" "${array[@]}" ;
+arrayname=$1[@] ;
+array=(${!arrayname}) ;
+printf "elem: %s\n" "${array[@]}" ;
 }
+my_array=(10 20 30)
+array_print my_array
+```
+* Note that arrayname above is just the string `my_array[@]`. This leverages the `${!...}` in bash, which is indirection.
 
 # Associative array / dict / hash
 
@@ -390,6 +405,21 @@ Note: cat file | while     .. wont cut it as while will work in a bash of its ow
 while read i ; do ... done   < $(another cmd) <- wont work. as that captures the output into a string.
 
 while read i ; do ... done   < <(another cmd) <- works. as that creates a named-pipe (a fd) and that can be given as stdin.
+```
+
+# More than one file
+
+In general `>&` or `<&` is the fd-duplicating operator in bash
+
+```sh
+exec 3>filename   # will duplicate 3 to a write-fd for file. Note no & here.
+
+echo "happy"      # writes to stdout.. normal
+echo "happy" >&3  # write  to this file!
+
+exec 3>&-         # closes the fd. Note the number comes first.
+
+exec 4<>filename  # open for both reading/writing
 ```
 
 # List all key-bindings in zsh
@@ -710,6 +740,9 @@ date '+%Y-%m-%d'
 
 #get epoch seconds
 date '+%s'
+
+#convert a given epoch into date
+date '-d@<epoch>'
 ```
 
 date also supports addition in linux!
@@ -809,17 +842,24 @@ find . -print 0 | xargs -0 your_command
 hexdump -C <file>
 ```
 
+## just get ip for a hostname
+
+    dig +short hostname
+
 
 
 # Give multi-line input as stdin to a command
 
 * this is refered as heredoc
-* Note variable expansion happens inside of heredoc as long as you put in quotes(!)
+* Note variable expansion happens inside of heredoc. If the delimiter is quoted, no substitution happen
+* Adding a `<<-` will allow for initial tabs to be ignored - Otherwise all lines should start from beginning.
+    * Note that tabs will be gone in the final output. So tabs might help in indenting in ur source where heredoc is present.
+    * spaces following tabs will be preserved on the emitted output.
 
 ```sh
 command <<EOF
-your multi line1
-your multi line2
+your multi line1 with substitution of ${variable}
+your multi line2 with substitution of $(command output)
 ...
 EOF
 ```

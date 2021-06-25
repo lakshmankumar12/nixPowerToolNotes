@@ -338,10 +338,11 @@ tc qdisc add dev eth0 root handle 1: prio priomap 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 
 # now add say netem to prio-band 1
 tc qdisc add dev eth0 parent 1:1 handle 10: netem delay 200ms
 
-# now choose which traffic experiences delay
+# now choose which traffic experiences delay (note how port is used with 0xffff)
 tc filter add dev eth0 protocol ip parent 1:0 prio 1 u32 match ip dst 10.0.0.1/32 match ip dport 80 0xffff flowid 1:1
 
 ```
+Netem explanation at https://wiki.linuxfoundation.org/networking/netem#packet_re-ordering
 
 ## Network namespace
 
@@ -378,6 +379,26 @@ ip netns identify ${PID}
 ```
 
 * lsns if available
+
+### Sample use of namespace - veth pair
+
+```sh
+# Add a new name-space
+ip netns add netns108
+# Create a veth-pair
+ip link add veth108_ns0 type veth peer name veth108_ns108
+# Ip to the one that is on def-ns
+ip addr add 10.1.108.2/24 dev veth108_ns0
+ip link set veth108_ns0 up
+# Move the other one to the named namespaced
+ip link set veth108_ns108 netns netns108
+# Typical to assign a ip on the same range to each of the ifcs so
+# that it mimics a real world router
+ip netns exec netns108 ip addr add 10.1.108.3/24 dev veth108_ns108
+ip netns exec netns108 ip link set veth108_ns108 up
+# Add route(s) to the external world inside the namespace via the veth-peer.
+ip netns exec netns108 ip route add 10.1.7.0/24 via 10.1.108.2 dev veth108_ns108 src 10.1.108.3
+```
 
 # Ip-Routing-Tables
 
@@ -429,6 +450,27 @@ iptables-restore -c < /tmp/a.iptables
 
 ```
 
+## Picture of chains
+
+R-D: Routing-Decision
+
+```
++--------+    +--------+        +---+      +--------+                   +--------+
+|Ntwk    |--->|PRE     |--------|R-D|----->|INPUT   |------------------>|Local   |
+|Intf    |    |ROUTING |        +---+      |        |                   |Process |
++--------+    +--------+          |        +--------+                   +--------+
+                                  v          ^
+                              +--------+     |
+                              |FORWARD |     |
+                              |        |     |
+                              +--------+     |
+                                  |          |
++--------+    +--------+          v        +---+   +--------+  +---+   +--------+
+|Ntwk    |<---|POST    |<------------------|R-D|<--|OUTPUT  |<-|R-D|---|Local   |
+|Intf    |    |ROUTING |                   +---+   |        |  +---+   |Process |
++--------+    +--------+                           +--------+          +--------+
+```
+
 ## chains and tables to use
 
 * To drop incoming pkts
@@ -442,6 +484,7 @@ iptables-restore -c < /tmp/a.iptables
 * To reject tcp
 ```
 -A INPUT -t filter -j REJECT --reject-with tcp-reset
+-A INPUT -t filter -p tcp -s 10.1.1.11 -d 10.1.1.2 -j REJECT --reject-with icmp-host-unreachable
 ```
 
 
@@ -627,9 +670,9 @@ hping3
 * --udp/-2
 
 * port mgmt
-  * --baseport/-s (choose src port, def: random)
-  * --keep/-k  (dont increase src-port. Def is to incrase)
-  * --destport/-p (def: 0, choose dest prot. Use + to increase on every reply, ++ to increase on every sending)
+  * -s/--baseport (choose src port, def: random)
+  * -k/--keep     (dont increase src-port. Def is to incrase)
+  * -p/--destport (def: 0, choose dest prot. Use + to increase on every reply, ++ to increase on every sending)
 
 ```
 -c <count>
@@ -756,3 +799,8 @@ ip xfrm state show
         nc -u -s 192.2.53.2 -p 19000 192.15.2.2 8090
     ```
 
+# Know my public ip
+
+```
+curl ifconfig.me.
+```

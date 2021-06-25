@@ -9,6 +9,13 @@ qpdf --password=sekritPassword --decrypt protected.pdf unprotected.pdf
 # merge 2 pdfs
 pdftk A=in1.pdf B=in2.pdf cat A1-2 B4-end output out1.pdf
 pdftk *pdf cat output combined.pdf
+## gs
+gs -dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE=combine.pdf -dBATCH 1.pdf 2.pdf
+
+
+## print 2 pages per sheet
+###  Search : multiple 2x1 2x2
+pdfjam --nup 2x1 --landscape input.pdf --outfile output.pdf
 
 # watermarking (works only for text-files).
 pdftk input.pdf background mark.pdf output marked-file.pdf
@@ -76,3 +83,4 @@ see gs file
 #pdf to text
 apt-get  install poppler-utils
 pdftotext -layout a.pdf a.txt
+pdftotext -layout -f <first-pagenum> -l <last-page-num> a.pdf a.txt

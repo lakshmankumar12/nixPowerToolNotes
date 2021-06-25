@@ -293,6 +293,14 @@ yum install yum-utils
     rpm2cpio ./your-rpm.rpm | cpio -idmv
     rpm2cpio ./your-rpm.rpm | cpio -iv --to-stdout ./some/specfic/file/mind/the/dot > your_file
     ```
+* List all repos
+    ```
+    yum repolist
+    ```
+* List all packages in a repo
+    ```
+    yum --disablerepo="*" --enablerepo="google" list available
+    ```
 
 
 

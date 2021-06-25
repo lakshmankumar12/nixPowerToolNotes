@@ -43,7 +43,13 @@
 
 ### force-quit
 
+Search: task-manager
+
 * command + option + Esc ->  Like ctrl-alt-del. Bring up Force-Quit manager.
+
+Search : activity monitor
+
+* Just open "Activity Monitor" from application->utilities or from spotlight or quicksilver
 
 
 ## screen shots
@@ -204,6 +210,10 @@
 
 The current-line highlight gets enabled because of command + option + ;
 
+* Block select
+    * Search : block, column, select
+    * Command + option + select
+
 mine:
 * shift-command-d  --> create new split-pane vertical
 * command+shift +/-  -> size of pane
@@ -232,6 +242,7 @@ https://shortcutworld.com/Outlook/mac/Microsoft-Outlook_2016_Shortcuts
 
 * Command-up   -> one folder up
 * Command-down -> go into selected foler (like enter)
+* Command-[    -> go to previous folder
 
 * command +backsapce -> move to trash
 * command + option + backsapce -> direct delete /w/o trash
@@ -307,7 +318,14 @@ http://mac.appstorm.net/how-to/productivity-how-to/mastering-quicksilver-the-bas
 # blueutil
 
 ```
+#install
+brew install blueutil
+
+#list all previously paired and now-connected.
 blueutil --recent
+
+#list currently connected
+blueutil --connected
 
 blueutil --connect 38-a2-8c-bf-32-e6
 

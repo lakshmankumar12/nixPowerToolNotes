@@ -258,3 +258,9 @@ Lan switches, with say 24 ports.
         }
         ```
 
+* shut a ifc
+    ```
+    set interfaces ge-0/0/16 disable
+    ```
+
+* display all macs on a vlan

@@ -30,10 +30,36 @@ condition {action}
     ```awk
     length(string) != 0
     ```
+* Ranged patterns
+    * ranged patterns are activated when begin matches. All further records match till end.
+    * records that match begin/end are both passed into action.
+    ```awk
+    /begin/,/end/ { action }
+    ```
 
 ## To use posix regular expression character classes like [[:digit:]]
 
 awk --posix
+
+## Input Field Separator
+
+* The darn thing can be a regex!
+
+    ```awk
+    awk -F '<(/?)some_xml_ish_tag>' '{ ..  }' infile
+    ```
+## for loops
+
+```awk
+
+awk 'for ( ; ; ) {  }'
+
+#quickly study fields
+ head -n 1 | awk -F'\\.|:|_|[[:space:]]+' '{for (i=1; i<=NF ; i++) {printf "%d : %s\n",i,$i}}'
+
+#for over an array
+for (key in array) { print array[key] }
+```
 
 # Special variables
 
@@ -72,6 +98,9 @@ awk --posix
 ```awk
 # idx is 1-based.
 small_str = substr(big_string_var, begin_idx, length)
+
+# trim the last n(eg:5) chars
+small_str = substr(big_string_var, 1, length(big_string_var)-5)
 ```
 
 ## match
@@ -80,6 +109,14 @@ small_str = substr(big_string_var, begin_idx, length)
 # gawk version - gets the result in 3rd arg
 #  plain awk - sets RSTART and RLENGTH
 mached_result = match(big_string_var, regex_or_literal, result_arr)
+```
+
+## sprintf
+
+```awk
+
+variable = sprintf("%d %c %s",intvar,charvar,stringvar);
+
 ```
 
 
@@ -102,27 +139,78 @@ system("your command with args")
 
 ## Collect output of a command in a vairable
 
+* awk has this quirky way of spawing other programs.
+* When a variable containing a command(with args) is used in a pipe-construct,
+  awk seems to exec that command the first time. Further uses continue to
+  use the same invoked program, until its closed. The same variable represents
+  the file-handle to close that program.
+
 ```awk
 cmd = "build your command"
 cmd | getline var_name
 close (cmd)
 ```
 
-## Peek one line ahead
+## Run a command on a block
+
+* everytime block begins we close the previous cmd
+* and then we pipe-in the current line to the curreng invocation of cmd
+```awk
+awk -v cmd='whatever your command is' '
+    /blockbegin/ { close(cmd); }
+    { print | cmd }' infile
+```
+
+## getline
+
+### Form-1
+
+* getline consumes the next-line. Next iteration wont see this.
+* NR,FNR,RT and ofcourse the var is set, B-U-T, $0 (and all of $1,$2...) and NF are still that of orig-line taken in this iteration
+
+```awk
+{
+    currentline=$0
+    getline nextlineconsumed
+    stillmaincurrentline=$0
+}
+
+```
+
+### Form-2
+
+* this is getline with a redirection. This getline is a parallel read of any file. using FILENAME variable, u can read the current file too.
+
+Search : Process one line with next line
+
+* The trick is to read the file parallely 2 times.
+    * Awk's main processing goes on normally
+    * An extra processing is done by an extra getline
+* note that FILENAME is a awk variable for current file under process
 
 ```awk
 BEGIN {
-  getline discard_first_line_as_this_is_never_peeked_by_any_line
+    getline discard_first_line < FILENAME
 }
-getline peeked_next_line
-this_line=$0
+{
+    getline next_line < FILENAME
+    current_line=$0
+}
 ```
 
 ## Detect duplicate lines in 2 files.
 
-* Note that the `==` ensures the dups are printed just once.
+* Note that the `== 1` ensures the dups are printed just once (the second occurence is printed).
 ```awk
 sort file1 file2 | awk ' seen[$0]++ == 1' > dups
+```
+
+## uniq without sorting
+
+```awk
+cat whatever | awk ' seen[$0]++ == 0' > uniq_lines
+#same .. more crisp
+cat whatever | awk '!x[$0]++'
 ```
 
 ## get extra lines in file2 that are not in file1
@@ -151,6 +239,7 @@ awk '{ORS=NR%10?"\t":"\n";print}' in_file
 ```
 
 note: sed-way
+You have to n-1 `N`s to merge n lines.
 ```
 sed 'N;N;N; s/\n/\t/g;' in_file
 ```
@@ -172,12 +261,6 @@ function stripw(var) {
     gsub(/[ \t]+$/,"",var);
     return var
 }
-```
-
-## Get uniq lines w/o spoiling order
-
-```awk
-cat whatever | awk '!x[$0]++'
 ```
 
 ## Get non-empty lines alone
