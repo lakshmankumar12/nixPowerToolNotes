@@ -119,12 +119,52 @@ variable = sprintf("%d %c %s",intvar,charvar,stringvar);
 
 ```
 
+# Array stuff
+
+* awk natively supports one-dimensional hash-tables which it calls array
+* You just index with key
+```awk
+array["mykey"]="my value"
+for (key in array) { printf "key:%s value:%s\n",key,array[key] }
+```
+* You can delete one key or entire array
+```awk
+delete array[key]
+delete array
+```
+* traditional awks dont support multi-dimenstional array.  You can test if your awk supports it with this script in:
+    https://stackoverflow.com/a/48025277
+* You can fake multi-dimensional array by
+```awk
+array[a,b]="my value"
+#At this point, awk will use the key a SUBSEP b.
+#If all you want is print them having both a and b at hand,
+#  then nothing much. Just do  array[a,b]
+#However, if you want to iterate over all available stuff with array[a], then
+#Build 2 arrays:
+if (x in first_level_key_tracker_array) {
+    first_level_key_tracker_array[x]=y
+} else {
+    first_level_key_tracker_array[x]=first_level_key_tracker_array[x] SUBSEP y
+}
+final_array[x,y]=value
+#Now you can iterate like:
+for (x in first_level_keys) {
+    delete available_keys
+    available_keys=split(first_level_key_tracker_array[x],available_keys,SUBSEP)
+    for (k in available_keys) {
+        value=final_array[x,available_keys[k]];
+    }
+}
+```
 
 # Functions
 
 ## To split a string into an array
 
 * split(string,array,delim)
+    * Note that you get a array, whose key is 1,2,3..N and split-values
+      against these keys
 * strtonum
 
 ## run shell commands

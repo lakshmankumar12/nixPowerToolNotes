@@ -50,7 +50,13 @@
       next line processing (like next in awk)
 * `t`
     * branch to label, if previous substitution(could have been in a previous command) is successful.
-
+* `e`
+    * Not be confused with `-e` arg. This is a exec-command, which is a gnu-sed extension.
+    * 2 flavors. Typically part of s command's option.
+        * `s/abc/tr 'a' 'A'/ep` - executes the pattern space as a command and substitues it with the stdout of the program.
+        * e followed by p, will do the above trick and then print the pattern space.
+    * just execute what follows. Mostly a hack way to have sed execute something.
+        * `sed '1e /bin/bash'`
 
 
 

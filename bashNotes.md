@@ -464,6 +464,16 @@ Black Red .. Green Yellow .... Blue Magenta .. Cyan White
 '\033[48;5;<n>m'   where <n> is one of the 256 values. for background
 ```
 
+## cursor up
+
+```sh
+function f_cursor_up()
+{
+    local lines=${1:-1}
+    [ -n "${lines}" ] && /bin/echo -ne "\033[${lines}A\033[0G"
+}
+```
+
 # Getting yes/no or other inputs from user
 
 ```sh
@@ -532,6 +542,8 @@ fi
 
 # Argc/Argv Parsing
 
+## Hand rolled
+
 good
 * long-options and short-options
 
@@ -576,7 +588,7 @@ if [[ -n $1 ]]; then
 fi
 ```
 
-or
+## getopts
 
 good
 * unix sytle combining of options
@@ -609,6 +621,42 @@ shift $((OPTIND-1))
 
 [ "$1" = "--" ] && shift
 Leftovers=$@
+```
+
+## getopt
+
+* Seems to be best of all worlds
+
+```sh
+options=$(getopt -o ab:c -l alpha,bravo:,charlie -n "$0" -- "$@")
+if [ $? -ne 0 ] ; then
+    echo "Incorrect options provided"
+    exit 1
+fi
+eval set -- "$options"
+while true; do
+    opt="$1"
+    shift
+    case "$opt" in
+    -a|--alpha)
+        echo "a option given"
+        ;;
+    -b|--bravo)
+        echo "b option with arg $1"
+        shift
+        ;;
+    -c)
+        echo "c option given"
+        ;;
+    --)
+        break
+        ;;
+    esac
+done
+
+echo "remaining parameters: $@"
+
+exit 0;
 ```
 
 # Finding who set that env variable
@@ -672,6 +720,19 @@ cat <&4
 set -x
 # turn off debugging
 set +x
+```
+
+# Turn off glob expansion error in zsh
+
+```
+$ setopt +o nomatch
+$ ls *non_existing_file*
+ls: cannot access *non_existing_file*: No such file or directory
+
+Default behavior
+$ setopt -o nomatch
+$ ls *non_existing_file*
+zsh: no matches found: *non_existing_file*
 ```
 
 
@@ -842,9 +903,30 @@ find . -print 0 | xargs -0 your_command
 hexdump -C <file>
 ```
 
+* with a format string
+  The following adds a `\x` and every byte as hex value.
+```
+hexdump -e '"\\\x"/1 "%02x"'
+```
+Explanation:
+* -e is for format-string.
+* format string has to be inside double-quotes. hexdump must see
+  the double quotes.
+  * `"\\\x"` is a literal `\x` to be printed.
+  * `\1 ` is outside double quotes. This is a requirement. It
+    is a iteration count and byte count. There should be a space
+    after this
+  * `"%02x"` is a traditional printf style format string to print
+    in hex with 0 pre-pended and a width of 2.
+
+
 ## just get ip for a hostname
 
     dig +short hostname
+
+### Other ip tools
+
+ipcalc
 
 
 
