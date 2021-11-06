@@ -704,6 +704,8 @@ done
 
 cat <&4
 
+/proc/pid/fd/3 is a way to access the file.
+
 ```
 * Note that in the above, the name is gone off the file-system.
 * But the file can be read by `/proc/<pid>/fd`
@@ -845,6 +847,8 @@ tail -n +11
 * this is a shell builtin
 * this annoyingly is different in bash and zsh. Notably:
     * `-a` is assign to arr in bash, while its `-A` in zsh
+* `-d delim` will continue reading until delim instead of newline.
+    * useing empty  will go on till EOF
 
 bash:
 ```sh
@@ -934,6 +938,7 @@ ipcalc
 
 * this is refered as heredoc
 * Note variable expansion happens inside of heredoc. If the delimiter is quoted, no substitution happen
+    * i.e Single quote that `'EOF'` will not expand variables and commands
 * Adding a `<<-` will allow for initial tabs to be ignored - Otherwise all lines should start from beginning.
     * Note that tabs will be gone in the final output. So tabs might help in indenting in ur source where heredoc is present.
     * spaces following tabs will be preserved on the emitted output.

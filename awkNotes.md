@@ -14,7 +14,7 @@ condition {action}
         * or in gawk, any of `, { ? : || && do else` continue the
           rule in the next line
 * Note: dont put assignments outside of blocks. Its treated as a
-  condition that is always true, and the default action of printing $0
+    condition that is always true, and the default action of printing $0
   happens
 
 ## Example conditions
@@ -48,6 +48,13 @@ awk --posix
     ```awk
     awk -F '<(/?)some_xml_ish_tag>' '{ ..  }' infile
     ```
+
+## Using fields by content
+
+* Instead of specifying field-separator, from awk 4.0 we can specify the field.
+    This is done using FPAT - allow for empty patterns if u want non patterns to separate empty columsn.
+    Otherwise all non-patters wll be treated as one big separator
+
 ## for loops
 
 ```awk
@@ -165,7 +172,7 @@ for (x in first_level_keys) {
 * split(string,array,delim)
     * Note that you get a array, whose key is 1,2,3..N and split-values
       against these keys
-* strtonum
+* strtonum   # search: atoi , hex to dec
 
 ## run shell commands
 
@@ -203,7 +210,22 @@ awk -v cmd='whatever your command is' '
 
 ## getline
 
-### Form-1
+http://awk.freeshell.org/AllAboutGetline
+
+```
+Variant                | Variables Set
+---------------------------------------
+getline                | $0, ${1...NF}, NF, FNR, NR, FILENAME
+getline var            | var, FNR, NR, FILENAME
+getline < file         | $0, ${1...NF}, NF
+getline var < file     | var
+command | getline      | $0, ${1...NF}, NF
+command | getline var  | var
+command |& getline     | $0, ${1...NF}, NF
+command |& getline var | var
+```
+
+### Form-2
 
 * getline consumes the next-line. Next iteration wont see this.
 * NR,FNR,RT and ofcourse the var is set, B-U-T, $0 (and all of $1,$2...) and NF are still that of orig-line taken in this iteration
@@ -217,7 +239,7 @@ awk -v cmd='whatever your command is' '
 
 ```
 
-### Form-2
+### Form-4
 
 * this is getline with a redirection. This getline is a parallel read of any file. using FILENAME variable, u can read the current file too.
 
@@ -301,6 +323,10 @@ function stripw(var) {
     gsub(/[ \t]+$/,"",var);
     return var
 }
+
+#oneliner
+function stripw(var){gsub(/^[ \t]+/,"",var);gsub(/[ \t]+$/,"",var);return var}
+
 ```
 
 ## Get non-empty lines alone
