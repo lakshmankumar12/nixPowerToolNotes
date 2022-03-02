@@ -168,6 +168,14 @@ Lan switches, with say 24 ports.
 
 ## 1941 ISR (Integrated Services Router)
 
+## Term server commands
+
+* Kill a line
+
+    ```
+    kill line 5
+    ```
+
 
 # Juniper commands
 

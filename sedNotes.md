@@ -58,7 +58,16 @@
     * just execute what follows. Mostly a hack way to have sed execute something.
         * `sed '1e /bin/bash'`
 
+## Different delimiter
 
+* Other commands. Use backslash before delimiter
+    ```
+    sed '\,some/path,d'
+    ```
+* `s` command is special. It doesnt need the backslash
+    ```
+    sed 's,some/path,other/path,'
+    ```
 
 # Some quick sed scripts
 

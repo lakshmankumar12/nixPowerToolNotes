@@ -294,7 +294,7 @@ awk '{$1=""}sub(FS,"")'
 
 ## Club N lines together
 
-Search: merge
+Search: merge join
 
 ```
 awk '{ORS=NR%10?"\t":"\n";print}' in_file
@@ -335,10 +335,34 @@ function stripw(var){gsub(/^[ \t]+/,"",var);gsub(/[ \t]+$/,"",var);return var}
 cat whatever | awk 'NF'
 ```
 
+## cams consolidated summary extracter
+
+```awk
+#Bring everything | seperated
+awk -F\| 'function stripw(var){gsub(/^[ \t]+/,"",var);gsub(/[ \t]+$/,"",var);return var} function printline() { printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\n",folio,fund,units,date,nav,value,registrar } NF > 2 { if (NR>2) { printline() } folio=stripw($1) ; fund=stripw($2) ; units=stripw($3) ; date=stripw($4) ; nav=stripw($5) ; value =stripw($6) ; registrar=stripw($7) } NF == 2 { fund = fund " " stripw($2) } END { printline()  }' statement.txt > statement.csv
+```
+
+
+
 # Not exactly awk, but text processing
 
 ## combile 2 or more files column wise
 
 ```
 paste -d, file1 file2 file3
+```
+
+# print the ip-tcp list
+
+```
+cat /proc/net/tcp | awk '
+function getip(inhex) {
+    match(inhex,"([0-9A-F]{2})([0-9A-F]{2})([0-9A-F]{2})([0-9A-F]{2}):([0-9A-F]{4})",res);
+    for(i in res){
+        res1[i]=strtonum("0x" res[i])
+    };
+    s=sprintf("%s.%s.%s.%s:%s",res1[4],res1[3],res1[2],res1[1],res1[5])
+    return s
+}
+1 {ip1=getip($2);ip2=getip($3);printf "%4s %20s %20s %s\n",$1,ip1,ip2,substr($0,35,length($0))}'
 ```

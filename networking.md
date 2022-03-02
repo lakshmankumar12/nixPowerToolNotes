@@ -638,6 +638,9 @@ src net 192.168.0.0/16 and dst net 10.0.0.0/8 or 172.16.0.0/16     # or is for t
 src mars and not dst port 22
 'src 10.0.2.4 and (dst port 3389 or 22)'
 
+#tcp syns
+tcp[tcpflags] & (tcp-syn|tcp-ack) != 0
+
 #shows all urgent
 'tcp[13] & 32!=0'
 

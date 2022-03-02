@@ -315,6 +315,8 @@ openssh-clients-5.5p1-24.fc14.2.i686
 rpm -qa
 ```
 
+* Centos debug info - http://debuginfo.centos.org/
+
 
 
 # tar
