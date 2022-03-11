@@ -65,6 +65,7 @@ virsh pool-list --all
 virsh pool-info <pool-name>
 
 virsh vol-list <pool-name>
+virsh vol-delete --pool <pool-name> <vol-name>
 
 # gui
 virt-manager
