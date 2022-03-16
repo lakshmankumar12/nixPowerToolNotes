@@ -46,7 +46,7 @@ docker ps
 #list just id
 docker ps -q
 
-#login from command-shell
+#login to your docker-account from command-shell
 docker login
 
 #copy files into a container
@@ -54,11 +54,13 @@ docker cp /path/to/file/on/host/file container_name:/path/in/container/
 
 #get a shell to some running container
 #get container name using docker ps -a
+#this will die if the original container exits
 docker exec -i -t <container-name> /bin/bash
 
 #attach to a container (you shoul rather exec as quitting that bash wont stop the container)
 #  heopfully the container is running a shell of sort
 docker attach container_name
+## Note the special key-sequence - ctrl-p,ctrl-q will detach you out of the container
 
 # stop a container
 #  .. will send a SIGKILL (or any signal passed as arg) to the main process in the container
@@ -88,38 +90,91 @@ docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
 docker run hello-world
 
 #-p host-port:cont-port  -> map port 4000 of local machine to 80 of container
+#-p cont-port            -> will random map the container-port to a random host port
 #-P                      -> (no-arg) auto-map random ports of host to all exposed container ports
+#                        -> use docker port <cont-name> to find the port assigned by host
+#                        -> port/prot.. eg:  -p 8080/tcp
 #-d run in detached mode
 #-e NAME=VALUE  -> set env NAME and give VALUE
 #-u userid      -> start as that userid
 #-v host-folder:cont-folder[:ro]    -> mount host-folder at cont-folder
 #-t             -> Give a tty
 #-i use this image
+#--name <name>    -> start with this name (instead of the auto-assigned crazy,but,cool name)
 docker run -d -p 4000:80 friendlyhello
 
 
 #Other run args:
---rm   -> remove the container on exit
+--rm               => remove the container on exit (Very useful)
+--privileged       => run with unrestricted powers
+--pid=host         => run in the process namespace of host (you can send signals to other processes)
+--memory <max-memory>
+--cpu-shares <relative-to-other-container>
+--cpu-quota  <to-limit-in-general>
 ```
 
-## Dockerfile and repository mgmt
+* Image/Container states
 
 ```
-#build from a Dockerfile
-# -t  is the name of the image
-docker build -t friendlyhello .
+Image --run-command-> Running Container --> Stopped Container -- commit-commnd --> New Image
+```
 
+### Docker logs
+
+```
+docker logs <container-name>
+
+```
+
+### inspect
+
+```
+# get pid of main process of a container
+docker inspect --format '{{.State.Pid}}' container_name
+```
+
+
+# Repository mgmt
+
+```
 #push a image to repo
 #if :tag is omitted, it tagged as :latest and existing :latest is lost.
 docker tag local_image_name lakshmankumar/repo_name:tag_to_this_version_of_image
 
 docker push lakshmankumar/repo_name:tag
+
+#Tag composition
+registry.example.com:port/organization_name/image_name:version-tag
+
 ```
 
-### File syntax
+# DockerFile
 
 ```
+#build from a Dockerfile
+# -t  is the name of the image
+# The . is the path where dockerfile is present.
+docker build -t friendlyhello .
+```
+
+* Note that each line creates a new image.
+* So, you dont want a huge Dockerfile as there will be lots of intermediate images!
+* Are not shell scripts. Processes running on one line will not be running on next line
+* ENV commands take up one line(and hence one image)
+
+## File syntax
+
+```
+# typically the first line in your dockerfile
+# the last from will be the one that that image is based on.
+#    With the help of COPY --from=... (multi-staged builds)
+#    you can have many FROM. See
+#    https://docs.docker.com/develop/develop-images/multistage-build/
 FROM some_base_image:version
+
+#your name or whoever maintains and the email"
+MAINTAINER firstname lastname <firstname.lastname@xyz.com>
+LABEL "comments on this dockerfile"
 
 # Set the working directory to /app
 WORKDIR /app
@@ -127,6 +182,10 @@ WORKDIR /app
 # Copy the current directory contents into the container at /app
 # Do this if you prepare ur image from a particular folder
 ADD . /app
+# uncompresses the tarball to the image.
+ADD project.tar.gz /install/
+# download from url
+ADD http://someurl.com/path/to/file.rpm /target_dir
 
 # Install any needed packages specified in requirements.txt
 RUN pip install -r requirements.txt
@@ -141,13 +200,28 @@ VOLUME /path/inside/container1 /path/inside/container2
 COPY rel-or-abs/path/in/host /abs/path/inside/container
 
 # Define environment variable
+# Available both further for next commands and also in the container as well.
 ENV NAME World
 
 # Run app.py when the container launches
+# Shell form - just type
+CMD python app.py
+# exec form - replaces the main shell
 CMD ["python", "app.py"]
+
+# entry points serve as the launch program. So whetever u give when starting the container
+# are passed as args to this command
+
+# change to user
+USER authur
+USER 1000
 ```
 
-## Networking
+# Networking
+
+* special name for host - `host.docker.internal`
+    * works in windows and mac
+    * it will typically be 172.17.0.1 for linux
 
 * There are 3 networks - bridge / host / none. By default, all containers run in the bridge network
 
@@ -160,6 +234,8 @@ CMD ["python", "app.py"]
 
     #connect a container to a bridge
     docker network connect networkNameX container_name
+    # or use this when starting a container
+    docker run --rm -ti ubuntu --net networkNameX
 
     #to know about a network
     docker network inspect networkNameX
@@ -169,8 +245,31 @@ CMD ["python", "app.py"]
     https://success.docker.com/article/Multiple_Docker_Networks
     https://docs.docker.com/engine/reference/commandline/network_create/#bridge-driver-options
 
-## Volumes
+# Volumes
 
+* Virtual discs to store and share data
+* 2 types
+    * Permanent - present even after all containers are stpped
+    * Ephemeral - goes when when the last container using it is gone
+* Not part of images
+* Between host and container
+    ```
+    # arg to run
+    -v host-folder:cont-folder[:ro]    -> mount host-folder at cont-folder
+
+    # Not if the host-path exists and is a file, it will be shared as a flie.
+    # If the host-path does't exist , it will be assumbed to be a dir.
+    ```
+* Ephemeral
+    ```
+    # this -v arg with only_path, creates a ephemeral volume
+    docker run -v only_path image_name --name cont_name
+
+    # another container can now use this using --volumes-from
+    docker run --volumes-from orig_container_name --name this_container
+    ```
+
+Old notes:
 * Created using docker create or implicitly by docker run
 * A volume is a directly in a container/image that bypasses UFS
   * volumes are initialized when (runtime)containers are created. If the baseimage
@@ -182,7 +281,7 @@ CMD ["python", "app.py"]
   * Data volumes persist even if the container itself is deleted.
 * Data volumes have persist lifetime, and not related to container lifetime
 
-    (I dont understand this fully - for now -v host-dir:container-dir is good enuf)
+(I dont understand this fully - for now -v host-dir:container-dir is good enuf)
 
 
 # Compose
