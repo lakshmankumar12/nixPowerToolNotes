@@ -89,23 +89,25 @@ docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
 #simplest -- just run a image, with the program mentioned as part of image
 docker run hello-world
 
-#-p host-port:cont-port  -> map port 4000 of local machine to 80 of container
-#-p cont-port            -> will random map the container-port to a random host port
-#-P                      -> (no-arg) auto-map random ports of host to all exposed container ports
-#                        -> use docker port <cont-name> to find the port assigned by host
-#                        -> port/prot.. eg:  -p 8080/tcp
-#-d run in detached mode
-#-e NAME=VALUE  -> set env NAME and give VALUE
-#-u userid      -> start as that userid
+#-p host-port:cont-port -> map port 4000 of local machine to 80 of container
+#-p cont-port           -> will random map the container-port to a random host port
+#-P                     -> (no-arg) auto-map random ports of host to all exposed container ports
+#                       -> use docker port <cont-name> to find the port assigned by host
+#                       -> port/prot.. eg:  -p 8080/tcp
+#-d                     -> run in detached mode (like daemon)
+#-e NAME=VALUE          -> set env NAME and give VALUE
+#-u userid              -> start as that userid
 #-v host-folder:cont-folder[:ro]    -> mount host-folder at cont-folder
-#-t             -> Give a tty
-#-i use this image
-#--name <name>    -> start with this name (instead of the auto-assigned crazy,but,cool name)
+#-t                     -> Give a tty
+#-i <image>             -> use this image
+#--name <name>          -> start with this name (instead of the auto-assigned crazy,but,cool name)
+
 docker run -d -p 4000:80 friendlyhello
 
 
 #Other run args:
 --rm               => remove the container on exit (Very useful)
+--restart=always   => restart the container if it dies.
 --privileged       => run with unrestricted powers
 --pid=host         => run in the process namespace of host (you can send signals to other processes)
 --memory <max-memory>
@@ -131,6 +133,16 @@ docker logs <container-name>
 ```
 # get pid of main process of a container
 docker inspect --format '{{.State.Pid}}' container_name
+```
+
+### save and load
+
+```
+#save an image locally into a file
+docker save -o outputfile.tar.gz existing_image_name
+
+#load save images
+docker load -i saved_file.tar.gz
 ```
 
 
@@ -286,8 +298,13 @@ Old notes:
 
 # Compose
 
+* Single machine co-ordination
+* designed for testing and development
+* brings up all containers, networks, volumes with one command
+
 ```
 #start for frist time
+# -d does the containers in detached mode.
 docker-compose up -d
 
 #build any dockerfiles
@@ -301,18 +318,27 @@ docker-compose restart
 
 #down
 docker-compose down
+
+#list
+docker-compose ps
 ```
 
 ## Compose file
 
+* docker-compose.yml (default)
+* docker-compose.override.yml (default)
+* Typically compose creates a private network named after the container parent folder
+    * Use the -p argument to override this name choice.
+    * Note this -p is a arg to the docker-compose command itself (and not just the up or other commands)
+
 ```
 version: '3'
 services:
-    jenkins:                                          <-- Will the dns-name of the container that runs whereby you can reach from other containers.
-        container_name: jenkins                       <-- Container name
-        image: jenkins/jenkins                        <-- Image for the container (if you are building, this will be the target name used)
-        build:                                        <-- If you are building your own, use this
-            context: centos7                          <-- Directory relative to this yml file as to where the Dockerfile is present
+    jenkins:                                            <-- Will the dns-name of the container that runs whereby you can reach from other containers.
+        container_name: jenkins                         <-- Container name
+        image: jenkins/jenkins                          <-- Image for the container (if you are building, this will be the target name used)
+        build:                                          <-- If you are building your own, use this
+            context: centos7                            <-- Directory relative to this yml file as to where the Dockerfile is present
         ports:
             - "8080:8080"
             - "50000:50000"
@@ -321,40 +347,160 @@ services:
         networks:
             - net
         environment:
-            - "MYSQL_ROOT_PASSWORD=1234"              <-- Note quoted.
+            - "MYSQL_ROOT_PASSWORD=1234"                <-- Note quoted.
+        depends_on:                                     <-- will start the db container first
+            - db
+    db:
+        image: couchbase:latest
+        ports:
+            - 8091:8091
+        extends:
+            file: an_include_file.yml
+            service: config                             <-- take contents of the service and apply to this service
 networks:
     net:
 ```
 
-# Centos 7 Installation
+# Orchestration
 
-Office location has a pristine Centos-7.4 installation.
+* Start containers -- and restart if they fail
+* service discovery -- allow them to find each other
+* resource allocation -- match containers to computers
 
-Steps for getting docker installed
+# Kubernetes
+
+Wiki has the info pretty laid out - https://en.wikipedia.org/wiki/Kubernetes
+
+On Kubernetes master
+
+* etcd
+* API-server
+* Scheduler
+* Controller Manager (process)
+    * Replication Controller
+        * Older. Now use replicaset
+    * ReplicaSet
+        * Ensures specified number of pods are running at all times
+    * Deployments
+        * mm.. deployments manages replica-sets which in turn manages pods
+        * pause(updates) and resume use-cases.
+    * daemonset controller
+        * ensures all nodes run a specific pod
+    * job controller
+        * like cron-job. Run one process to completion
+    * Services
+        * Allow connectivity between one set of deployments with another
+          in a seamless way by anchoring the IP to use.
+            ```
+                                                +---> Backend Pod 1
+                                                |
+            FrontEnd Pod ---> Backend Service --+---> Backend Pod 2
+                                                |
+                                                +---> Backend Pod 3
+            ```
+        * Can be internal or external.
+            * External exposes a node-ip:node-port
+            * Load balancer: exposes a application to internet
+
+## Cluster
+
+* Collection of nodes
+* one kubectl can handle many clusters (check?)
+
+## nodes
+
+* Can be a physical machien or a VM
+* should have a container tooling like docker
+* kubelet
+    * agent that runs on each node communicating with api-server
+    * executes pod-containers via container engine
+    * mounts and run pod-volumes and secrets
+    * executers health status of pods/volumes and reports back to api-server
+* kube-proxy (networking-proxy)
+    * reflects services as defined on each node
+    * network stream or round-robin forwarding across a set of backend containers
+    * 3 modes
+        * User-space mode
+        * iptables mode
+        * ipvs mode
+* pods
+    * containers within the pods
+
+## Pods
+
+* One single unit of deployment
+    * ephemeral, disposable
+    * not restarted by scheduler by itself
+* All containers inside pod are guaranteed to run in same node
+* Each pod has a unique IP address
+    * So, apps can use the same port w/o conflict
+* Storage resources
+* Options that govern how the containers can be run
+
+### Pod States
+
+* Pending - accepted by kubernetes system.
+* Running
+* Succeeded
+* Failed
+* CrashLoopBackOff
+
+### PodSpec
+
+* Yaml file that describes a pod
+
+## Labels
+
+* Key value pairs
+* Eg:
+  ```
+  "release" : "stable", "release" : "canary"
+  ```
+* Label selectors
+    * Equality
+    * Set based - IN, NOTIN, EXISTS
+
+## Namespaces
+
+* All objects are placed in default namespace at start
+
+## Link to instal kubernets/minibox within a vm
+
+https://webme.ie/how-to-run-minikube-on-a-virtualbox-vm/
+
+## kubectl commands
+
+```sh
+kubectl cluster-info
+
+kubectl get nodes
+
+kubectl get all
 
 ```
-yum install policycoreutils-python
-http://mirror.centos.org/centos/7/extras/x86_64/Packages/container-selinux-2.28-1.git85ce147.el7.noarch.rpm
-http://mirror.centos.org/centos/7/extras/x86_64/Packages/skopeo-containers-0.1.24-1.dev.git28d4e08.el7.x86_64.rpm
-http://mirror.centos.org/centos/7/extras/x86_64/Packages/container-storage-setup-0.7.0-1.git4ca59c5.el7.noarch.rpm
-http://mirror.centos.org/centos/7/extras/x86_64/Packages/oci-systemd-hook-0.1.14-1.git1ba44c6.el7.x86_64.rpm
-http://mirror.centos.org/centos/7/extras/x86_64/Packages/oci-umount-2.0.0-1.git299e781.el7.x86_64.rpm
-http://mirror.centos.org/centos/7/extras/x86_64/Packages/oci-register-machine-0-3.13.gitcd1e331.el7.x86_64.rpm
-http://mirror.centos.org/centos/7/extras/x86_64/Packages/container-selinux-2.28-1.git85ce147.el7.noarch.rpm
-http://mirror.centos.org/centos/7/extras/x86_64/Packages/docker-common-1.12.6-61.git85d7426.el7.centos.x86_64.rpm
-http://mirror.centos.org/centos/7/extras/x86_64/Packages/docker-client-1.12.6-61.git85d7426.el7.centos.x86_64.rpm
-http://mirror.centos.org/centos/7/extras/x86_64/Packages/docker-1.12.6-61.git85d7426.el7.centos.x86_64.rpm
 
-systemctl enable docker
-systemctl start docker
+## config file
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloworld
+spec:
+  selector:
+    matchLabels:
+      app: helloworld
+  replicas: 1       # tells deployment to run 1 pods matching the template
+  template:         # create pods using pod definition in this template
+    metadata:
+      labels:
+        app: helloworld
+    spec:
+      containers:
+      - name: helloworld
+        image: karthequian/helloworld:latest
+        ports:
+        - containerPort: 80
 ```
 
-# Mac host from docker containers:
 
-docker.for.mac.localhost
-
-* get into the sheel of the docker-for-mac's linux host:
-
-```
-screen ~/Library/Containers/com.docker.docker/Data/vms/0/tty
-```
