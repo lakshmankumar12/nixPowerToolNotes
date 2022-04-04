@@ -82,6 +82,8 @@ DISKPART
 
 https://www.xda-developers.com/windows-11-keyboard-shortcuts/
 
+* Shift-F10 at explorer will open context-menu
+
 
 # Installing ssh in windows
 
@@ -107,4 +109,15 @@ Icacls authorized_keys /inheritance:r /remove SYSTEM
 * publickeyauth - yes
 * comment off the last admin groups to use other auth file
 
+# Setting up reminders
 
+Link: https://windowsloop.com/display-popup-message-in-windows-10/
+
+* Open Task Scheduler
+* Create a new folder - mytasks
+* Create a basic task
+* Choose cmd as powershell and arg as below:
+```
+powershell
+-WindowStyle hidden -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('Afternoon Syncup Meeting','Meeting Reminder')}"
+```

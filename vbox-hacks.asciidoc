@@ -69,3 +69,5 @@ virsh vol-delete --pool <pool-name> <vol-name>
 
 # gui
 virt-manager
+
+

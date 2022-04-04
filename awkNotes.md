@@ -114,9 +114,21 @@ small_str = substr(big_string_var, 1, length(big_string_var)-5)
 
 ```awk
 # gawk version - gets the result in 3rd arg
-#  plain awk - sets RSTART and RLENGTH
 mached_result = match(big_string_var, regex_or_literal, result_arr)
+result_str = result_arr[0]
+
+#  plain awk - sets RSTART and RLENGTH
+mached_result = match(big_string_var, regex_or_literal)
+result_str = substr(big_string_var, RSTART, RLENGTH)
 ```
+
+## find and replace
+
+```awk
+gsub(what_to_find,what_to_replace,inline_replaced_var);
+
+```
+
 
 ## sprintf
 

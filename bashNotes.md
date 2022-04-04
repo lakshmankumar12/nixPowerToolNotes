@@ -776,6 +776,15 @@ ps -o args= -p pid
 * lstart              -- full blow up of start time.
 * tt                  -- terminal
 * pid,ppid            -- pid and parent pid resp
+* rss                 -- resident set size (inKB) (Most meaningful)
+* %mem                -- rss as a % of total memory
+* trs,drz             -- text resident size, data resident size
+* vsz                 -- virtual size (in 1024b units)
+* size                -- approximate amount of swap space that would
+                         be required if the process were to dirty
+                         all writable pages and then be swapped out.
+                         This number is very rough! (Dont follow)
+
 
 
 ## ls

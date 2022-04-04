@@ -78,6 +78,9 @@ docker port container_name
 #Get the pid of the first process in a docker from the host
 pid = "$(docker inspect -f '{{.State.Pid}}' "container_name | Uuid")"
 
+#Get all volumes
+docker inspect -f '{{ .Mounts }}' containerid
+
 ```
 
 ### Running a image
@@ -99,7 +102,7 @@ docker run hello-world
 #-u userid              -> start as that userid
 #-v host-folder:cont-folder[:ro]    -> mount host-folder at cont-folder
 #-t                     -> Give a tty
-#-i <image>             -> use this image
+#-i                     -> Interactive mode
 #--name <name>          -> start with this name (instead of the auto-assigned crazy,but,cool name)
 
 docker run -d -p 4000:80 friendlyhello
@@ -125,8 +128,17 @@ Image --run-command-> Running Container --> Stopped Container -- commit-commnd -
 
 ```
 docker logs <container-name>
-
 ```
+
+* The information that is logged and the format of the log
+  depends almost entirely on the container’s endpoint command.
+* Basically you get to see /dev/stdout and /dev/stderr of the
+  container.
+* If you have a daemon like program that is your container's
+  command, you can employ tricks to redirect log files of that
+  daemon to stdout/stderr
+* For eg, nginx image sets the `/var/log/nginx/access.log` as a
+  softlink to `/dev/stdout`
 
 ### inspect
 
@@ -252,6 +264,8 @@ USER 1000
     #to know about a network
     docker network inspect networkNameX
 
+    #delete
+    docker network rm networkNameX
     ```
 * reading more on networking in docker
     https://success.docker.com/article/Multiple_Docker_Networks
@@ -409,7 +423,7 @@ On Kubernetes master
 
 ## nodes
 
-* Can be a physical machien or a VM
+* Can be a physical machine or a VM
 * should have a container tooling like docker
 * kubelet
     * agent that runs on each node communicating with api-server
@@ -449,6 +463,31 @@ On Kubernetes master
 
 * Yaml file that describes a pod
 
+## Deployment / ReplicaSet
+
+* Resource object that defines how pods should be started
+* A deployment is a collection of replica-sets
+* When you update a image, the current replica-sets are replaced with new ones.
+
+
+## service
+
+* Logical abstraction for a collection of pods that function exactly alike
+* Pods are ephemeral - so service offers a frontend to the pods to other functions
+* service spec has a label, which maps it to the backing deployment/pod.
+
+### Service types
+
+* ClusterIP
+    * Exposes a service which is only accessible from within the cluster.
+* NodePort
+    * Exposes a service via a static port on each node’s IP.
+* LoadBalancer
+    * Exposes the service via the cloud provider’s load balancer.
+* ExternalName
+    * Maps a service to a predefined externalName field by returning a value for the CNAME record.
+
+
 ## Labels
 
 * Key value pairs
@@ -474,8 +513,39 @@ https://webme.ie/how-to-run-minikube-on-a-virtualbox-vm/
 kubectl cluster-info
 
 kubectl get nodes
-
 kubectl get all
+
+kubectl get deployment/helloworld -o yaml | less
+
+kubectl get pods --show-labels
+kubectl label pod/pod_name keyname=value --overwrite
+kubectl label pod/pod_name keyname-  # deletes the label keyname
+kubectl get pods --selector keyname=value
+kubectl get pods -l 'keyname in (value1,value2)'  # notin
+
+kubectl create -f <file.yml>
+#other args to create
+# --record          => keeps a log of changes.
+
+kubectl expose deployment helloworld --type=NodePort
+
+kubectl rollout history deployment/deployment_name
+kubectl rollout undo deployment/deployment_name
+#other args
+# --to-revision=N       => to that revision as reported in history
+
+kubectl describe deployment/deployment_name
+kubectl describe pod/pod_name
+
+kubectl logs pod/pod_name
+
+kubectl exec -it pod/pod_name -c container_name_in_pod /bin/bash
+
+kubectl delete pod pod_name
+kubectl delete deployment deployment_name
+kubectl delete svc service_name
+
+minikube service list
 
 ```
 
@@ -503,4 +573,7 @@ spec:
         - containerPort: 80
 ```
 
+## probes
 
+* readiness probe
+* liveliness probe

@@ -98,12 +98,6 @@ ip link set eth0 master bridge_name
 ip link set eth0 nomaster
 ```
 
-### better link show
-
-```
-ip link show | awk ' /^[0-9]+:/ { link = $2 ; getline ; print link " " $0 } '
-```
-
 ```
 #show a bridge
 bridge link show
@@ -544,6 +538,89 @@ ssh -nNT -R 9222:localhost:22 lakshman_narayanan@mforge3.corp.aryaka.com &
 
 iptables -t mangle -I PREROUTING -s ${ip} whatever-else-tomatch -j LOG --log-prefix "foo:"
 
+# Open vswitch
+
+https://randomsecurity.dev/posts/openvswitch-cheat-sheet/
+
+
+## ovs-vsctl
+
+```sh
+# ask what-if questions to ovs-vswitchd and other daemons
+ovs-appctl
+
+# show ovs configuration
+ovs-vsctl show
+
+# list bridges
+ovs-vsctl list
+
+# list ports of a bridge
+ovs-vsctl list-ports <brname>
+
+# list interfaces -- grep name to quickly get a feel of all ifcs
+ovs-vsctl list-interface
+
+# Add a bridge
+ovs-vsctl add-br <bridge>
+## Creates a bridge in the switch database.
+
+ovs-vsctl add-port <bridge> <interface>
+## Binds an interface (physical or virtual) to a bridge.
+ovs-vsctl add-port <bridge> <interface> tag=<VLAN number>
+## Converts port to an access port on specified VLAN
+##   (by default all OVS ports are VLAN trunks).
+
+ovs-vsctl set interface <interface> type=patch options:peer=<interface>
+## Used to create patch ports to connect two or more bridges together.
+
+```
+
+## ovs-ofctl
+
+* observe/modify ovs's open-flow behavior
+
+```sh
+ovs-ofctl show <bridge>
+## Shows OpenFlow features and port descriptions.
+
+ovs-ofctl snoop <bridge>
+## Snoops traffic to and from the bridge and prints to console.
+
+ovs-ofctl dump-flows <bridge> <flow>
+## Prints flow entries of specified bridge.
+## With the flow specified, only the matching flow will be printed to console.
+## If the flow is omitted, all flow entries of the bridge will be printed.
+
+ovs-ofctl dump-ports-desc <bridge>
+## Prints port statistics. This will show detailed information about
+## interfaces in this bridge, include the state, peer, and speed information.
+
+## Very useful
+ovs-ofctl dump-tables-desc <bridge>
+## Similar to above but prints the descriptions of tables
+## belonging to the stated bridge.
+## ovs-ofctl dump-ports-desc is useful for viewing port connectivity.
+## This is useful in detecting errors in your NIC to bridge bonding.
+
+## Below are the common configurations used with the ovs-ofctl tool:
+
+ovs-ofctl add-flow <bridge> <flow>
+## Add a static flow to the specified bridge. Useful in defining
+## conditions for a flow (i.e. prioritize, drop, etc).
+
+ovs-ofctl del-flows <bridge> <flow>
+## Delete the flow entries from flow table of stated bridge.
+## If the flow is omitted, all flows in specified bridge will be deleted.
+
+## The above commands can take many arguments regarding different field to match.
+## They can be used for simple source/destination flow additions to complex L3 rewriting
+## (SNAT, DNAT, etc). You can even build a functional router with them :)
+
+```
+
+
+
 # List all open ports
 
 ss -l -p -n
@@ -747,6 +824,15 @@ Miscellaneous:
 The TCP window size option can be set by the environment variable
 TCP_WINDOW_SIZE. Most other options can be set by an environment variable
 IPERF_<long option name>, such as IPERF_BANDWIDTH.
+
+#Sample iperf3 invocation
+iperf3 -s -B ${mip} -p ${port} -i 1
+iperf3 -B ${mip} -p ${port} -u -c ${pip} -i 1 -t 3600 -b2M
+
+#Sample iperf1 invocation
+iperf -s -B ${mip} -p ${port} -i 1 -u -l 300
+iperf -B ${mip} -p ${port} -u -c ${pip} -i 1 -d -l 300 -t 3600 -b50M
+
 
 
 ```
