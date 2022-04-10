@@ -154,6 +154,12 @@ ip route add 10.0.2.0/24 dev netb
 ```
 ip route show
 ```
+* To enable forwarding:
+```
+sysctl -w net.ipv4.ip_forward=1
+
+```
+
 
 ### find local ip used for a route
 

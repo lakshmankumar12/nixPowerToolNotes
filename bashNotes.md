@@ -932,6 +932,21 @@ Explanation:
   * `"%02x"` is a traditional printf style format string to print
     in hex with 0 pre-pended and a width of 2.
 
+## journalctl
+
+Search: syslog
+
+```sh
+journalctl --list-boots
+
+# lists logs of just one service
+journalctl -u some_service
+
+# list log of a particular boot
+journalctl -b 1
+
+```
+
 
 ## just get ip for a hostname
 
