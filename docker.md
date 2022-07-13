@@ -577,3 +577,26 @@ spec:
 
 * readiness probe
 * liveliness probe
+
+# AWS and kubectl
+
+* Install aws-cli : https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-instructions
+```
+temp_dir=$(mktemp -d /tmp/install-aws-XXXX)
+echo "temp_dir is $temp_dir"
+curr_dir=$(pwd)
+cd $temp_dir
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+
+#This should now work
+aws --version
+
+cd $curr_dir
+rm -rf $temp_dir
+```
+* aws configure : https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html
+* setting up aws to a cloudinstance (step-2): https://docs.aws.amazon.com/eks/latest/userguide/getting-started-console.html
+
+

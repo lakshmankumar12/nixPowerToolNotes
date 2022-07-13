@@ -451,7 +451,25 @@ mkfs.ext2 /dev/loop0p1
 e2label /dev/loop0p1 'CentOS 7 x86_64'
 sync
 
+#remove the loop-device
+losetup -d /dev/loopN
+
 ```
+
+## LVM
+
+```sh
+#pvs
+pvs
+
+#lgs
+lgs
+
+#lvs
+lvs
+
+```
+
 
 # Impitool
 

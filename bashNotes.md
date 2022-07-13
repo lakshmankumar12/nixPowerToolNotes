@@ -409,7 +409,12 @@ while read i ; do ... done   < <(another cmd) <- works. as that creates a named-
 
 # More than one file
 
+https://wiki.bash-hackers.org/howto/redirection_tutorial
+
+search : redirection stderr
+
 In general `>&` or `<&` is the fd-duplicating operator in bash
+Mnemonic `&` always comes after the direction. Otherwise its backgrounding.
 
 ```sh
 exec 3>filename   # will duplicate 3 to a write-fd for file. Note no & here.
@@ -420,6 +425,9 @@ echo "happy" >&3  # write  to this file!
 exec 3>&-         # closes the fd. Note the number comes first.
 
 exec 4<>filename  # open for both reading/writing
+
+echo "foo" 1>&2   # writes into stderr
+                  # target>&source
 ```
 
 # List all key-bindings in zsh
@@ -810,6 +818,8 @@ date '+%Y-%m-%d'
 %S - second
 %N - nanosecond
 
+-I - give only date portion
+
 #get epoch seconds
 date '+%s'
 
@@ -907,6 +917,14 @@ Arguments
 ```
 find . -print 0 | xargs -0 your_command
 ```
+
+* other useful args
+```
+--no-run-if-empty / -r
+-n 1
+-I'{}' your_command '{}'
+```
+
 
 ## hexdump/od
 
