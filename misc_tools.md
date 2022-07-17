@@ -123,7 +123,7 @@ tmux show-options -w
 ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no example.com
 ```
 
-## Forwarding
+## forwarding
 
 * Local forwarding
     ```
@@ -138,6 +138,16 @@ ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no example.com
     * listens in sshed_server at port_at_sshed_server, and whatever is sent there will be sent to to_fwd_server:to_fwd_port as if going out of client_machine
     * you can use localhost, which will make client forward to itself.
     * This is useful when you wnat to reverse ssh back into thi client mc from server mc.
+
+* To put ssh in background
+
+```
+ssh -fN -L 'whatever' user@host
+
+-f  -- go to background
+-N  -- dont execute any command at host
+```
+
 
 ## Mosh command to pick a particular port
 
@@ -600,3 +610,33 @@ spotify:playlist:
 
 https://open.spotify.com/album/241F2pNbl6OIJPixynRuiu?si=7UiPMaRXRV-15_TEYbF5PA
 https://open.spotify.com/album/0q3KEEwGPGPPnXJNQ32Wyz?si=osGPcJ4-SnqgFf8xd375JQ
+
+# gdrive
+
+```
+#install
+wget 'https://github.com/prasmussen/gdrive/releases/download/2.1.1/gdrive_2.1.1_linux_amd64.tar.gz'
+tar xf gdrive_2.1.1_linux_amd64.tar.gz
+# or easy:
+brew install gdrive
+
+#to authenticate -- follow instructions
+gdrive about
+
+# ls the root drive - note default is 30 items.. use -m <100> to list 100
+gdrive list
+
+# ls a particular dir - get id of parent
+gdrive list --query " 'IdOfTheParentFolder' in parents"
+
+# general find by name
+gdrive list --query "name contains 'temp'"
+
+#download
+gdrive download <id>
+
+gdrive upload --parent <parent-id> ubuntu_install_debug.tar
+
+
+```
+
