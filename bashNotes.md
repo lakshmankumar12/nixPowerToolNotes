@@ -840,6 +840,30 @@ while [ $date != $end ] ; do
 done
 ```
 
+## timedatectl
+
+```sh
+#get status
+timedatectl status
+
+# list time-zones
+timedatectl list-timezones
+
+# set a timezone
+timedatectl set-timezone Asia/Kolkata
+timedatectl set-timezone Etc/UTC
+
+# set time
+timedatectl set-time "YYYY-MM-DD HH:MM:SS"
+
+# enable ntp
+timedatectl set-ntp true
+
+
+
+```
+
+
 ## head and tail
 
 * Mnemonic: head is for top part printing, tail is for bottom part printing

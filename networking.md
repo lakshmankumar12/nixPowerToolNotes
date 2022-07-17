@@ -528,6 +528,15 @@ iptables -t nat -A POSTROUTING -o eth0 -d ! 172.16.0.0/12 -j SNAT --to-source 17
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 ```
 
+* Nat a particular port from one m/c to another m/c. Here we front end port 9999 and fwd it to 443 behind this m/c
+```
+sudo iptables -t nat -A PREROUTING -p tcp -m tcp --dport 9999 -j DNAT --to-destination 192.168.150.1:443
+sudo iptables -t nat -A POSTROUTING -d 192.168.150.1/32 -o eth1 -j MASQUERADE
+sudo iptables -t filter -A FORWARD -d 192.168.150.1/32 -p tcp -m tcp --dport 443 -j ACCEPT
+sudo iptables -t filter -A FORWARD -s 192.168.150.1/32 -p tcp -m tcp --sport 443 -j ACCEPT
+```
+
+
 ### Just drop all pkts
 
 ```
