@@ -147,6 +147,11 @@ ssh -fN -L 'whatever' user@host
 -f  -- go to background
 -N  -- dont execute any command at host
 ```
+* Useful ssh options
+```
+-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o ExitOnForwardFailure=yes
+```
+
 
 
 ## Mosh command to pick a particular port
@@ -245,6 +250,8 @@ else cond2
 
 # Encrypt  / Decrypt
 
+See more openssl notes in general_reading_notes/ssl_tls.md
+
 * encrypt
 ```
 openssl enc -in foo.bar -aes-256-cbc -pass stdin > foo.bar.enc
@@ -342,6 +349,20 @@ find . -name 'whatsoever' | tar cf newtarball.tar -T -
 ```
 tar tf tarball.tar
 ```
+
+# dhclient
+
+dhcp dont update resolv.conf
+```sh
+cat <<EOF > /etc/dhcp/dhclient-enter-hooks.d/nodnsupdate
+#!/bin/sh
+make_resolv_conf(){
+   :
+}
+EOF
+chmod +x /etc/dhcp/dhclient-enter-hooks.d/nodnsupdate
+```
+
 
 # Linux Hard-disk related tools
 
@@ -638,5 +659,16 @@ gdrive download <id>
 gdrive upload --parent <parent-id> ubuntu_install_debug.tar
 
 
+```
+
+
+# jq
+
+```sh
+
+#prettify json
+cat jsonfile | jq
+
+#just get one
 ```
 

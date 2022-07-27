@@ -123,6 +123,10 @@ ip addr show
 
 ```
 ip addr show | awk '/^[0-9]+:/ {ifname=$2} /^ *inet / {print ifname " " $2; }' | grep ""
+
+ip -br a
+
+ip -4 -br a show dev eth0 | grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}"
 ```
 
 ### list a particular interface
@@ -314,6 +318,8 @@ sudo tc qdisc add dev eth0 root handle 1: netem delay 100ms 25ms loss 5%
 
 #remove
 sudo tc qdisc del dev eth0 root
+
+
 ```
 
 
@@ -382,6 +388,8 @@ ip netns identify ${PID}
 
 ### Sample use of namespace - veth pair
 
+https://developers.redhat.com/blog/2018/10/22/introduction-to-linux-interfaces-for-virtual-networking#
+
 ```sh
 # Add a new name-space
 ip netns add netns108
@@ -399,6 +407,9 @@ ip netns exec netns108 ip link set veth108_ns108 up
 # Add route(s) to the external world inside the namespace via the veth-peer.
 ip netns exec netns108 ip route add 10.1.7.0/24 via 10.1.108.2 dev veth108_ns108 src 10.1.108.3
 ```
+
+* Collection of `/etc/network/interfaces` files - `https://gist.github.com/evrardjp/f970315fb9094acb65c9e424f54273b0`
+
 
 # Ip-Routing-Tables
 
@@ -742,6 +753,20 @@ tcp[tcpflags] & (tcp-syn|tcp-ack) != 0
 #gre packets
 protochain GRE && proto IP
 ```
+
+* tshark to text-only dump all packets
+
+```
+tshark -V -r a.pcap > a.txt ; vi a.txt
+```
+
+* get timestamp info from a pcap file
+
+```
+TZ=Etc/UTC capinfos pixel-s1ap.pcap
+```
+
+
 
 
 ## ping args

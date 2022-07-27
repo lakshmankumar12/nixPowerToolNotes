@@ -116,7 +116,12 @@ docker run -d -p 4000:80 friendlyhello
 --memory <max-memory>
 --cpu-shares <relative-to-other-container>
 --cpu-quota  <to-limit-in-general>
+
+#committing a container
+docker commit NameOrIdOfContainer NewImageName
 ```
+
+
 
 * Image/Container states
 

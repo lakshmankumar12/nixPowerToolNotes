@@ -659,6 +659,10 @@ while true; do
     --)
         break
         ;;
+    *)
+        echo "Unknown option"
+        exit 1
+        ;;
     esac
 done
 
@@ -996,7 +1000,26 @@ journalctl -b 1
 
 ### Other ip tools
 
-ipcalc
+```sh
+#verify if ip is good
+#  -c (verify and show all details of ip)
+#  -s (silent - suppress all the detalis)
+ipcalc -cs $ip
+if [ $? -ne 0 ] then echo "bad ip" ; fi
+
+```
+
+
+
+## unix user management
+
+```sh
+user_to_add=lakshman   #or whoever the name is
+sudo adduser ${user_to_add}
+
+# Ensure to add the user to the libvirt group so that they can run virsh commands.
+sudo usermod -a -G libvirt ${user_to_add}
+```
 
 
 
