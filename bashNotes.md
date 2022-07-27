@@ -985,11 +985,19 @@ Search: syslog
 ```sh
 journalctl --list-boots
 
-# lists logs of just one service
+# lists logs of just one unit (service)
 journalctl -u some_service
 
 # list log of a particular boot
 journalctl -b 1
+
+# only from till
+journalctl --since "3 hours ago"
+journalctl --since "2 days ago"
+journalctl --since "2015-06-26 23:15:00" --until "2015-06-26 23:20:00"
+
+#only form processes running as a user
+journalctl _UID=108
 
 ```
 

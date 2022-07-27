@@ -152,6 +152,22 @@ ssh -fN -L 'whatever' user@host
 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o ExitOnForwardFailure=yes
 ```
 
+## ssh_config setting
+
+```sh
+# file is in ~/.ssh/config
+
+## Typical config showing a jumper host proxy-command
+Host testvm
+    Hostname IP_OF_FINAL_HOST_AT_JUMPER
+    ProxyCommand ssh -p jumper_host_port -l jmp_host_usr JUMPER_HOST_IP -W %h:%p
+    User final_mc_user
+    Port final_mc_port
+    IdentityFile ~/.ssh/insecure_private_key
+    UserKnownHostsFile /dev/null
+    StrictHostKeyChecking no
+```
+
 
 
 ## Mosh command to pick a particular port

@@ -210,6 +210,9 @@ ip route flush table myTable
 
 ```
 iptables-save
+
+#with statistics
+iptables-save -c
 ```
 
 ### Tunnels
