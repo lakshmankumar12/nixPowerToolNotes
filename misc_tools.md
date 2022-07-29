@@ -278,6 +278,12 @@ openssl enc -in foo.bar -aes-256-cbc -pass stdin > foo.bar.enc
 openssl enc -in foo.bar.enc -d -aes-256-cbc -pass stdin > foo.bar
 ```
 
+# strongswan
+
+swanctl
+
+See general_reading_notes/ipsec_notes.md
+
 # curl
 
 ```

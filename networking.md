@@ -567,6 +567,17 @@ ssh -nNT -R 9222:localhost:22 lakshman_narayanan@mforge3.corp.aryaka.com &
 
 iptables -t mangle -I PREROUTING -s ${ip} whatever-else-tomatch -j LOG --log-prefix "foo:"
 
+### tcpdump a pkt
+
+```
+sudo iptables -I INPUT -m addrtype --dst-type LOCAL -m policy --pol ipsec --dir in -j NFLOG --nflog-group 5
+sudo iptables -I OUTPUT -m policy --pol ipsec --dir out -j NFLOG --nflog-group 5
+
+tcpdump -n -i nflog:5
+tcpdump -s 0 -n -i nflog:5 -w ./ipsec.pcap
+```
+
+
 # Open vswitch
 
 https://randomsecurity.dev/posts/openvswitch-cheat-sheet/

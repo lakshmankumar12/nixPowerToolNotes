@@ -414,7 +414,7 @@ https://wiki.bash-hackers.org/howto/redirection_tutorial
 search : redirection stderr
 
 In general `>&` or `<&` is the fd-duplicating operator in bash
-Mnemonic `&` always comes after the direction. Otherwise its backgrounding.
+Mnemonic `&` always comes after the direction. Otherwise its backgrounding (with one exception below).
 
 ```sh
 exec 3>filename   # will duplicate 3 to a write-fd for file. Note no & here.
@@ -426,8 +426,14 @@ exec 3>&-         # closes the fd. Note the number comes first.
 
 exec 4<>filename  # open for both reading/writing
 
-echo "foo" 1>&2   # writes into stderr
+echo "foo" 2>&1   # writes stderr to stdout
+echo "foo" 1>&2   # rare: writes stdout into stderr
                   # target>&source
+
+cmd 0<&-          # closes stdin for cmd
+
+cmd &> file       # short for 2>&1 >file.. (the exception to &-not-first rule)
+                  # write stderr and stdout to a file.
 ```
 
 # List all key-bindings in zsh
@@ -702,25 +708,40 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 # Create Temp file in bash
 
 ```sh
+#create a file with a random name. XXXX is substituted with random chars
+#also outputs the name back
+tmpfile=$(mktemp /tmp/whatever-XXXXX)
+
+#create dir instead
+tmpdir=$(mktemp -d /tmp/whatever-XXXXX)
+
+#just print a name
+# note this is unsafe - as by the time you really create a file
+# later, its possible that is created by somebody already.
+mktemp -u /tmp/whatever.XXXX
+
+
+
+```
+
+
+```sh
 tmpfile=$(mktemp /tmp/abc-script.XXXXXX)
 #create 1 fd for writing, and 2 fd's for reading
 exec 3>"$tmpfile" 4<"$tmpfile" 5<"$tmpfile"
 rm "$tmpfile"
 
-
 ifc=$1
-
 while read i ; do
         echo "what a $i" >&3
 done
 
 cat <&4
 
-/proc/pid/fd/3 is a way to access the file.
-
 ```
+
 * Note that in the above, the name is gone off the file-system.
-* But the file can be read by `/proc/<pid>/fd`
+* But the file can be read by `/proc/<pid>/fd/<no>`
 * It seems the script can either read or write into such numbered-fd's.
 * Thus we do a `3>` or a `4<` depending on if we need to write or read
 * Further, one numbered-fd can be read only once looks like. Its like a
@@ -735,6 +756,54 @@ set -x
 # turn off debugging
 set +x
 ```
+
+# Daemonizing
+
+Search: daemon demon background
+
+https://stackoverflow.com/questions/3430330/best-way-to-make-a-shell-script-daemon/29107686#29107686
+
+* Quick hack way
+```sh
+nohup ./myscript 0<&- &> /abs/path/to/my.daemon.log.file &
+## note:
+## better to do following in script
+me_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+me_FILE=$(basename $0)
+#fork
+$me_DIR/$me_FILE
+cd /
+umask 0
+```
+
+* proper-way
+```sh
+me_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+me_FILE=$(basename $0)
+cd /
+# we will use $1 of the script to decide who we are
+#   not any of "child","daemon" -- original caller
+#   child - first child
+#   daemon - goto work
+if [ "$1" = "child" ] ; then
+    umask 0
+    $me_DIR/$me_FILE daemon "$@" </dev/null >/dev/null 2>/dev/null &
+    exit 0
+elif [ $1 != "daemon" ] ; then
+    setsid $me_DIR/$me_FILE child "$@" &
+    exit 0
+fi
+# daemon
+exec >/tmp/outfile    # whichever file you want for debugging
+exec 2>/tmp/errfile
+exec 0</dev/null
+shift # get rid of the daemon arg.
+
+
+# your work!
+```
+
+ 
 
 # Turn off glob expansion error in zsh
 
