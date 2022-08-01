@@ -1070,6 +1070,38 @@ journalctl _UID=108
 
 ```
 
+## systemctl
+
+search: systemd
+
+* Simple user service
+```sh
+mkdir -p  ~/.config/systemd/user/
+
+cat <<EOF > ~/.config/systemd/user/devvm_ssh_starter.service
+[Unit]
+Description=ssh monitor for dev-vm
+StartLimitInterval=3600
+StartLimitBurst=5
+
+[Service]
+Type=simple
+ExecStart=ssh -N -o ExitOnForwardFailure=yes -o PreferredAuthentications=publickey -L *:38882:localhost:22 lakshman@192.168.122.162
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target
+EOF
+
+systemctl --user daemon-reload
+systemctl --user enable --now  devvm_ssh_starter.service
+
+systemctl --user status devvm_ssh_starter.service
+journalctl --user -u devvm_ssh_starter
+```
+
+
 
 ## just get ip for a hostname
 

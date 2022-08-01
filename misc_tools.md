@@ -309,6 +309,15 @@ wget '..' -O out_file
 dpkg-query -L <package-name>
 ```
 
+* find which package provides a file
+```
+sudo apt install -y apt-file
+sudo apt-file update
+apt-file search /path/to/file
+
+```
+
+
 # yum
 
 ```
