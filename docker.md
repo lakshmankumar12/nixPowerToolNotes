@@ -551,6 +551,8 @@ kubectl delete deployment deployment_name
 kubectl delete svc service_name
 
 minikube service list
+minikube start
+minikube delete --all
 
 ```
 

@@ -1072,6 +1072,14 @@ journalctl _UID=108
 
 ## systemctl
 
+Types:
+```sh
+Type=simple
+Type=oneshot
+
+```
+
+
 search: systemd
 
 * Simple user service

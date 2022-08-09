@@ -214,6 +214,21 @@ unzip -l zipfile.zip
 \grep --color=auto -nH -P  '[^\x00-\x7F]' /tmp/a
 ```
 
+### Perl regex
+
+search : pcre
+https://www.pcre.org/original/doc/html/pcrepattern.html
+
+```
+\K - pretend match began here.. usually combined with the -o grep option.
+        grep -Po 'hello \Kworld'   # prints only world
+?= - positive assertion, but not in pattern
+        grep -Po 'hello (?=world)' # prints hello that is followed by world, but just hello
+?! - negative assertion
+
+```
+
+
 # Draw ascii figures in web
 
 * tag: ascii diagram
@@ -686,6 +701,9 @@ gdrive list --query "name contains 'temp'"
 
 #download
 gdrive download <id>
+
+#info on file, path where it is..
+gdrive info <id>
 
 gdrive upload --parent <parent-id> ubuntu_install_debug.tar
 
