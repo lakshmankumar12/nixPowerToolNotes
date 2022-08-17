@@ -418,6 +418,7 @@ Mnemonic `&` always comes after the direction. Otherwise its backgrounding (with
 
 ```sh
 exec 3>filename   # will duplicate 3 to a write-fd for file. Note no & here.
+exec 1>filename   # will make all stdouts go to this filename
 
 echo "happy"      # writes to stdout.. normal
 echo "happy" >&3  # write  to this file!

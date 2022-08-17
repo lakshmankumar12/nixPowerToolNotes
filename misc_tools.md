@@ -302,11 +302,16 @@ See general_reading_notes/ipsec_notes.md
 # curl
 
 ```
-# -f  --> be quiet on failures (Not sure, what failures are okay and what shouldn't be quietened)
-# -s  --> silent or quiet mode. Mute o/p
-# -S  --> when used with -s, -S will show errors
-# -L  --> Track redirects
+# -f        --> be quiet on failures (Not sure, what failures are okay and what shouldn't be quietened)
+# -s        --> silent or quiet mode. Mute o/p
+# -S        --> when used with -s, -S will show errors
+# -L        --> Track redirects
+# -C        --> continue from where you left
+# -o <file> --> choose output file
 # --interface <ip> -- choose a local-bind-ip
+# -X/--request <cmd> -- specifies a custom command to use (eg: -X GET)
+# -H/--header <hdr>  -- extra header to include in request (eg: -H "accept: application/json")
+
 curl 'http://...link' -o out_file
 ```
 
@@ -400,13 +405,13 @@ tar tf tarball.tar
 
 dhcp dont update resolv.conf
 ```sh
-cat <<EOF > /etc/dhcp/dhclient-enter-hooks.d/nodnsupdate
+cat <<EOF | sudo tee /etc/dhcp/dhclient-enter-hooks.d/nodnsupdate > /dev/null
 #!/bin/sh
 make_resolv_conf(){
    :
 }
 EOF
-chmod +x /etc/dhcp/dhclient-enter-hooks.d/nodnsupdate
+sudo chmod +x /etc/dhcp/dhclient-enter-hooks.d/nodnsupdate
 ```
 
 
@@ -716,8 +721,23 @@ gdrive upload --parent <parent-id> ubuntu_install_debug.tar
 ```sh
 
 #prettify json
-cat jsonfile | jq
+cat input.json | jq '.'
+#or
+jq '.' input.json
 
-#just get one
+#just get one element - assuming the top object is a dict
+cat input.json | jq '.key'
+cat input.json | jq '.key1.key2.key3'
+#if keys are numbers
+cat input.json | jq '.key1."12345".key3'
+
+#if top object is array
+#get just key from each object in array
+cat input.json | jq '.[].key1'
+
+#if you have dict of dicts and want just one element from inner dict
+# {"level1key1" : { "level2key1" : "value1" }} ..
+cat input.json | jq 'map_values(.level2key1)'
+
 ```
 
