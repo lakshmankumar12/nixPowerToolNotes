@@ -318,8 +318,14 @@ curl 'http://...link' -o out_file
 # wget
 
 ```
+Args
+-O <file>           -- output to a file     use -O- to output to stdin (typically coupled with -nv)
+--limit-rate=RATE   -- limit to the rate    eg: --limit-rate=20k  (will limit to 20kB/s)
+-q                  -- completely quiet
+-nv                 -- noverbose (error and basic info get printed)
+
+
 wget '..' -O out_file
---limit-rate=RATE  .. eg: --limit-rate=20k  (will limit to 20kB/s)
 ```
 
 # dpkg
@@ -720,6 +726,9 @@ gdrive upload --parent <parent-id> ubuntu_install_debug.tar
 
 ```sh
 
+#args
+-c   -- compact json
+
 #prettify json
 cat input.json | jq '.'
 #or
@@ -738,6 +747,12 @@ cat input.json | jq '.[].key1'
 #if you have dict of dicts and want just one element from inner dict
 # {"level1key1" : { "level2key1" : "value1" }} ..
 cat input.json | jq 'map_values(.level2key1)'
+
+## Add a new entry or modify it
+cat input.json | jq '.new_member="value1"'
+
+## remove a member
+cat input.json | jq 'del(.member)'
 
 ```
 

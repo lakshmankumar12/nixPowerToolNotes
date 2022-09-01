@@ -914,6 +914,15 @@ while [ $date != $end ] ; do
 done
 ```
 
+## hostnamectl
+
+```sh
+hostnamectl set-hostname newhostname
+hostnamectl set-hostname "new-hostname" --pretty
+
+```
+
+
 ## timedatectl
 
 ```sh
@@ -1133,11 +1142,40 @@ if [ $? -ne 0 ] then echo "bad ip" ; fi
 
 ```sh
 user_to_add=lakshman   #or whoever the name is
-sudo adduser ${user_to_add}
+#prefer useradd over adduser
+useradd -m -p $pass -s /bin/bash ${user_to_add}
+## options
+# -m, --create-home    -- creates home directory
+# -p <passwd>          -- supply crypted password over commandline
+# -s <shell>
 
-# Ensure to add the user to the libvirt group so that they can run virsh commands.
+#modify user
+usermod [optoins] $USER
+## optoins
+# -a                    -- append to more groups. Must have -G
+# -G GROUP1[,Group2,..] -- groups
+
+#eg:
 sudo usermod -a -G libvirt ${user_to_add}
 ```
+
+* Getting crypted password
+```
+python3
+>>> import crypt
+>>> crypt.crypt('clearpassword')
+'$6$o.bhfCRTBCUr71Qm$Ljmb3Oh8jrSvwzu.S5sdJ/mQorXuBOk9xbQiTY/jQn.FTXYF/gE08Tg09MEK.OAcFPOTCV4A1kuH0QXVWEpeN0'
+### Note the first 20 chars is the salt. This is random generated.
+### We can pass it as second arg to get the same hash back
+>>> crypt.crypt('clearpassword','$6$o.bhfCRTBCUr71Qm$')
+'$6$o.bhfCRTBCUr71Qm$Ljmb3Oh8jrSvwzu.S5sdJ/mQorXuBOk9xbQiTY/jQn.FTXYF/gE08Tg09MEK.OAcFPOTCV4A1kuH0QXVWEpeN0'
+>>>
+
+## here is a command line arg of getting passwd
+pass=$(python3 -c 'import crypt; print(crypt.crypt("clearpass"))')
+```
+
+
 
 
 
