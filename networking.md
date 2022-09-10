@@ -586,14 +586,14 @@ https://randomsecurity.dev/posts/openvswitch-cheat-sheet/
 ## ovs-vsctl
 
 ```sh
-# ask what-if questions to ovs-vswitchd and other daemons
-ovs-appctl
-
 # show ovs configuration
 ovs-vsctl show
 
 # list bridges
 ovs-vsctl list
+
+# list controller
+ovs-vsctl list controller
 
 # list ports of a bridge
 ovs-vsctl list-ports <brname>
@@ -611,8 +611,12 @@ ovs-vsctl add-port <bridge> <interface> tag=<VLAN number>
 ## Converts port to an access port on specified VLAN
 ##   (by default all OVS ports are VLAN trunks).
 
-ovs-vsctl set interface <interface> type=patch options:peer=<interface>
 ## Used to create patch ports to connect two or more bridges together.
+ovs-vsctl set interface <interface> type=patch options:peer=<interface>
+
+## change the interaction type
+## Look wrong.
+ovs-vsctl set-controller gtp_br0 connection-mode=out-of-band
 
 ```
 
@@ -659,6 +663,12 @@ ovs-ofctl del-flows <bridge> <flow>
 
 ```
 
+## ovs-appctl
+
+```sh
+# ask what-if questions to ovs-vswitchd and other daemons
+ovs-appctl
+```
 
 
 # List all open ports
@@ -941,6 +951,27 @@ ip xfrm state show
     ```
         nc -u -s 192.2.53.2 -p 19000 192.15.2.2 8090
     ```
+
+# Other useful commands
+
+## netstat
+
+```
+options
+
+-n,--numeric       --   dont expand to names
+-t                 --   only tcp
+-p                 --   show pids of programs owning the socket
+-l                 --   show (only) listening
+```
+
+Useful invocations
+
+```
+# dump all sockets and programs
+netstat -np
+
+```
 
 # Know my public ip
 

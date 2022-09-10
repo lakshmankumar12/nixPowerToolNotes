@@ -1,5 +1,13 @@
 # Windows Shell Command
 
+## environment
+
+search: export
+
+```
+SET VARIABLE=value
+```
+
 ## Grep Equivalent
 
 ```

@@ -1082,6 +1082,12 @@ journalctl _UID=108
 
 ## systemctl
 
+```
+systemctl list-units --type=service
+
+```
+
+
 Types:
 ```sh
 Type=simple

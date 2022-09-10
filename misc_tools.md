@@ -147,9 +147,10 @@ ssh -fN -L 'whatever' user@host
 -f  -- go to background
 -N  -- dont execute any command at host
 ```
-* Useful ssh options
+* Useful ssh and scp options
 ```
 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o ExitOnForwardFailure=yes
+-o LogLevel=ERROR   # suppresses the host-added warnings
 ```
 
 ## ssh_config setting
