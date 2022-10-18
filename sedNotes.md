@@ -240,30 +240,3 @@ head -n -3 <file>
 ```sh
 hexdump -C <file> | less
 ```
-
-# Using find
-
-```sh
-find <global-options> <path-one-or-more> <expressions>
-```
-
-* At its core find prints every file in the given path, provided the expression returns True for that file.
-* expressions (also referred as primary) can be many, and unless otherwise given, an implicit AND is assumed.
-* -print is assumed to be given unless other stuff like -print0 , -ls, -exec, -execdir is given.
-
-* List upto a certain depth
-    ```sh
-    find . -maxdepth 2
-    ```
-* ls just dirs
-    ```sh
-    find . -maxdepth 1 ! -path . -type d
-    ```
-* prune a few dirs from search
-    ```sh
-    find . -type f \( -path dir1 -o -path dir2 -o -path -dir3 \) -prune -o -print
-    ```
-* do something with the file
-    ```sh
-    find . -name '*.c' -exec grep to_find_string '{}' \;
-    ```

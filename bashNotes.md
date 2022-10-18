@@ -876,6 +876,16 @@ ps -o args= -p pid
 ls -d $(pwd)/*
 ```
 
+## sort
+
+```sh
+
+#args
+-t SEP     # field separator
+-k f1,f2   # use only from field f1 to f2
+
+```
+
 
 ## date
 
@@ -975,6 +985,7 @@ tail -n +11
     * `-a` is assign to arr in bash, while its `-A` in zsh
 * `-d delim` will continue reading until delim instead of newline.
     * useing empty  will go on till EOF
+    * This property can be leveraged to read heredocs
 
 bash:
 ```sh
@@ -988,6 +999,22 @@ read "var_to_assign?anything_after_qmark_is_prompt:"
 IFC=$':' read -A array_var <<< ${var_to_split}
 ```
 
+### heredoc read to a variable
+
+search: multiline
+
+```sh
+read -r -d '' VAR <<'EOF'
+abc'asdf"
+$(dont-execute-this)
+foo"bar"''
+EOF
+
+echo "$VAR"
+
+```
+
+
 ## printf
 
 * Very useful to convert hex to dec to oct etc..
@@ -1000,6 +1027,10 @@ IFC=$':' read -A array_var <<< ${var_to_split}
     ```sh
     n=5
     printf "willrepeat%.0s" {1..${n}}
+    ```
+* Assigning to a variable.
+    ```
+    printf -v var_to_assign "format_str:%s" $value1
     ```
 
 ## random shuffle
@@ -1247,40 +1278,6 @@ zsh$ zle -la
 #query existing binding
 zsh$ bindkey '\C-y'
 ```
-
-# Ubuntu pkg mgmt
-
-https://askubuntu.com/questions/170348/how-to-create-a-local-apt-repository
-
-## remove a pkg
-
-```
-apt-get remove --purge libav-tools
-```
-
-
-# Centos pkg mgmt
-
-* Information from a rpm
-    ```
-    rpm -qip rpname.rpm
-    ```
-
-* Force install a rpm
-    ```sh
-    rpm -ivh --force --nodeps whatever.rpm
-    ```
-
-* List files in  a rpm
-    ```sh
-    rpm -qpl whatever.rpm
-    ```
-
-* Just extract files of a rpm
-    ```sh
-    rpm2cpio ./your-rpm.rpm | cpio -idmv
-    ```
-
 
 ## chomp last line in file
 

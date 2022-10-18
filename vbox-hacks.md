@@ -60,6 +60,7 @@ virsh net-info <name>
 virsh net-destory <name>
 virsh net-undefine <name>
 
+# search dhclient
 virsh net-dhcp-leases --network <net-name>
 
 virsh pool-list --all

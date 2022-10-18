@@ -80,7 +80,7 @@ git log --all -- <path/to/file>
 git log --author=abc         # show all commits of author
 git log --grep=efg           # show all commits with comments having the string
 git log -S=hij               # show all commits with changed lines having the string. Slower -> so narrow ur commit-list
-git log --name-only          # display names of files changed with every commit
+git log --name-only          # display filename changed with every commit
 
 git log --pretty=fuller      # shows both dates
 ```
@@ -350,6 +350,14 @@ commit^2  .. second left parent of commit (meaningful for merge commits)
 ```
 git branch -a --contains <commit>
 ```
+
+* To check if current branch has a commit
+  * Replace HEAD with branch_name to check on other branch
+```sh
+git merge-base --is-ancestor $COMMIT_ID HEAD
+
+```
+
 
 ## which commit has a certain version of file
 

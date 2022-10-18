@@ -414,7 +414,7 @@ ip netns exec netns108 ip route add 10.1.7.0/24 via 10.1.108.2 dev veth108_ns108
 * Collection of `/etc/network/interfaces` files - `https://gist.github.com/evrardjp/f970315fb9094acb65c9e424f54273b0`
 
 
-# Ip-Routing-Tables
+# iptables
 
 Adding a rule
 ```
@@ -576,6 +576,15 @@ sudo iptables -I OUTPUT -m policy --pol ipsec --dir out -j NFLOG --nflog-group 5
 tcpdump -n -i nflog:5
 tcpdump -s 0 -n -i nflog:5 -w ./ipsec.pcap
 ```
+
+### random drop
+
+
+```sh
+sudo iptables -A OUTPUT -m statistic --mode random --probability 0.5 -d 8.8.8.8 -j DROP
+
+```
+
 
 
 # Open vswitch
@@ -963,6 +972,7 @@ options
 -t                 --   only tcp
 -p                 --   show pids of programs owning the socket
 -l                 --   show (only) listening
+-D                 --   enable debugging on socket
 ```
 
 Useful invocations

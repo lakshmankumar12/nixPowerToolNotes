@@ -122,8 +122,7 @@ docker commit NameOrIdOfContainer NewImageName
 ```
 
 
-
-* Image/Container states
+### Image/Container states
 
 ```
 Image --run-command-> Running Container --> Stopped Container -- commit-commnd --> New Image
@@ -288,7 +287,7 @@ USER 1000
     # arg to run
     -v host-folder:cont-folder[:ro]    -> mount host-folder at cont-folder
 
-    # Not if the host-path exists and is a file, it will be shared as a flie.
+    # Note if the host-path exists and is a file, it will be shared as a flie.
     # If the host-path does't exist , it will be assumbed to be a dir.
     ```
 * Ephemeral
@@ -380,7 +379,7 @@ networks:
     net:
 ```
 
-# Orchestration
+## Orchestration
 
 * Start containers -- and restart if they fail
 * service discovery -- allow them to find each other

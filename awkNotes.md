@@ -349,6 +349,8 @@ cat whatever | awk 'NF'
 
 ## cams consolidated summary extracter
 
+Search: mutual fund
+
 ```awk
 #Bring everything | seperated
 awk -F\| 'function stripw(var){gsub(/^[ \t]+/,"",var);gsub(/[ \t]+$/,"",var);return var} function printline() { printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\n",folio,fund,units,date,nav,value,registrar } NF > 2 { if (NR>2) { printline() } folio=stripw($1) ; fund=stripw($2) ; units=stripw($3) ; date=stripw($4) ; nav=stripw($5) ; value =stripw($6) ; registrar=stripw($7) } NF == 2 { fund = fund " " stripw($2) } END { printline()  }' statement.txt > statement.csv

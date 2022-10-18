@@ -155,6 +155,8 @@ ssh -fN -L 'whatever' user@host
 
 ## ssh_config setting
 
+Search: sshconfig
+
 ```sh
 # file is in ~/.ssh/config
 
@@ -207,6 +209,15 @@ unzip -l zipfile.zip
 ```
 
 # grep
+
+## options
+
+```sh
+-q       # quiet. quit after first occurence
+-m<N>    # stop after getting max N occurences
+
+```
+
 
 ## Highlight non-ascii chars
 
@@ -282,7 +293,7 @@ else cond2
 
 # Encrypt  / Decrypt
 
-See more openssl notes in general_reading_notes/ssl_tls.md
+* See more openssl notes in general_reading_notes/ssl_tls.md
 
 * encrypt
 ```
@@ -335,6 +346,15 @@ wget '..' -O out_file
 ```
 dpkg-query -L <package-name>
 ```
+* extract files in a deb package
+```sh
+ar x file.deb
+## you will see like this
+## ls
+control.tar.gz  data.tar.gz  debian-binary
+## your data file are in data.tar.gz
+tar xf data.tar.gz
+```
 
 * find which package provides a file
 ```
@@ -343,6 +363,25 @@ sudo apt-file update
 apt-file search /path/to/file
 
 ```
+
+## remove a pkg
+
+```
+apt-get remove --purge libav-tools
+```
+
+## Ubuntu pkg mgmt
+
+https://askubuntu.com/questions/170348/how-to-create-a-local-apt-repository
+
+### Installation of ubuntu
+
+search: autoinstall cloudinit
+
+links:
+* https://gist.github.com/s3rj1k/55b10cd20f31542046018fcce32f103e
+* https://ubuntu.com/server/docs/install/autoinstall-reference
+
 
 
 # yum
@@ -358,6 +397,10 @@ yum install yum-utils
 * list files in a rpm-package
     ```
     rpm -qlp <file.rpm>
+    ```
+* Information from a rpm
+    ```
+    rpm -qip rpname.rpm
     ```
 * Force install a rpm
     ```sh
@@ -393,19 +436,51 @@ rpm -qa
 * Centos debug info - http://debuginfo.centos.org/
 
 
-
 # tar
 
 * create
-```
+```sh
 tar cf newtarball.tar some_folder1/ some_folder2/ file3
 tar cf newtarball.tar -T filelist.txt
 find . -name 'whatsoever' | tar cf newtarball.tar -T -
+
+# tar a folder but exclude the path to that folder
+tar cf target.tar -C path/to/where/your/tar/should/begin .
+# however if you want to glob files in that path, then
+# its better to cd there
+(cd path/to/where/your/tar/should/begin ; tar cf /abs/path/target.tar *glob* )
 ```
 
 * list
 ```
 tar tf tarball.tar
+```
+
+# find
+
+```sh
+find <global-options> <path-one-or-more> <expressions>
+```
+
+* At its core find prints every file in the given path, provided the expression returns True for that file.
+* expressions (also referred as primary) can be many, and unless otherwise given, an implicit AND is assumed.
+* -print is assumed to be given unless other stuff like -print0 , -ls, -exec, -execdir is given.
+
+```sh
+# include paths in the search
+find . -wholename '*parentdirname*filepartname*'
+
+# List upto a certain depth
+find . -maxdepth 2
+
+# ls just dirs
+find . -maxdepth 1 ! -path . -type d
+
+# prune a few dirs from search
+find . -type f \( -path dir1 -o -path dir2 -o -path -dir3 \) -prune -o -print
+
+# do something with the file
+find . -name '*.c' -exec grep to_find_string '{}' \;
 ```
 
 # dhclient
@@ -725,10 +800,17 @@ gdrive upload --parent <parent-id> ubuntu_install_debug.tar
 
 # jq
 
+## Links
+
+Good read: https://earthly.dev/blog/jq-select/
+
+## cheatsheet
+
 ```sh
 
 #args
--c   -- compact json
+# -c   -- compact json
+# -r   -- raw strings (doesnt print quotes)
 
 #prettify json
 cat input.json | jq '.'
@@ -744,6 +826,8 @@ cat input.json | jq '.key1."12345".key3'
 #if top object is array
 #get just key from each object in array
 cat input.json | jq '.[].key1'
+# the above wont be json output. So to wrap the result into a [], you do:
+cat input.json | jq '[ .[].key1 ]'
 
 #if you have dict of dicts and want just one element from inner dict
 # {"level1key1" : { "level2key1" : "value1" }} ..
@@ -751,6 +835,9 @@ cat input.json | jq 'map_values(.level2key1)'
 
 ## Add a new entry or modify it
 cat input.json | jq '.new_member="value1"'
+
+## Add multiple entries
+cat input.json | jq '.new_member1="value1" | .exist_member2="value2" | .new_member3 = "value3"'
 
 ## remove a member
 cat input.json | jq 'del(.member)'
