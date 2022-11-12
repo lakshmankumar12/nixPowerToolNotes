@@ -189,6 +189,8 @@ service network restart
 
 # Fireup a quick http-server
 
+* See more info in pynotes.md
+
 ```
 #for 2.7
 python -m SimpleHTTPServer 8000
@@ -239,6 +241,30 @@ https://www.pcre.org/original/doc/html/pcrepattern.html
 ?! - negative assertion
 
 ```
+
+# core mgmt in linux
+
+```sh
+cat /proc/sys/kernel/core_pattern
+
+
+echo "/tmp/cores/core.%e.%p.%h.%t" > /proc/sys/kernel/core_pattern
+
+## notes
+%e: executable filename
+%p: pid
+%t: UNIX time of dump
+
+%%: output one '%'
+%u: uid
+%g: gid
+%s: signal number
+%h: hostname
+%: both are dropped
+%: '%' is dropped
+
+```
+
 
 
 # Draw ascii figures in web
@@ -323,6 +349,7 @@ See general_reading_notes/ipsec_notes.md
 # --interface <ip> -- choose a local-bind-ip
 # -X/--request <cmd> -- specifies a custom command to use (eg: -X GET)
 # -H/--header <hdr>  -- extra header to include in request (eg: -H "accept: application/json")
+# -m, --max-time <fractional seconds>  -- max time for each transfer to take
 
 curl 'http://...link' -o out_file
 ```
@@ -438,7 +465,16 @@ rpm -qa
 
 # tar
 
-* create
+## args
+
+```sh
+# -a               -- automatically detect the compression algo from file suffix
+# -O, --to-stdout  -- cat to stdout
+
+```
+
+
+## create
 ```sh
 tar cf newtarball.tar some_folder1/ some_folder2/ file3
 tar cf newtarball.tar -T filelist.txt
@@ -451,9 +487,12 @@ tar cf target.tar -C path/to/where/your/tar/should/begin .
 (cd path/to/where/your/tar/should/begin ; tar cf /abs/path/target.tar *glob* )
 ```
 
-* list
-```
+## list
+```sh
 tar tf tarball.tar
+
+# cat a file to stdout w/o really creating a file
+tar xf file.tgz path/in/tar/ball --to-stdout
 ```
 
 # find
@@ -601,7 +640,7 @@ cdparanoia -B
 
 ## build a usb-raw image
 
-```
+```sh
 dd if=/dev/zero of=usb.img bs=1M count=8192
 losetup -f usb.img
 
@@ -612,6 +651,10 @@ parted /dev/loop0
 (parted) quit
 
 mkfs.ext2 /dev/loop0p1
+#or ext4
+mkfs.ext4 /dev/loop0p1
+
+# works for all of ext2/3/4
 e2label /dev/loop0p1 'CentOS 7 x86_64'
 sync
 
@@ -619,6 +662,23 @@ sync
 losetup -d /dev/loopN
 
 ```
+
+## mount
+
+```sh
+#create the dir
+sudo mkdir /mountpoint
+#std args
+mount -t deviceFileFormat -o umask=filePermissions,gid=ownerGroupID,uid=ownerID /device /mountpoint
+
+#useful invocation
+mount -o umask=filePermissions,gid=1000,uid=1000 /dev/loop8p1 /mnt/extra_data
+
+#for ext4 partitions, do this after mounting
+sudo chown -R user:group /mountpoint
+
+```
+
 
 ## LVM
 
@@ -794,7 +854,7 @@ gdrive info <id>
 
 gdrive upload --parent <parent-id> ubuntu_install_debug.tar
 
-
+python3 -m http.server 8000
 ```
 
 
@@ -803,6 +863,7 @@ gdrive upload --parent <parent-id> ubuntu_install_debug.tar
 ## Links
 
 Good read: https://earthly.dev/blog/jq-select/
+Manual: https://stedolan.github.io/jq/manual/
 
 ## cheatsheet
 

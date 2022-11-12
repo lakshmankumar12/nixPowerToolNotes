@@ -2,8 +2,13 @@
 
 ## List all tracked files
 
+```sh
 git ls-files
-git ls-tree --full-tree -r HEAD   # too complex for the above?
+## this is very useful if your current repo is in a flux
+## and you want to see the tree as of some other commit
+## giving HEAD is ofcourse is same as git ls-files
+git ls-tree --full-tree -r <treeish>
+```
 
 ## List all untracked files
 

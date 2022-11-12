@@ -9,106 +9,111 @@
 
 ### list all interfaces
 
-```
+```sh
 ip link list
+ip link show
+
+# get interesting info on the link
+ip -d -j -p link show ${linkname}
+## for eg:
+ip -d -j -p link show gtp_br0 | jq '.[0].linkinfo.info_kind'
+
+# Type of interface
+ethtool -i devicename
+    driver-info: igb/tun(for both tun/tap)/ip_gre
+    bus-info: tun/tap/pci-value
 ```
+* Also circuitously found by `lspci` and `/sys/bus/pci/drivers`
+
 
 ### arp
 
-```
+```sh
 ip neigh show
 
 #delete a entry
 ip neigh delete 9.3.76.43 dev eth0
 
-#old
+#deprecated
 #display table
 arp
 
 #add a static entry
-apr -s <ip> <mac>
+arp -s <ip> <mac>
 ```
 
-* actual info is in /proc/net/arp
+* actual info is in `/proc/net/arp`
 
 * Add a proxy arp
-```
+```sh
 #arp -Ds <hostname> <ifname> pub   # pub is for publish
 #Eg:
 arp -Ds 192.168.0.253 eth0 pub
 ```
 
-### Tell the type of the interface
+### create a tun/tap interface
 
-ethtool -i devicename
-driver-info: igb/tun(for both tun/tap)/ip_gre
-
-bus-info: tun/tap/pci-value
-
-* Also circuitously found by `lspci` and `/sys/bus/pci/drivers`
-
-#### delete a apr cache
-
-```
-ip neigh delete 9.3.76.43 dev eth0
+```sh
+ip tuntap add dev mytap mode tap user md
 ```
 
-## vlans
+### vlans
 
-### add a vlan
+* add a vlan
 
-```
+```sh
 ip link add link eth0 name eth0.2 type vlan id 2
 ```
 
 * The loose_binding flag stops the VLAN interface from tracking the line protocol status of the underlying device.
 * Also note the .2 name is not mandatory (you can call eth0.2 as myvlan, say). But its nice to have that for convention!
 
-```
+```sh
 ip link add link eth0 name eth0.2 type vlan id 2 loose_binding on
 ip link delete eth0.2 type vlan
 ip link add foo type vlan help
 ```
 
-#### old/deprecated
+* old/deprecated
 
-```
+```sh
 vconfig add lan ${id}
 vconfig rem ${ifname}
 ```
 
-### create a tun/tap interface
-
-```
-ip tuntap add dev mytap mode tap user md
-```
 
 ### create a bridge
 
-```
-ip link add name bridge_name type bridge
-ip link set bridge_name up
-ip link delete bridge_name type bridge
+```sh
+brname=my_br0
+#add
+ip link add name ${brname} type bridge
+ip link set ${brname} up
+
+#del
+ip link delete ${brname} type bridge
 ```
 
-### add/del a interface to a bridge
+#### add/del a interface to a bridge
 
-```
-ip link set eth0 master bridge_name
+```sh
+brname=my_br0
+ip link set eth0 master ${brname}
 ip link set eth0 nomaster
 ```
 
-```
+#### details of a bridge
+
+```sh
 #show a bridge
 bridge link show
-```
+#another one
+ip -d link show ${brname}
 
-### brctl
-
-```
+# older deprecated
+# list all bridges
 brctl show
 ```
-
 
 
 ## L3-ish
@@ -150,6 +155,23 @@ ip link set netb up
 ip addr add 10.0.1.1 dev netb
 ip route add 10.0.2.0/24 dev netb
 ```
+
+### create a dummy interface
+
+```sh
+ip link add eth1 type dummy
+ip addr add 10.0.5.1/24 dev eth1
+ip link set eth1 up
+```
+
+### private ip ranges
+
+search: public
+
+* Class A: `10.0.0.0` to `10.255.255.255`.
+* Class B: `172.16.0.0` to `172.31.255.255`.
+* Class C: `192.168.0.0` to `192.168.255.255`.
+
 
 ## Routing-ish
 
@@ -414,6 +436,19 @@ ip netns exec netns108 ip route add 10.1.7.0/24 via 10.1.108.2 dev veth108_ns108
 * Collection of `/etc/network/interfaces` files - `https://gist.github.com/evrardjp/f970315fb9094acb65c9e424f54273b0`
 
 
+## dns
+
+* RFC 1035 explains the contraints of a label. RFC 1123 also covers this
+    * Labels
+        * basically [a-zA-z0-9-]
+        * max 63 chars
+    * Total name
+        * max 253 chars.
+        * `.` seperates labels.
+    * rfc
+        * 1123 - internet host requirements rfc
+        * 1035 - domain names
+
 # iptables
 
 Adding a rule
@@ -589,13 +624,80 @@ sudo iptables -A OUTPUT -m statistic --mode random --probability 0.5 -d 8.8.8.8 
 
 # Open vswitch
 
-https://randomsecurity.dev/posts/openvswitch-cheat-sheet/
+## OpenFlow protocol
 
+* Switches are data-path elements. If there are multiple of them, each is a
+  different dataplane-member as fars as controllers are concerned.
+    * Each switch has a bunch of ports associated to it.
+    * Each switch is controlled by a controller using the Open-switch protocol
+* Configurations are static - outside of OF protocol. These are done using vsctl
+* OF has tables. Each table has a table-number.
+    * Each table has a collection of flow-entries
+        * cookies - opaque set by controller
+        * priority
+        * match-fields
+        * instruction sets
+        * counters
+        * timeouts
+
+
+## ovs
+
+* https://sreeninet.wordpress.com/2014/01/02/openvswitch-and-ovsdb/
+* Ovs essentiall implements openflow for linux/kernel.
+
+### components of ovs
+
+* In the Kernel space
+    * ovs-vswitchd
+        * a daemon that implements the switch, along with a companion
+          Linux kernel module for flow-based switching.
+          We can talk to ovs-switchd using Openflow protocol.
+    * ovsdb-server
+        * a lightweight database server that ovs-vswitchd queries to
+          obtain its configuration. External clients can talk to ovsdb-server
+          using ovsdb management protocol (a json rpc)
+    * forwarding path itself
+* User space
+    * control and management cluster
+        * contains client tools to talk to ovsdb-server and ovs-vswitchd.
+
+* Tables in the ovsdb-server db:
+    * Bridge     : Bridge configuration.
+    * Port       : Port configuration.
+    * Interface  : One physical network device in a Port.
+    * Flow_Table : OpenFlow table configuration
+    * QoS        : Quality of Service configuration
+    * Queue      : QoS output queue.
+    * Mirror     : Port mirroring.
+    * Controller : OpenFlow controller configuration.
+    * Manager    : OVSDB management connection.
+    * NetFlow    : NetFlow configuration.
+    * SSL        : SSL configuration.
+    * sFlow      : sFlow configuration.
+    * IPFIX      : IPFIX configuration
+
+* ovs-dpctl
+    * a tool for configuring the switch kernel module.
+    * Used to administer Open vSwitch datapaths
+* ovs-ofctl
+    * to list implemented flows in the OVS kernel module
+    * A command line tool for monitoring and administering OpenFlow switches
+* ovs-vsctl
+    * a utility for querying and updating the configuration of ovs-vswitchd.
+    * Used for configuring the ovs-vswitchd configuration database (known as ovs-db)
+* ovs-appctl
+    * a utility that sends commands to running Open vSwitch daemons.
+* ovsdb-client
+    * a command line utility to ovsdb server.
+
+https://randomsecurity.dev/posts/openvswitch-cheat-sheet/
 
 ## ovs-vsctl
 
 ```sh
 # show ovs configuration
+##  Note use ofctl show bridge to dump more details of each bridge
 ovs-vsctl show
 
 # list bridges
@@ -608,7 +710,8 @@ ovs-vsctl list controller
 ovs-vsctl list-ports <brname>
 
 # list interfaces -- grep name to quickly get a feel of all ifcs
-ovs-vsctl list-interface
+# doesn't seem to work
+#ovs-vsctl list-interface
 
 # Add a bridge
 ovs-vsctl add-br <bridge>
@@ -644,13 +747,15 @@ ovs-ofctl dump-flows <bridge> <flow>
 ## Prints flow entries of specified bridge.
 ## With the flow specified, only the matching flow will be printed to console.
 ## If the flow is omitted, all flow entries of the bridge will be printed.
+## Eg for a flow is:
+##   table=N  .. only that table is printed
 
 ovs-ofctl dump-ports-desc <bridge>
 ## Prints port statistics. This will show detailed information about
 ## interfaces in this bridge, include the state, peer, and speed information.
 
 ## Very useful
-ovs-ofctl dump-tables-desc <bridge>
+ovs-ofctl dump-table-desc <bridge>
 ## Similar to above but prints the descriptions of tables
 ## belonging to the stated bridge.
 ## ovs-ofctl dump-ports-desc is useful for viewing port connectivity.
@@ -676,7 +781,9 @@ ovs-ofctl del-flows <bridge> <flow>
 
 ```sh
 # ask what-if questions to ovs-vswitchd and other daemons
-ovs-appctl
+
+# one of the best. Trace the pkt
+sudo ovs-appctl ofproto/trace gtp_br0 tcp,in_port=patch-up,ip_dst=192.168.201.100,ip_src=8.8.8.8,tcp_src=80,tcp_dst=3372
 ```
 
 
@@ -695,6 +802,8 @@ ss -l -p -n
 
 
 # Tcpdump commands
+
+search: tcpdump
 
 https://danielmiessler.com/study/tcpdump/
 
@@ -813,6 +922,16 @@ ping <ip>
 -M do|dont          # do=>set DF bit, dont=>dont set DF
 ```
 
+### ping operation not permitted
+
+```
+getcap $(which ping)
+
+sudo setcap cap_net_raw+p /usr/bin/ping
+
+```
+
+
 
 ## hping3 args
 
@@ -920,6 +1039,42 @@ ab -n 1000 -c 10 -s 30 https://${pip}/${file_to_download}
 -c   : number of concurrent requests
 -s   : timeout
 ```
+
+# dhcp server
+
+```sh
+#install
+sudo apt install isc-dhcp-server
+
+#backup the default file
+sudo mv /etc/dhcp/dhcpd.conf{,.origbackup}
+
+# ofcourse , change the ip to your choice
+cat <<EOF | sudo tee /etc/dhcp/dhcpd.conf > /dev/null
+default-lease-time 600;
+max-lease-time 7200;
+authoritative;
+
+subnet 192.168.1.0 netmask 255.255.255.0 {
+    range 192.168.1.100 192.168.1.200;
+    option routers 192.168.1.254;
+    option domain-name-servers 192.168.1.1, 192.168.1.2;
+    #option domain-name "mydomain.example";
+}
+host archmachine {
+    hardware ethernet e0:91:53:31:af:ab;
+    fixed-address 192.168.1.20;
+}
+EOF
+
+#eidt this file /etc/default/isc-dhcp-server
+#and correct the interface to bind in there
+INTERFACESv4="eth0"
+
+sudo systemctl restart isc-dhcp-server.service
+
+```
+
 
 
 # IPsec configuration

@@ -104,6 +104,8 @@ docker run hello-world
 #-t                     -> Give a tty
 #-i                     -> Interactive mode
 #--name <name>          -> start with this name (instead of the auto-assigned crazy,but,cool name)
+#--cap-add=NET_ADMIN    -> if you want to add dummy ifcs (other other networking admin stuff) in the cont
+#--privileged           -> Works as well for above.
 
 docker run -d -p 4000:80 friendlyhello
 
@@ -253,7 +255,7 @@ USER 1000
 
 * There are 3 networks - bridge / host / none. By default, all containers run in the bridge network
 
-    ```
+    ```sh
     docker network ls
     docker network inspect bridge
 

@@ -92,6 +92,7 @@ $(( ($var1 + $var2) * $var3 ))
 ```sh
 ${i:index}     .. substring of i starting at index(0-based)
 ${i:index:len} .. substring of i starting at index(0-based) for length len
+${i::-len}     .. substring of i starting at index(0-based) until last len
 ```
 
 Note: `${i:-val}` .. will give i or val if is unset
@@ -235,6 +236,8 @@ $*    -- all args as a single word
 $@    -- all args are intact, as invidivual quoted strings
 
 ## pass arg as reference / pass a name to which value is to be assigned
+
+Search: pass by reference
 
 ```sh
 function implementor()
@@ -427,9 +430,12 @@ exec 3>&-         # closes the fd. Note the number comes first.
 
 exec 4<>filename  # open for both reading/writing
 
+# redirection pattern: target>&source
+#   post that operation, anything sent to target-fd will appear on source-fd
+#   Note that target-fd appears unavailable after this.
+
 echo "foo" 2>&1   # writes stderr to stdout
 echo "foo" 1>&2   # rare: writes stdout into stderr
-                  # target>&source
 
 cmd 0<&-          # closes stdin for cmd
 
@@ -892,6 +898,8 @@ ls -d $(pwd)/*
 ```sh
 #date in a given format
 date '+%Y-%m-%d'
+#date+time
+date '+%Y-%m-%d-%H-%M-%S'
 
 %Y - XXXX
 %m - NN

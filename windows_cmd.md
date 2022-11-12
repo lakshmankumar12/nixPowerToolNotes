@@ -51,7 +51,7 @@ superuser answer]
 http://winaero.com/blog/the-full-list-of-shell-commands-in-windows-8/
 
 ```
-shell:startup
+shell:startup          -  C:\Users\<USER>\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup
 shell:common startup
 shell:Start Menu
 shell:Profile
