@@ -1,4 +1,58 @@
-# git stuff
+# day to day working
+
+```sh
+
+#revert modified changes and come back to HEAD
+## WARN :: IRREVERSIBLE
+git checkout -- .
+# only that of particular file
+git checkout -- path/to/file
+
+
+```
+
+## git diff args
+
+```
+git diff <lhs-commit> <rhs-commit> <file-path>
+
+git diff HEAD -- <all-files>
+
+#show staged changes
+git diff --cached
+
+#avoid getting the a/ b/
+git diff --no-prefix
+```
+
+## backup
+
+```
+#get a beautiful list of all local commits as a mail format
+git format-patch --stdout <Any-range>   # eg: base..
+
+#apply the generated file
+git am <file>
+```
+
+## grep with git
+
+```sh
+git grep -nH 'yourGrepPattern' -- '*path/spec/*'
+```
+
+## push
+
+### Push only one or a few commits when we have more local commits
+
+```
+git push <remotename> <commit SHA>:<remotebranchname>
+git push <remotename> <commit SHA>:refs/heads/<new-remotebranchname-name>
+```
+
+
+
+# working on files
 
 ## List all tracked files
 
@@ -12,47 +66,68 @@ git ls-tree --full-tree -r <treeish>
 
 ## List all untracked files
 
+```sh
 git ls-files --others --exclude-standard
+```
 
-## Get a particular revision
+## show a particular revision
 
+```sh
 git show treeish:path/to/file
+```
 
-use HEAD to get the tip.
+# Commits handling
 
-## Git bring back a file discarding chagnes
+## come to any commit
 
-git checkout -- path/to/file
-
-### restore to head discarding all changes
-
-git checkout -- .
-
-### unstage
-
-git reset
-
-### getting rid of the top-commit
-
+```sh
 git reset --hard HEAD~1
+```
 
-* you can get it back as long as its in the same repo with git reflog (git pack may erase it after some time..)
+* you can get it back as long as its in the same repo with git reflog (git pack
+  may erase it after some time..)
+
+## To get the commit from where you started working
+
+Normally, `@{u}` is enuf. However, if you did a git fetch, chances are `@{u}` has advanced.
+
+```
+git merge-base @{u} $(git symbolic-ref --short -q HEAD)
+
+#find the most-common-ancestor /parent of 2 commits
+git merge-base <commt1> <commit2>
+```
+
+## getting latest /top commit
+
+```
+git log -n 1
+git log -n 1 --pretty=format:"%H"
+```
+
+## geting parent commit of a commit
+
+```
+git show --quiet --pretty=format:"%P" <commit>
+
+commit~1  .. First Parent of commit
+commit~2  .. Grand(second) Parent of commit
+
+commit^1  .. First left parent of commit
+commit^2  .. second left parent of commit (meaningful for merge commits)
+```
+
+
+
+# Branches
 
 ## List all branches in server and clone
 
+```sh
 git branch -a
-
-If you dont see remotes/origin branches here, then your refspec isn't good.
-
-Check repo_root/.git/config and see if you have this:
-
 ```
-[remote "origin"]
-    url = WHATEVER
-    fetch = +refs/heads/*:refs/remotes/origin/*
-```
-
-If you are missing the fetch line, add it.
+NOTE: If you dont see remotes/origin branches here, then your refspec isn't good.
+See section on refspec
 
 ## checkout remote branch with tracking
 
@@ -73,7 +148,42 @@ git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 git remote prune origin
 ```
 
-## TO see all changes to a file across all branch
+## which remote am i tracking
+
+```
+git rev-parse --abbrev-ref @{u}
+```
+
+## which branches contain a commit
+
+```
+git branch -a --contains <commit>
+```
+
+* To check if current branch has a commit
+  * Replace HEAD with branch_name to check on other branch
+```sh
+git merge-base --is-ancestor $COMMIT_ID HEAD
+
+```
+
+
+
+# refspec
+
+
+Check repo_root/.git/config and see if you have this:
+
+```
+[remote "origin"]
+    url = WHATEVER
+    fetch = +refs/heads/*:refs/remotes/origin/*
+```
+* If you are missing the fetch line, add it.
+
+# log
+
+## To see all changes to a file across all branch
 
 ```
 git log --all -- <path/to/file>
@@ -112,6 +222,25 @@ git log --pretty=oneline     # <sha1> <title line>
 --stat        : count of lines changed.
 ```
 
+# tags
+
+## Creating a simple tag
+
+git tag <tagname> <commit>
+
+## creating a annotated tag
+
+git tag -a <tagname> -m '<message>'
+
+## Get info of a annotaed tag
+
+```
+git tag -l 'prefix*'   # will give all tags that start with prefix
+git tag -l '*substr*'  # will give all tags that have substr
+
+git show <tag-name>    # will show info of tag + the commit as well. Can get the time of the tagging.
+```
+
 ## To get the tag done on a given date
 
 ```
@@ -126,6 +255,41 @@ mgtags 80S | tail -n 100 | while read i ; do npgit log -n 1 --decorate --pretty=
 #print every 50th tag.
 mgtags 80S | sed -n '1~50p' | while read i ; do npgit log -n 1 --decorate --pretty=format:"$i %cD" $i ; echo ; ; done
 ```
+
+## Push a tag
+
+```
+git push origin <tag_name>
+```
+
+## delete a tag from remote
+
+```
+git push --delete origin tagname
+
+#https://nathanhoad.net/how-to-delete-a-remote-git-tag
+git push origin :refs/tag/tagname
+```
+
+
+# Backend
+
+## general args
+
+```sh
+--abbrev-ref   -- usually gets the branch name instead of sha
+
+```
+
+
+## Variables
+
+```sh
+@{u} -- short for @{upstream}
+     -- the name of the tracked branch in the remote.
+
+```
+
 
 ## To quickly get the sha-1 of any tag/branch-name/commit-representative!
 
@@ -142,57 +306,11 @@ else
   echo "you are NOT in a git repo"
 ```
 
-## Get upstream info
-
-```
-git rev-parse --abbrev-ref @{u}
-```
-
-
-## To get the commit from where you started working
-
-Normally, `@{u}` is enuf. However, if you did a git fetch, chances are `@{u}` has advanced.
-
-```
-git merge-base @{u} $(git symbolic-ref --short -q HEAD)
-
-#find the most-common-ancestor /parent of 2 commits
-git merge-base <commt1> <commit2>
-```
-
-
-## git diff args
-
-```
-git diff <lhs-commit> <rhs-commit> <file-path>
-
-git diff HEAD -- <all-files>
-
-#show staged changes
-git diff --cached
-
-#avoid getting the a/ b/
-git diff --no-prefix
-```
-
-
-## backup
-
-```
-#get a beautiful list of all local commits as a mail format
-git format-patch --stdout <Any-range>   # eg: base..
-
-#apply the generated file
-git am <file>
-```
-
-
-
 ## Difftool with a different tool
 
 git difftool -t meld
 
-## stash
+# stash
 
 ```
 #create a stash
@@ -271,6 +389,7 @@ git cat-file -t <sha>
 
 ## Get new clone
 
+```sh
 git-ws --branch v160.main asr5k/master.git master
 
 git submodule
@@ -279,45 +398,9 @@ git submodule status | grep '^ '
 rolldown:
 
 git forest pull
-
-## Creating a simple tag
-
-git tag <tagname> <commit>
-
-## creating a annotated tag
-
-git tag -a <tagname> -m '<message>'
-
-## Get info of a annotaed tag
-
-```
-git tag -l 'prefix*'   # will give all tags that start with prefix
-git tag -l '*substr*'  # will give all tags that have substr
-
-git show <tag-name>    # will show info of tag + the commit as well. Can get the time of the tagging.
 ```
 
-## Push only one or a few commits when we have more local commits
-
-```
-git push <remotename> <commit SHA>:<remotebranchname>
-git push <remotename> <commit SHA>:refs/heads/<new-remotebranchname-name>
-```
-
-## Push a tag
-
-```
-git push origin <tag_name>
-```
-
-## delete a tag from remote
-
-```
-git push --delete origin tagname
-
-#https://nathanhoad.net/how-to-delete-a-remote-git-tag
-git push origin :refs/tag/tagname
-```
+# Uncategorized
 
 ## delete commits from remote
 
@@ -330,38 +413,6 @@ git push remote_name -f
 git push remote_name +COMMIT_ID:branch
 ```
 
-## getting latest /top commit
-
-```
-git log -n 1
-git log -n 1 --pretty=format:"%H"
-```
-
-## geting parent commit of a commit
-
-```
-git show --quiet --pretty=format:"%P" <commit>
-
-commit~1  .. First Parent of commit
-commit~2  .. Grand(second) Parent of commit
-
-commit^1  .. First left parent of commit
-commit^2  .. second left parent of commit (meaningful for merge commits)
-```
-
-
-## which branches contain a commit
-
-```
-git branch -a --contains <commit>
-```
-
-* To check if current branch has a commit
-  * Replace HEAD with branch_name to check on other branch
-```sh
-git merge-base --is-ancestor $COMMIT_ID HEAD
-
-```
 
 
 ## which commit has a certain version of file
@@ -516,11 +567,6 @@ git config credentials.helper store
 
 #your password will bein ~/.git-credentials in clear text.
 ```
-
-## grep with git
-
-git grep -nH 'yourGrepPattern' -- '*path/spec/*'
-
 
 
 # Old commands equivalent
