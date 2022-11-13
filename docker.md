@@ -121,6 +121,10 @@ docker run -d -p 4000:80 friendlyhello
 
 #committing a container
 docker commit NameOrIdOfContainer NewImageName
+
+# my standard run args
+name=my_cont_name
+docker run -it --name $my_cont_name
 ```
 
 
@@ -314,6 +318,19 @@ Old notes:
 * Data volumes have persist lifetime, and not related to container lifetime
 
 (I dont understand this fully - for now -v host-dir:container-dir is good enuf)
+
+# test image with good networking tools
+
+```sh
+
+base_image=phusion/baseimage
+# if the above doesnt work.. goto github and get latest version
+base_image=phusion/baseimage:jammy-1.0.1
+docker pull ${base_image}
+
+docker run --privileged -t -i ${base_image} /sbin/my_init -- bash -l
+
+```
 
 
 # Compose

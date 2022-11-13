@@ -115,6 +115,15 @@ tmux show-options -g
 tmux show-options -w
 ```
 
+# screen
+
+* Minimal screenrc
+
+```sh
+hardstatus alwayslastline "%H %-Lw%{= BW}%50>%n%f* %t%{-}%+Lw%<"
+```
+
+
 # ssh
 
 * Authenticate only with password
@@ -904,4 +913,57 @@ cat input.json | jq '.new_member1="value1" | .exist_member2="value2" | .new_memb
 cat input.json | jq 'del(.member)'
 
 ```
+
+## manual reading dump
+
+```sh
+
+'.simplekeywithoutspecialchars'
+'.[key]'  # same
+'.["key$$"]' # key with spl char
+
+'.[integer]' # when integer, treats input as array.
+             # can be a slice .[10:15]
+
+'.[]'   # return all elements of array or dict.
+        # Note you will get N independant json objects as output
+        # its a array value iterator
+
+        # comma
+'.user, .projects[]'  # same input given to both filters
+                      # output is concatenated in order
+'.[2,4]'
+
+```
+
+* pipe
+    * combines two filters by feeding the output(s) of the one on the left into
+      the input of the one on the right
+    * If the one on the left produces multiple results, the one on the right
+      will be run for each of those results.
+* parenthesis
+    * grouping operator
+* array construction - `[]`
+    * typically `[filter1, filter2, filterN]`
+    * `filter1` itself can produce multiple outputs. So the result in one long array
+    * Eg: `'[.user, .projects[]]'`
+* `as` - var-assigment
+    * `"f o o" as foo | {value: $foo}`
+* Object contruction - `{}`
+    * Basically you do `{key1: filter1, key2: filter2}`
+    * Typically `key1`, `key2` are literals. For values you use filters.
+    * If filter produces multiple values, then result will be multiple JSON objects.
+    * If key isn't a literal, use parenthesis to trigger a evaluation
+* Operators
+    * `+,-,*`
+* Built-ins
+    * length
+    * keys, keys_unsorted
+    * has(key)
+    * in -- object is builtin's arg, while key is from input-json. Invert of has(key)
+    * map(filter)
+        * runs filter on each member in input array. Gives array output
+    * map_values(filter)
+        * runs filter on each value in input object. Gives object output
+
 

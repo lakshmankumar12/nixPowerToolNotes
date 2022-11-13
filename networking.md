@@ -25,6 +25,21 @@ ethtool -i devicename
 ```
 * Also circuitously found by `lspci` and `/sys/bus/pci/drivers`
 
+* assing a mac to a interface
+
+```sh
+ifname=name_of_ifc
+## first octet
+##   last-bit     MUST be 0. 1=>multicast -- can never be a source
+##   last-but-one MUST be 0. 0=>globally unique 1=>locally enforced
+mac=0c:0c:0c:0c:0c:0c
+sudo ip link set dev ${ifname} down
+sudo ip link set dev ${ifname} address ${mac}
+sudo ip link set dev ${ifname} up
+
+```
+
+
 
 ### arp
 
@@ -56,6 +71,84 @@ arp -Ds 192.168.0.253 eth0 pub
 ```sh
 ip tuntap add dev mytap mode tap user md
 ```
+
+### create a veth pair
+
+https://developers.redhat.com/blog/2018/10/22/introduction-to-linux-interfaces-for-virtual-networking#veth
+
+```sh
+myname=vethA1
+mypeername=vethA2
+ip link add ${myname} type veth peer name ${mypeername}
+
+# you can put them in different namespaces right on creation
+myns=ns1
+peerns=ns2
+ip link add ${myname} netns ${myns} type veth peer name ${mypeername} netns ${peerns}
+```
+
+### vlan filtering
+
+https://developers.redhat.com/articles/2022/04/06/introduction-linux-bridging-commands-and-features#vlan_filter
+
+* Pretty cool! Mimics a regular switch.
+* Create a bridge, add interfaces to it.
+* Each interface can be access or trunk, simply based on how many vlans are added to it.
+* Exactly one vlan is marked as `PVID` (port Vlan ID). All untagged ingress pkts belong to this vlan
+* It good practise to mark one vlan as `Egress Untagged`. All pkts from this vlan are put untagged at egress.
+    * But you have have multiple vlans as `Egress Untagged`, which is just mixing them up!
+
+```sh
+#create the bridge
+sudo ip link add name ${brname} type bridge
+
+#setup a bridge to act in this real-switch mode
+sudo ip link set ${brname} type bridge vlan_filtering 1
+sudo ip link set ${brname} up
+
+#add a interface to the bridge
+sudo ip link set ${ifcname} master ${brname}
+## At this point, the ifc is typically an access port
+##   with the vlan-1 of the bridge set as PVID,Egress-Untagged
+
+## add another vlan(s) to the ifc (in trunk fashion a.k.a tagged)
+##   -- just a note - we dont callout bridge name here.
+sudo bridge vlan add dev ${ifcname} vid 2-4
+
+## make one vlan as the access-vlan of the ifc
+sudo bridge vlan add dev ${ifcname} vid 2 pvid untagged
+## note while PVID moves to this vlan, the default 1 continues to be untagged.
+## remove it off, if you want this ifc to be a true access port.
+sudo bridge vlan del dev ${ifcname} vid 1
+## note: even if a ifc is trunk, if vid-1 is not the untagged,
+## remove and add it back so that it becomes explicitly tagged.
+
+## display the vlan status of (all) bridges on the host
+bridge vlan show
+    port              vlan-id
+    my_br0            1 PVID Egress Untagged
+    vethA1            1 PVID Egress Untagged
+                      2
+                      3
+                      4
+    vethB1            2 PVID Egress Untagged
+    vethC1            3 PVID Egress Untagged
+    vethD1            1
+                      2
+                      3
+                      4 PVID Egress Untagged
+
+```
+
+---
+**Creating vlan ifcs atop veths**
+
+* Usuually you attach veth pairs to the bridge.
+* One pair is attached. Dont add vlan ifcs to this veth
+* Add ip-addresses and vlans to the other ifc of the pair.
+
+---
+
 
 ### vlans
 
@@ -286,7 +379,7 @@ but one root class cannot borrow from another. We could have created the other
 three classes directly under the htb qdisc, but then the excess bandwidth from
 one would not be available to the others.
 ```
-tc class add dev eth0 parent 1: classid 1:1 htb rate 100kbps ceil 100kbps 
+tc class add dev eth0 parent 1: classid 1:1 htb rate 100kbps ceil 100kbps
 tc class add dev eth0 parent 1:1 classid 1:10 htb rate 30kbps ceil 100kbps
 tc class add dev eth0 parent 1:1 classid 1:11 htb rate 10kbps ceil 100kbps
 tc class add dev eth0 parent 1:1 classid 1:12 htb rate 60kbps ceil 100kbps
