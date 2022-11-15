@@ -271,6 +271,11 @@ git push --delete origin tagname
 git push origin :refs/tag/tagname
 ```
 
+## list tags sorted by createdate
+
+```sh
+git for-each-ref --sort=creatordate --format '%(refname) %(creatordate)' refs/tags
+```
 
 # Backend
 

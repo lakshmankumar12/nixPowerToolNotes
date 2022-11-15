@@ -85,6 +85,10 @@ ip link add ${myname} type veth peer name ${mypeername}
 myns=ns1
 peerns=ns2
 ip link add ${myname} netns ${myns} type veth peer name ${mypeername} netns ${peerns}
+
+## delete a veth pair .. deleting the one you used to name first.
+## automatically deletes the other
+ip link del ${myname}
 ```
 
 ### vlan filtering
@@ -345,6 +349,8 @@ ip tun show
 tc [-s] qdisc show
 tc [-s] qdisc show dev <intf>
 
+tc [-s] [-d] class show
+
 tc qdisc add dev <intf> parent <handle> classid <handle> whatever
 ..repl add with del until the classid <handle>
 
@@ -496,6 +502,8 @@ ip netns exec mynamespace ip link list
 ```
 ip link set ens33 netns mynamespace
 ```
+* Bridge devices dont seem to move namespaces with the above command.
+  However, creating the bridge directly on the namespace seems to work
 
 * tell which namespace a pid belongs. If this is empty.. its the default namespace.
 ```
