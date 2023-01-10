@@ -205,6 +205,8 @@ system("your command with args")
   the file-handle to close that program.
 
 ```awk
+# search : shell
+
 cmd = "build your command"
 cmd | getline var_name
 close (cmd)
@@ -340,6 +342,20 @@ function stripw(var) {
 function stripw(var){gsub(/^[ \t]+/,"",var);gsub(/[ \t]+$/,"",var);return var}
 
 ```
+
+## preserve white-space if editing line
+
+```awk
+echo "a  2   4  6" | gawk ' {
+ n=split($0,a," ",b)   # the 4th arg to split save the separators
+ a[3]=7                # edit field(s) of choice
+ line=b[0]             # build the line back
+ for (i=1;i<=n; i++)
+     line=(line a[i] b[i])
+ print line
+}'
+```
+
 
 ## Get non-empty lines alone
 

@@ -28,10 +28,13 @@ C:\Users\lnara002>
 
 ## Display Routing Table
 
-```
+```sh
 route print
 route print -4
 route print -4 135*
+
+#getting mac
+getmac
 ```
 
 Lowest metric is the highest priority as per http://superuser.com/a/198784[this
@@ -56,6 +59,15 @@ shell:common startup
 shell:Start Menu
 shell:Profile
 ```
+
+## program name in run
+
+```
+mspaint
+diskmgmt.msc
+
+```
+
 
 # networking
 

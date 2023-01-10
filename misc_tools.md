@@ -544,6 +544,56 @@ EOF
 sudo chmod +x /etc/dhcp/dhclient-enter-hooks.d/nodnsupdate
 ```
 
+# rsyslog
+
+```sh
+#check rsyslog config
+rsyslogd -N1
+
+# config lines for /etc/rsyslog/NN-myfile.conf
+if ( $programname contains "magmad" ) then {
+    action(type="omfile" file="/var/log/magmad.log")
+    stop
+}
+
+#old style
+:programname, contains, "magmad"    /var/log/magmad.log
+&~
+
+#trigger a script on hitting file-limit
+# note the script will run as syslog-user.. so you ought to add sudo here
+# and add this access in /etc/sudoer
+$outchannel Magamdlog,/var/log/magmad.log,104856,sudo /path/to/script
+
+if ($programname contains 'magmad' ) then :omfile:$Magamdlog;FileFormat
+&~
+## some content in script can be to logrotate, eg:
+/usr/sbin/logrotate -f /etc/logrotate.d/file-having-rotate-config-for-our-just-file-of-interest
+
+```
+
+# logrorate
+
+```sh
+#sample config
+onyxedge@onyxedge-agw:/etc/logrotate.d$ sudo cat /etc/logrotate.d/gxc-magmad
+/var/log/magmad.log
+{
+  su root syslog
+  rotate 10
+  size 50M
+  daily
+  missingok
+  notifempty
+  compress
+  copytruncate
+}
+
+```
+
+
+
+
 
 # Linux Hard-disk related tools
 
@@ -691,6 +741,8 @@ sudo chown -R user:group /mountpoint
 
 ## LVM
 
+search lvm physical logical
+
 ```sh
 #pvs
 pvs
@@ -700,6 +752,11 @@ lgs
 
 #lvs
 lvs
+
+#extend a ext4 part what is on lvm
+# get the vg-name and lv-name from the lvs command
+lvextend -l +100%FREE /dev/volume-group-name/logical-volume-name
+
 
 ```
 
@@ -866,6 +923,22 @@ gdrive upload --parent <parent-id> ubuntu_install_debug.tar
 python3 -m http.server 8000
 ```
 
+direct download link
+
+```
+#what you get
+https://drive.google.com/file/d/1ulBg9QO62imSzowJRjTF7BMXPV3JpbEQ/view?usp=sharing
+#direct download
+https://drive.google.com/uc?export=download&id=1ulBg9QO62imSzowJRjTF7BMXPV3JpbEQ
+
+orig_url=${url}
+id=$(echo $orig_url | awk -F/ '{print $6}')
+echo ${id}
+direct_url="https://drive.google.com/uc?export=download&id=${id}"
+echo ${direct_url}
+```
+
+
 
 # jq
 
@@ -873,6 +946,7 @@ python3 -m http.server 8000
 
 Good read: https://earthly.dev/blog/jq-select/
 Manual: https://stedolan.github.io/jq/manual/
+Another cheatsheet: https://gist.github.com/olih/f7437fb6962fb3ee9fe95bda8d2c8fa4
 
 ## cheatsheet
 
@@ -881,6 +955,8 @@ Manual: https://stedolan.github.io/jq/manual/
 #args
 # -c   -- compact json
 # -r   -- raw strings (doesnt print quotes)
+# -n   -- create a new json file
+# --arg name value  -- assign value to the variable name for use inside of expression
 
 #prettify json
 cat input.json | jq '.'
@@ -894,14 +970,18 @@ cat input.json | jq '.key1.key2.key3'
 cat input.json | jq '.key1."12345".key3'
 
 #if top object is array
-#get just key from each object in array
+#get just one key from each object in array
 cat input.json | jq '.[].key1'
 # the above wont be json output. So to wrap the result into a [], you do:
 cat input.json | jq '[ .[].key1 ]'
 
 #if you have dict of dicts and want just one element from inner dict
 # {"level1key1" : { "level2key1" : "value1" }} ..
+##  returns {"level1key1" : "value1", ...}
 cat input.json | jq 'map_values(.level2key1)'
+
+## You can replace each object with the number of items in that object
+cat /tmp/last_data| jq 'map_values(length)' | less
 
 ## Add a new entry or modify it
 cat input.json | jq '.new_member="value1"'
@@ -911,6 +991,9 @@ cat input.json | jq '.new_member1="value1" | .exist_member2="value2" | .new_memb
 
 ## remove a member
 cat input.json | jq 'del(.member)'
+
+## create a new json file
+jq -n --arg greeting world --arg second more_values '{"hello":$greeting,"another":$second}' > file.json
 
 ```
 

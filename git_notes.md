@@ -23,6 +23,10 @@ git diff --cached
 
 #avoid getting the a/ b/
 git diff --no-prefix
+
+#get only added files between 2 commits that patch a patten
+git diff --name-only --diff-filter=A HEAD HEAD~1 *.md
+
 ```
 
 ## backup
@@ -125,6 +129,9 @@ commit^2  .. second left parent of commit (meaningful for merge commits)
 
 ```sh
 git branch -a
+
+# list them in last update order
+git branch --sort=committerdate
 ```
 NOTE: If you dont see remotes/origin branches here, then your refspec isn't good.
 See section on refspec
@@ -571,6 +578,25 @@ git worktree add -b mg80f ../../mg80f/panos remotes/origin/TiMOS-MG_8_0_future
 git config credentials.helper store
 
 #your password will bein ~/.git-credentials in clear text.
+```
+
+# gitlab urls
+
+```
+# compare URL, where ref_source and ref_target can be commit SHA, tag, or branch
+https://${gitlab_host}/${repo_path}/-/compare/${ref_target}...${ref_source}
+
+# tag example 1, comparing tag v1.5.1 to master
+https://${gitlab_host}/${repo_path}/-/compare/v1.5.1...master
+
+# tag example 2, comparing tag v1.5.1 to tag v1.5.2
+https://${gitlab_host}/${repo_path}/-/compare/v1.5.1...v1.5.2
+
+# commit example 1, comparing commit SHA to master
+https://${gitlab_host}/${repo_path}/-/compare/f6098082f...master
+
+# commit example 2, comparing commit SHA to another commit SHA
+https://${gitlab_host}/${repo_path}/-/compare/f6098082f...2b8daf28
 ```
 
 

@@ -37,6 +37,8 @@ virt-host-validate
 
 virsh nodeinfo
 virsh domcapabilities | less
+# get the sizes of disk
+virsh domstats <vm-name>
 virsh net-info default
 virsh net-dumpxml default
 
@@ -44,9 +46,14 @@ virsh start <vm-name>
 virsh shutdown <vm-name>
 virsh destroy <vm-name>
 virsh undefine <vm-name>
+virsh undefine <vm-name>
+virsh undefine --remove-all-storage <vm-name>
+
 
 virsh dumpxml <vm-name>  > /some/file
 virsh define /path/to/xml
+
+virt-clone --original $oldvm --name $newvm --auto-clone
 
 #list all vm's
 virsh list
@@ -73,7 +80,7 @@ virsh vol-delete --pool <pool-name> <vol-name>
 virt-manager
 ```
 
-* Xml snippet to add a cdrom-device (or just add a iso)
+* xml snippet to add a cdrom-device (or just add a iso)
 
 ```
     <disk type='file' device='cdrom'>
@@ -85,6 +92,18 @@ virt-manager
       <address type='drive' controller='0' bus='0' target='0' unit='0'/>
     </disk>
 ```
+
+* attach a network after starting the vm
+```sh
+# this adds when the vm is down.
+## remove --config if the vm is running (not sure how the guest os will respond though).
+virsh attach-interface --domain lakshmantrfvm --type bridge \
+        --source virbr0 --model virtio \
+        --mac 52:54:00:4b:73:5f --config
+
+
+```
+
 
 ## Boot order
 
@@ -128,4 +147,26 @@ virsh detach-disk vmName /path/to/imagefile.raw
     </disk>
 ```
 
+# secure linux
+
+search : modprobe permitted
+
+```sh
+
+#install pkg
+sudo apt-get install mokutil
+
+#verify state
+mokutil --sb-state
+
+#enable modification
+# give exactly this password - 12345678
+sudo mokutil --disable-validation
+
+## reboot press any key
+## on prompt type the individual letters of the passwd
+## disable.
+
+
+```
 

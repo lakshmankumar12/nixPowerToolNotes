@@ -55,6 +55,8 @@ arp
 
 #add a static entry
 arp -s <ip> <mac>
+#delete if off
+arp -d <ip>
 ```
 
 * actual info is in `/proc/net/arp`
@@ -256,9 +258,11 @@ ip route add 10.0.2.0/24 dev netb
 ### create a dummy interface
 
 ```sh
-ip link add eth1 type dummy
-ip addr add 10.0.5.1/24 dev eth1
-ip link set eth1 up
+ifname=my_new_ifc
+addr="10.0.5.1/24"
+sudo ip link add ${ifname} type dummy
+sudo ip addr add ${addr} dev ${ifname}
+sudo ip link set ${ifname} up
 ```
 
 ### private ip ranges
@@ -268,6 +272,10 @@ search: public
 * Class A: `10.0.0.0` to `10.255.255.255`.
 * Class B: `172.16.0.0` to `172.31.255.255`.
 * Class C: `192.168.0.0` to `192.168.255.255`.
+
+Link local ip
+
+`169.254.1.0` to `169.254.254.255`.
 
 
 ## Routing-ish
@@ -279,7 +287,12 @@ ip route show
 ```
 * To enable forwarding:
 ```
-sysctl -w net.ipv4.ip_forward=1
+sudo sysctl -w net.ipv4.ip_forward=1
+
+## stay on reboots
+sudo vi "/etc/sysctl.conf"
+## uncomment:
+## net.ipv4.ip_forward=1
 
 ```
 
@@ -430,8 +443,9 @@ tc filter add dev ${ifname} protocol ip parent 1: prio 2 u32 match ip dst 0.0.0.
 sudo tc qdisc add dev eth0 root handle 1: htb default 12
 sudo tc class add dev eth0 parent 1:1 classid 1:12 htb rate 15mbit ceil 15mbit
 
-#remove
+#remove or replace
 sudo tc qdisc del dev eth0 root
+sudo tc qdisc replace dev enp1s0 root fq_codel
 ```
 
 ### Add a latency/loss to a interface
@@ -721,6 +735,62 @@ sudo iptables -A OUTPUT -m statistic --mode random --probability 0.5 -d 8.8.8.8 
 
 ```
 
+# nft
+
+https://wiki.nftables.org/wiki-nftables/index.php/Main_Page
+https://wiki.nftables.org/wiki-nftables/index.php/Netfilter_hooks
+https://wiki.nftables.org/wiki-nftables/index.php/Simple_rule_management
+
+
+```sh
+# families:   ip, arp, ip6, bridge, inet, netdev.
+# hooks: see diagram in link above.
+
+# hierarchy: family, table, chain
+
+#typical rule syntax
+% nft (add | create) chain [<family>] <table> <name> [ { type <type> hook <hook> [device <device>] priority <priority> \; [policy <policy> \;] } ]
+% nft (delete | list | flush) chain [<family>] <table> <name>
+% nft rename chain [<family>] <table> <name> <newname>
+
+# interactive shell.. better as most rules have chars like !,&,> which shell wont be happy with
+sudo nft -i
+
+# list everything
+nft list ruleset
+# list all rules -- family defaults to ip if not given
+nft list table ${family} ${table}
+
+# see stats
+# https://insights-core.readthedocs.io/en/latest/shared_parsers_catalog/nfnetlink_queue.html
+## headers:
+## que-num peer_portid queue_total copy_mode copy_range queue_droped user_dropped id_seq  ignore
+##    1    628029      0          2          4016        0              0         0       1
+##    2    628030      0          2          4016        0              0         0       1
+##
+## peer_portid: good chance it is process ID of software listening to the queue
+## copy_mode: 0 and 1 only message only provide meta data. If 2, the message provides a part of packet of size copy range.
+## copy_range: length of packet data to put in message
+## id_seq: pkt_id of last pkt
+sudo cat /proc/net/netfilter/nfnetlink_queue
+
+
+# add a rule
+sudo nft add rule ${family} ${table} ${chain} vlan id 500 ip flags '&' 0x1 != 0 queue num 800
+sudo nft add rule bridge gxc_mtu gxc_prerouting vlan id 500 ip flags '&' 0x1 != 0 queue num 800
+
+# delete a rule
+sudo nft delete rule ${family} ${table} handle 7
+sudo nft delete rule bridge gxc_mtu handle 7
+
+# flush in chain or table
+sudo nft flush chain ${table} ${chain}
+sudo nft flush table ${table}
+# flush everything
+sudo nft flush ruleset
+```
+
+
 
 
 # Open vswitch
@@ -831,6 +901,9 @@ ovs-vsctl set interface <interface> type=patch options:peer=<interface>
 ## Look wrong.
 ovs-vsctl set-controller gtp_br0 connection-mode=out-of-band
 
+## adding a flow
+sudo ovs-ofctl add-flow -Oopenflow13 gtp_br0 'table=20,priority=30,reg1=0x1,ip,nw_dst=192.168.203.3 actions=set_field:52:54:00:7a:74:a3->eth_dst,"patch-up"'
+
 ```
 
 ## ovs-ofctl
@@ -845,6 +918,8 @@ ovs-ofctl snoop <bridge>
 ## Snoops traffic to and from the bridge and prints to console.
 
 ovs-ofctl dump-flows <bridge> <flow>
+## --names
+## --no-names
 ## Prints flow entries of specified bridge.
 ## With the flow specified, only the matching flow will be printed to console.
 ## If the flow is omitted, all flow entries of the bridge will be printed.
@@ -931,6 +1006,13 @@ less useful
 
 -w <file>        # write to a file
 -r <file>        # read from file
+```
+
+* various filters
+```
+icmp and greater 500 and less 600
+vlan
+vlan and ether[14:2] & 0xfff == 1000
 ```
 
 * to rollover

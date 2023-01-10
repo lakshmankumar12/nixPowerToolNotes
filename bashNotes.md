@@ -40,6 +40,17 @@ See https://stackoverflow.com/a/3427931
 * `$[ ]` - Deprecated. Use `$((  ))`
 * `$' '` - The word expands to a string, with backslash-escaped characters replaced as specified by the ANSI-C standard.
            Used in some siutaiton like IFS=$' ' assignments. To read.
+
+### special variables
+
+```sh
+$?  -- last command exit status
+$$  -- invoker's pid
+$#  -- number of arguments.
+
+```
+
+
 # Operators
 
 http://tldp.org/HOWTO/Bash-Prog-Intro-HOWTO-11.html
@@ -495,7 +506,9 @@ function f_cursor_up()
 }
 ```
 
-# Getting yes/no or other inputs from user
+# Some useful stuff
+
+## Getting yes/no or other inputs from user
 
 ```sh
 echo "Do you wish to install this program?"
@@ -524,7 +537,7 @@ done
 read -p prompt -t timeout variable_that_stores_input
 ```
 
-# Find all unique files in 2 folders
+## Find all unique files in 2 folders
 
 ```sh
 #this WONT GIVE u if a file is present twice is DIR1 itself but absent in DIR2!
@@ -533,7 +546,7 @@ export DIR2=whatever2
 find $DIR1 $DIR2 -type f -exec sha1sum '{}' \+ | sort | uniq -c --check-chars 40 | egrep '^ *1 ' | cut -c 51-
 ```
 
-# Running sth at exit no-matter-what
+## Running sth at exit no-matter-what
 
 ```sh
 function my_function {
@@ -542,7 +555,7 @@ function my_function {
 trap my_function INT TERM EXIT HUP
 ```
 
-# Do sth in a lock
+## Do sth in a lock
 
 ```sh
 lockfile=/var/tmp/mylock
@@ -560,6 +573,17 @@ else
         echo "Lock Exists: $lockfile owned by $(cat $lockfile)"
 fi
 ```
+
+## get file-sizes
+
+```
+
+cd dir/of/interest
+find . type d | xargs du -sh
+ls -1 | xargs du -sh
+
+```
+
 
 # Argc/Argv Parsing
 
@@ -919,6 +943,7 @@ date '+%s'
 date '-d@<epoch>'
 ```
 
+iterate over date
 date also supports addition in linux!
 ```
 start=20141001
@@ -930,6 +955,19 @@ while [ $date != $end ] ; do
     prefix="$yy-$mm-eStmt_$yy-$mm-21" ;
     pdftotext -layout ../${prefix}.pdf ${prefix}.txt ;
 done
+
+#try passwords
+file=...
+start="19750101"
+for i in $(seq 0 $((30*365)) )  ; do
+    passwd=$(date --date="$start + $i day" +'%d%m%Y');
+    echo $passwd
+    qpdf --password=${passwd} --decrypt ${file} a.pdf
+    if [ $? -eq 0 ] ; then
+        break;
+    fi
+done
+
 ```
 
 ## hostnamectl
@@ -1009,7 +1047,7 @@ IFC=$':' read -A array_var <<< ${var_to_split}
 
 ### heredoc read to a variable
 
-search: multiline
+search: multiline multi-line
 
 ```sh
 read -r -d '' VAR <<'EOF'
@@ -1096,6 +1134,16 @@ Explanation:
   * `"%02x"` is a traditional printf style format string to print
     in hex with 0 pre-pended and a width of 2.
 
+## numfmt
+
+search : human readable
+
+```sh
+numfmt --to=iec-i --suffix=B --format="%9.2f" 1975684956
+
+```
+
+
 ## journalctl
 
 Search: syslog
@@ -1109,6 +1157,9 @@ journalctl -u some_service
 # list log of a particular boot
 journalctl -b 1
 
+# list log since current boot only
+journalctl -b
+
 # only from till
 journalctl --since "3 hours ago"
 journalctl --since "2 days ago"
@@ -1121,8 +1172,15 @@ journalctl _UID=108
 
 ## systemctl
 
-```
+```sh
 systemctl list-units --type=service
+
+# This will make systemd read all services and update
+# its database
+systemctl daemon-reload
+
+# verify a definition file
+sudo systemd-analyze verify phy_ifc_map_check.service
 
 ```
 
@@ -1221,6 +1279,54 @@ pass=$(python3 -c 'import crypt; print(crypt.crypt("clearpass"))')
 ```
 
 
+### add to sudoers
+
+Search : password
+
+```sh
+username="whoever"
+echo "${username} ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers > /dev/null
+
+```
+
+### sudoers file syntax
+
+* https://toroid.org/sudoers-syntax
+
+```sh
+## General
+## <%group> -- % identifes a group
+## this line says, the given user can in the mentioned hosts
+##   switch as the tgt-user/grp and run the list of commands.
+<user>  <hosts>=(<tgt-users>:<grp>) ALL=[NOPASSWD:] [SETENV:] [=list-cmds]
+
+## eg:
+##  lakshman can in All hosts switch as any user/groups and run
+##   anything w/o prompt for passwd
+lakshman ALL=(ALL:ALL) NOPASSWD: ALL
+
+syslog  ALL=NOPASSWD: /usr/local/bin/rotater_script.sh
+
+```
+
+
+## chomp last line in file
+
+```
+perl -pe 'chomp if eof' filename > new_filename
+perl -pi -e 'chomp if eof' inline_filename
+```
+
+## expand filename soft links
+
+```sh
+realpath ${file}
+
+#also
+readlink -e ${file}
+
+```
+
 
 
 
@@ -1287,12 +1393,6 @@ zsh$ zle -la
 zsh$ bindkey '\C-y'
 ```
 
-## chomp last line in file
-
-```
-perl -pe 'chomp if eof' filename > new_filename
-perl -pi -e 'chomp if eof' inline_filename
-```
 
 # Linux proc file stuff
 

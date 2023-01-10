@@ -330,6 +330,19 @@ docker pull ${base_image}
 
 docker run --privileged -t -i ${base_image} /sbin/my_init -- bash -l
 
+apt update
+apt install -y iproute2 iputils-ping  iptables  net-tools  \
+        bridge-utils  conntrack  ethtool  tcpdump  \
+        strongswan iperf3 lsof wget curl wireshark tshark ipcalc jq
+
+exit
+
+docker ps -a
+docker commit <id> my_routerish_container
+
+docker tag my_routerish_container lakshmankumar/simple-routerish-docker:latest
+docker push lakshmankumar/simple-routerish-docker
+
 ```
 
 

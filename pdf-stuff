@@ -6,6 +6,18 @@ pdftk protected.pdf input_pw sekritPassword cat output unprotected.pdf
 # when u know only user password
 qpdf --password=sekritPassword --decrypt protected.pdf unprotected.pdf
 
+#crak password of unknown pdf
+protected=
+unprotected=a.pdf
+for i in $(seq 0 9999) ; do
+    pass=$(printf "%04d" $i)
+    echo "Trying $pass"
+    qpdf --password=$pass --decrypt ${protected} ${unprotected}
+    if [ $? -eq 0 ] ; then
+        break
+    fi
+done
+
 # merge 2 pdfs
 pdftk A=in1.pdf B=in2.pdf cat A1-2 B4-end output out1.pdf
 pdftk *pdf cat output combined.pdf
