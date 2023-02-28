@@ -552,7 +552,7 @@ find $DIR1 $DIR2 -type f -exec sha1sum '{}' \+ | sort | uniq -c --check-chars 40
 function my_function {
   rm whatever;
 }
-trap my_function INT TERM EXIT HUP
+trap my_function INT TERM EXIT HUP ERR
 ```
 
 ## Do sth in a lock
