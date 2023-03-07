@@ -1260,6 +1260,9 @@ usermod [optoins] $USER
 
 #eg:
 sudo usermod -a -G libvirt ${user_to_add}
+
+## change password for a user as root
+sudo passwd username
 ```
 
 * Getting crypted password
@@ -1326,6 +1329,17 @@ realpath ${file}
 readlink -e ${file}
 
 ```
+
+## ssh-key gen
+
+```sh
+# create key pair
+### -N ""  .. for no passphrase
+### -q  for  quiet mode
+ssh-keygen -t rsa -f /path/to/output/dir/with/private_key -N "passphrase" -C "comment"
+
+```
+
 
 
 

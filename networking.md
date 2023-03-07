@@ -1105,6 +1105,13 @@ ping <ip>
 -M do|dont          # do=>set DF bit, dont=>dont set DF
 ```
 
+Notes on size
+
+* `-s N` will generate a N+28 byte IP packet.
+* Default is `-s 56` which will generate 84 sized IP pkt
+* Wireshark will show 20-byte IP , 8 byte Icmp, 8 byte time-stamp and only remaining as payload.
+* Thus if u have `-s N` , you will see N+28 ip pkt and N-8 byte ICMP payload in wireshark.
+
 ### ping operation not permitted
 
 ```

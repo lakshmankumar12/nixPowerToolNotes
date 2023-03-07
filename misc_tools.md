@@ -219,6 +219,16 @@ zip combined.zip file1 file2
 unzip -l zipfile.zip
 ```
 
+* 7z
+```
+sudo apt install p7zip-full
+
+#extract
+7z x file.7z
+
+```
+
+
 # grep
 
 ## options
