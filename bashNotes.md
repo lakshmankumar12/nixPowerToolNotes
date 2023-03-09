@@ -1183,15 +1183,12 @@ systemctl daemon-reload
 sudo systemd-analyze verify phy_ifc_map_check.service
 
 ```
-
-
 Types:
 ```sh
 Type=simple
 Type=oneshot
 
 ```
-
 
 search: systemd
 
@@ -1222,6 +1219,12 @@ systemctl --user status devvm_ssh_starter.service
 journalctl --user -u devvm_ssh_starter
 ```
 
+* Get pid of main process
+
+```sh
+systemctl show --property MainPID --value $SERVICE
+
+```
 
 
 ## just get ip for a hostname

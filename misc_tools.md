@@ -236,7 +236,7 @@ sudo apt install p7zip-full
 ```sh
 -q       # quiet. quit after first occurence
 -m<N>    # stop after getting max N occurences
-
+-P       # perl regex
 ```
 
 
@@ -407,6 +407,13 @@ tar xf data.tar.gz
 sudo apt install -y apt-file
 sudo apt-file update
 apt-file search /path/to/file
+
+```
+
+* list packages provided by a repostiry
+```sh
+# check into the files in
+grep -h -P -o "^Package: \K.*" /var/lib/apt/lists/repo_name_*_Packages | sort -u
 
 ```
 
@@ -996,11 +1003,19 @@ cat /tmp/last_data| jq 'map_values(length)' | less
 ## Add a new entry or modify it
 cat input.json | jq '.new_member="value1"'
 
+## add to an array entry. Note the use of [name|length] and .+
+jq '.data.messages[.data.messages| length] |= .+ {member:"value"}'
+
 ## Add multiple entries
 cat input.json | jq '.new_member1="value1" | .exist_member2="value2" | .new_member3 = "value3"'
 
 ## remove a member
 cat input.json | jq 'del(.member)'
+
+## remove from array .. del elems 1,3,5,11
+cat input.json | jq 'del(.Array[1,3,5,11])'
+## remote from array .. by equiality
+cat input.json | jq 'del(.Array[] | select(.foobar2 == "barfoo2"))'
 
 ## create a new json file
 jq -n --arg greeting world --arg second more_values '{"hello":$greeting,"another":$second}' > file.json
