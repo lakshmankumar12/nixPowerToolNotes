@@ -254,6 +254,42 @@ USER authur
 USER 1000
 ```
 
+## multistage builds
+
+* Before this you had separate dev-docker image and prod-docker image
+* dev-docker image had all build tools in it, while prod-image has only runtime deps
+
+* Multistage quick demo
+```dockerfile
+## First half .. developer prone
+# syntax=docker/dockerfile:1
+# you can name with the AS syntax
+FROM golang:1.16 AS builder
+WORKDIR /go/src/github.com/alexellis/href-counter/
+RUN go get -d -v golang.org/x/net/html
+COPY app.go ./
+RUN CGO_ENABLED=0 go build -a -installsuffix cgo -o app .
+
+## final production image. It just picks the binary from above
+## with the COPY --from=0 or --from=builder
+FROM alpine:latest
+RUN apk --no-cache add ca-certificates
+WORKDIR /root/
+COPY --from=0 /go/src/github.com/alexellis/href-counter/app ./
+CMD ["./app"]
+
+```
+
+* Stop at a stage:
+```sh
+docker build --target builder -t alexellis2/href-counter:latest .
+```
+* You can even copy from totally different images not involved in earlier building!
+```sh
+COPY --from=nginx:latest /etc/nginx/nginx.conf /nginx.conf
+```
+
+
 # Networking
 
 * special name for host - `host.docker.internal`
