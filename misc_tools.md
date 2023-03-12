@@ -381,6 +381,11 @@ Args
 --limit-rate=RATE   -- limit to the rate    eg: --limit-rate=20k  (will limit to 20kB/s)
 -q                  -- completely quiet
 -nv                 -- noverbose (error and basic info get printed)
+--user <username>
+--password <passwd>
+--http-user <username>   (overrides user)
+--http-password <passwd>   (overrides user)
+--ask-password
 
 
 wget '..' -O out_file

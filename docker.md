@@ -153,6 +153,9 @@ docker logs <container-name>
 ### inspect
 
 ```
+# dump all
+docker inspect  container_name
+
 # get pid of main process of a container
 docker inspect --format '{{.State.Pid}}' container_name
 ```
@@ -198,7 +201,7 @@ docker build -t friendlyhello .
 
 ## File syntax
 
-```
+```dockerfile
 # typically the first line in your dockerfile
 # the last from will be the one that that image is based on.
 #    With the help of COPY --from=... (multi-staged builds)

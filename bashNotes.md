@@ -970,6 +970,8 @@ done
 
 ```
 
+* phc2sys - sync ptp clock to sys clock
+
 ## hostnamectl
 
 ```sh
@@ -1357,10 +1359,16 @@ ssh-keygen -t rsa -f /path/to/output/dir/with/private_key -N "passphrase" -C "co
     * spaces following tabs will be preserved on the emitted output.
 
 ```sh
-command <<EOF
+# can be any command
+## btw, its mostly cat -- NOT echo. The contents are from stdin not an arg.
+cat <<EOF
 your multi line1 with substitution of ${variable}
 your multi line2 with substitution of $(command output)
 ...
+EOF
+
+cat <<'EOF'
+no substition for this ${variable}
 EOF
 ```
 
