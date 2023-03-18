@@ -1001,36 +1001,32 @@ https://danielmiessler.com/study/tcpdump/
 -q               # Show less protocol information.
 -E               # Decrypt IPSEC traffic by providing an encryption key.
 
+-w <tmpl>       file-name-with-template eg: /tmp/trace-%m-%-%H-%M-%S-%s.pcap
+-W 10           max of 10 files. Stop after that
+-G 120          rollover at 120s
+-C 100          rollover at 100MB
+
 less useful
 -A               # print each pkt in ascii.. (Useful for text-based prot like HTTP having HTML)
 
--w <file>        # write to a file
 -r <file>        # read from file
-```
-
-* various filters
-```
-icmp and greater 500 and less 600
-vlan
-vlan and ether[14:2] & 0xfff == 1000
 ```
 
 * to rollover
 ```
 -w /tmp/trace-%m-%-%H-%M-%S-%s.pcap -W 10 -G 120 -C 100 -n -s 100
 
--w <tmpl>       file-name-with-template
--W 10           max of 10 files. Stop after that
--G 120          rollover at 120s
--C 100          rollover at 100MB
--n              no reverse-lookups
--s 100          snip only 100 bytes of each pkt.
 ```
 
 ## Filter expressions
 
 * popular expressions
 ```
+<type> <dir> <proto>
+type - host, net, port
+dir  - src, dst
+prot - tcp, udp, icmp, ah, ip6 ..
+
 host <ip>
 src  <ip>
 dst  <ip>
@@ -1044,27 +1040,15 @@ ip6
 less <size>
 greater <size>
 
-
-
-```
-
-```
-<type> <dir> <proto>
-
-type - host, net, port
-dir  - src, dst
-prot - tcp, udp, icmp, ah, ip6 ..
-
-less <n-byte-size>
-greater <>
-<= <n>
-
-
+icmp and greater 500 and less 600
 host 10.1.2.3
 src 10.5.2.3 and dst port 3389
 src net 192.168.0.0/16 and dst net 10.0.0.0/8 or 172.16.0.0/16     # or is for the dst net ( .. or .. )
 src mars and not dst port 22
 'src 10.0.2.4 and (dst port 3389 or 22)'
+
+# pick a particular vlanid (eg:1000)
+vlan and ether[14:2] & 0xfff == 1000
 
 #tcp syns
 tcp[tcpflags] & (tcp-syn|tcp-ack) != 0
@@ -1091,8 +1075,10 @@ tshark -V -r a.pcap > a.txt ; vi a.txt
 TZ=Etc/UTC capinfos pixel-s1ap.pcap
 ```
 
-
-
+* filter and save to a smaller file
+```
+tcpdump -r infile.pcap -w outfile.pcap host 184.107.41.72 and port 80
+```
 
 ## ping args
 

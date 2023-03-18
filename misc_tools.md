@@ -263,6 +263,8 @@ https://www.pcre.org/original/doc/html/pcrepattern.html
 
 # core mgmt in linux
 
+search: coredump
+
 ```sh
 cat /proc/sys/kernel/core_pattern
 
@@ -369,6 +371,9 @@ See general_reading_notes/ipsec_notes.md
 # -X/--request <cmd> -- specifies a custom command to use (eg: -X GET)
 # -H/--header <hdr>  -- extra header to include in request (eg: -H "accept: application/json")
 # -m, --max-time <fractional seconds>  -- max time for each transfer to take
+# -w <format>  -- write given format-string(expaned to values) to stdout
+#                 eg format:
+#                    '\\n%{response_code}'
 
 curl 'http://...link' -o out_file
 ```
@@ -782,6 +787,23 @@ lvextend -l +100%FREE /dev/volume-group-name/logical-volume-name
 
 ```
 
+# modules
+
+```sh
+# list all modules
+lsmod
+
+onyxedge@svt2agw:~$ lsmod | grep gre
+ip_gre                 28672  0            ## nobody else seems to use ip_gre
+ip_tunnel              24576  1 ip_gre     ## ip_tunnel is used by ip_gre
+gre                    16384  1 ip_gre
+onyxedge@svt2agw:~$
+
+# load 
+
+```
+
+
 
 # Impitool
 
@@ -896,6 +918,8 @@ https://www.howto-outlook.com/howto/searchcommands.htm
 
 ## Common adv-search terms I use
 
+search: outlook
+
 ```
 read: no
 hasflag: true
@@ -984,6 +1008,10 @@ Another cheatsheet: https://gist.github.com/olih/f7437fb6962fb3ee9fe95bda8d2c8fa
 cat input.json | jq '.'
 #or
 jq '.' input.json
+
+# output keys in the top-level dict
+cat input.json | jq 'keys'
+cat input.json | jq 'keys_unsorted'
 
 #just get one element - assuming the top object is a dict
 cat input.json | jq '.key'
