@@ -548,6 +548,8 @@ find $DIR1 $DIR2 -type f -exec sha1sum '{}' \+ | sort | uniq -c --check-chars 40
 
 ## Running sth at exit no-matter-what
 
+search: TRAP cleanup
+
 ```sh
 function my_function {
   rm whatever;
@@ -583,6 +585,13 @@ find . type d | xargs du -sh
 ls -1 | xargs du -sh
 
 ```
+
+## keep screen active
+
+```sh
+date; i=1 ; while [ 1 ] ; do printf "\rThis is iteration $i..." ; i=$((i+1)) ; sleep 3 ; done
+```
+
 
 
 # Argc/Argv Parsing
@@ -673,39 +682,71 @@ Leftovers=$@
 * Seems to be best of all worlds
 
 ```sh
-options=$(getopt -o ab:c -l alpha,bravo:,charlie -n "$0" -- "$@")
-if [ $? -ne 0 ] ; then
-    echo "Incorrect options provided"
-    exit 1
-fi
-eval set -- "$options"
-while true; do
-    opt="$1"
-    shift
-    case "$opt" in
-    -a|--alpha)
-        echo "a option given"
-        ;;
-    -b|--bravo)
-        echo "b option with arg $1"
-        shift
-        ;;
-    -c)
-        echo "c option given"
-        ;;
-    --)
-        break
-        ;;
-    *)
-        echo "Unknown option"
-        exit 1
-        ;;
+
+
+is_empty() {
+    var="$1"
+    case ${var+x$var} in
+      (x) echo empty;;
+      ("") echo unset;;
+      (x*[![:blank:]]*) echo nonblank;;
+      (*) echo blank
     esac
-done
+}
 
-echo "remaining parameters: $@"
+usage() {
+    echo "$0 -p|--presence -v|--value"
+    echo "   -h|--help                mandatory_arg"
+    echo
+    echo " options:"
+    echo "  -p|--presence  indicates-a-bool-arg"
+    echo "  -v|--value     indicates-a-val-arg,   default: 2s"
+    exit 1
+}
 
-exit 0;
+parse_args() {
+    YES_OR_NO_ARG=""
+    STR_ARG=""
+    options=$(getopt -o hpv: -l help,presence,value: -n "$0" -- "$@")
+    if [ $? -ne 0 ] ; then
+        echo "Incorrect options provided"
+        exit 1
+    fi
+    eval set -- "$options"
+    while true; do
+        opt="$1"
+        shift
+        case "$opt" in
+        -p|--presence)
+            YES_OR_NO_ARG="yes"
+            ;;
+        -v|--value)
+            VALUE="$1"
+            shift
+            ;;
+        -h|--help)
+            usage
+            ;;
+        --)
+            break
+            ;;
+        *)
+            echo "Unknown option: $opt"
+            usage
+            ;;
+        esac
+    done
+
+    if [ "$(is_empty $@)" != "nonblank" ] ; then
+        echo "Mandatory arg missing"
+        exit 1
+    fi
+    MANDATORY_ARG="$1" ; shift
+    if [ "$(is_empty $@)" == "nonblank" ] ; then
+        echo "Ignoring remaining args: $@"
+    fi
+}
+parse_args "$@"
 ```
 
 # Finding who set that env variable
@@ -739,6 +780,7 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 # Create Temp file in bash
 
 ```sh
+#search: mktmp
 #create a file with a random name. XXXX is substituted with random chars
 #also outputs the name back
 tmpfile=$(mktemp /tmp/whatever-XXXXX)
@@ -1038,7 +1080,7 @@ tail -n +11
 bash:
 ```sh
 read -p prompt var_to_assign
-IFC=$':' read -a array_var <<< ${var_to_split}
+IFS=$':' read -a array_var <<< ${var_to_split}
 ```
 
 zsh:

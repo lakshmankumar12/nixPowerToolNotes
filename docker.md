@@ -382,6 +382,9 @@ docker commit <id> my_routerish_container
 docker tag my_routerish_container lakshmankumar/simple-routerish-docker:latest
 docker push lakshmankumar/simple-routerish-docker
 
+#and to use this in other machines
+docker pull lakshmankumar/simple-routerish-docker
+
 ```
 
 

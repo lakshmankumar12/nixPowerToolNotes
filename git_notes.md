@@ -269,9 +269,13 @@ mgtags 80S | sed -n '1~50p' | while read i ; do npgit log -n 1 --decorate --pret
 git push origin <tag_name>
 ```
 
-## delete a tag from remote
+## delete a tag from local remote
 
-```
+```sh
+#local
+git tag -d tagname
+
+#remote -- same for branch as well
 git push --delete origin tagname
 
 #https://nathanhoad.net/how-to-delete-a-remote-git-tag

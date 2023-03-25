@@ -273,7 +273,8 @@ echo "/tmp/cores/core.%e.%p.%h.%t" > /proc/sys/kernel/core_pattern
 
 ## notes
 %e: executable filename
-%p: pid
+%p: pid (in its namespace)
+%P: pid (in intiial namespace)
 %t: UNIX time of dump
 
 %%: output one '%'
@@ -618,6 +619,12 @@ onyxedge@onyxedge-agw:/etc/logrotate.d$ sudo cat /etc/logrotate.d/gxc-magmad
 
 ```
 
+```sh
+#mount a vbox folder
+mount -t vboxsf D_DRIVE /path/in/local/vm
+
+```
+
 
 
 
@@ -771,11 +778,15 @@ sudo chown -R user:group /mountpoint
 search lvm physical logical
 
 ```sh
+
+## physical volue <-> volume-group <-> logical-volume
+
+
 #pvs
 pvs
 
 #lgs
-lgs
+vgs
 
 #lvs
 lvs

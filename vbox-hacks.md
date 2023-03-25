@@ -41,6 +41,9 @@ virsh domcapabilities | less
 virsh domstats <vm-name>
 virsh net-info default
 virsh net-dumpxml default
+# bring interface down for a running vm
+virsh domif-setlink <vm-name> <mac-addr> up    #  add --config if you want to this go to xml as well (persistent)
+virsh domif-setlink <vm-name> <mac-addr> down
 
 virsh start <vm-name>
 virsh shutdown <vm-name>
@@ -48,6 +51,7 @@ virsh destroy <vm-name>
 virsh undefine <vm-name>
 virsh undefine <vm-name>
 virsh undefine --remove-all-storage <vm-name>
+virsh undefine --nvram --remove-all-storage <vm-name>
 
 
 virsh dumpxml <vm-name>  > /some/file
@@ -75,6 +79,19 @@ virsh pool-info <pool-name>
 
 virsh vol-list <pool-name>
 virsh vol-delete --pool <pool-name> <vol-name>
+
+## create a new vm
+vmname=mynewvm
+osvariant=ubuntu20.04   ## use virt-install --os-variant list to find options
+cpu=4
+ram=16384               ## in KB
+image_path=/path/to/iso
+bridge=virbr0
+hdsize=256              ## in GB
+virt-install --name=${vm_name} --os-variant=${osvariant} \
+             --vcpu=${cpu} --ram=${ram} --graphics vnc \
+             --cdrom=${image_path} --network bridge=${bridge},model=virtio \
+             --disk size=${hdsize}
 
 # gui
 virt-manager
