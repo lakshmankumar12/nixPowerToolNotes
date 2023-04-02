@@ -167,3 +167,12 @@ mkdir -p check; eyeD3 --write-images=check *.mp3
 avconv -i "1 Audio Track.aiff" -acodec libmp3lame -ab 192k "1 Audio Track.mp3"
 ```
 
+
+## record ustreamer.service
+
+https://stackoverflow.com/a/52081149
+
+```sh
+ffmpeg -use_wallclock_as_timestamps 1 -f mjpeg -i "http://localhost:8001/stream" -t 30 -c copy -y output.mp4
+```
+

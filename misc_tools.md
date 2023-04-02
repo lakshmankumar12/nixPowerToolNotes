@@ -215,8 +215,12 @@ zip combined.zip file1 file2
 ```
 
 * list files in a zip
-```
+```sh
 unzip -l zipfile.zip
+
+#extract one specific file
+# -p prints to stdout
+unzip -p zipfile.zip path/in/zip/to/file > file
 ```
 
 * 7z
