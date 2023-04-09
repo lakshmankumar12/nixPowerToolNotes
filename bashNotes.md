@@ -173,7 +173,9 @@ lower=${a,,}
 upper=${a^^}
 ```
 
-## Trim white space
+## trim white space
+
+search: strip
 
 ```sh
 var="  one two three  "
@@ -592,6 +594,26 @@ ls -1 | xargs du -sh
 date; i=1 ; while [ 1 ] ; do printf "\rThis is iteration $i..." ; i=$((i+1)) ; sleep 3 ; done
 ```
 
+## empty check
+
+```sh
+# simpler
+trimmed_var=$(echo "$var" | xargs)
+
+is_empty() {
+    var="$1"
+    case ${var+x$var} in
+      (x) echo empty;;
+      ("") echo unset;;
+      (x*[![:blank:]]*) echo nonblank;;
+      (*) echo blank
+    esac
+}
+
+
+```
+
+
 
 
 # Argc/Argv Parsing
@@ -684,16 +706,6 @@ Leftovers=$@
 ```sh
 
 
-is_empty() {
-    var="$1"
-    case ${var+x$var} in
-      (x) echo empty;;
-      ("") echo unset;;
-      (x*[![:blank:]]*) echo nonblank;;
-      (*) echo blank
-    esac
-}
-
 usage() {
     echo "$0 -p|--presence -v|--value"
     echo "   -h|--help                mandatory_arg"
@@ -737,12 +749,13 @@ parse_args() {
         esac
     done
 
-    if [ "$(is_empty $@)" != "nonblank" ] ; then
+    FIRST_ARG="$(echo $1 | xargs)" ; shift
+    if [ -z "$FIRST_ARG" ] ; then
         echo "Mandatory arg missing"
         exit 1
     fi
-    MANDATORY_ARG="$1" ; shift
-    if [ "$(is_empty $@)" == "nonblank" ] ; then
+    SECOND_ARG="$(echo $1 | xargs)"
+    if [ -n "$SECOND_ARG" ] ; then
         echo "Ignoring remaining args: $@"
     fi
 }
@@ -1384,6 +1397,9 @@ readlink -e ${file}
 ### -N ""  .. for no passphrase
 ### -q  for  quiet mode
 ssh-keygen -t rsa -f /path/to/output/dir/with/private_key -N "passphrase" -C "comment"
+
+### change paraphrase for existing key
+ssh-keygen -p ...other-args..
 
 ```
 

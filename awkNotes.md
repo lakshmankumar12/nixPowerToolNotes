@@ -129,6 +129,37 @@ gsub(what_to_find,what_to_replace,inline_replaced_var);
 
 ```
 
+### replace a block in file
+
+```sh
+to_add_block=$(mktemp /tmp/gxc_bash_hist_fixup-XXXXXX)
+cat <<'EOF' > $to_add_block
+#GXC_BASH_HIST START
+export PROMPT_COMMAND='RETRN_VAL=$?;logger -p local6.debug "$(whoami) [$$]: $(history 1 | sed "s/^[ ]*[0-9]\+[ ]*//" ) [$RETRN_VAL]"'
+#GXC_BASH_HIST END
+EOF
+## see if the block is already there
+existing_block=$(sed -n -e '/#GXC_BASH_HIST START/,/#GXC_BASH_HIST END/p' $GLOBAL_BASHRC_FILE)
+if [ -n "$existing_block" -a "$existing_block" = "$(cat $to_add_block)" ] ; then
+    #already good
+    rm $to_add_block
+    return 0
+fi
+if [ -z "$existing_block" ] ; then
+    #adding for first time
+    echo "Adding PROMPT_COMMAND to bashrc for first time"
+    cat $to_add_block >> $GLOBAL_BASHRC_FILE
+else
+    echo "Updating PROMPT_COMMAND in bashrc"
+    temp_file=$(mktemp /tmp/gxc_bash_hist_fixup-XXXXXX)
+    awk -v f=$to_add_block '/#GXC_BASH_HIST START/,/#GXC_BASH_HIST END/{if (!a) {system("cat " f)};a=1;next}1' $GLOBAL_BASHRC_FILE > $temp_file
+    mv $temp_file $GLOBAL_BASHRC_FILE
+fi
+rm $to_add_block
+
+
+```
+
 
 ## sprintf
 
@@ -324,6 +355,17 @@ note: paste
 ```
 paste -d'\t' - - - - < in_file
 ```
+
+## tablular output
+
+search: col column table tabularize
+
+```sh
+# separator as -s
+cat output | column -t -s "|"
+
+```
+
 
 
 
