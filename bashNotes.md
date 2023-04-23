@@ -961,6 +961,21 @@ ps -o args= -p pid
 ls -d $(pwd)/*
 ```
 
+## ln
+
+```sh
+ln actual_filename link_name
+
+## args
+# -s      create softlik
+# -f      force overwrite of link_name
+# -n      (not clear) from man: treat LINK_NAME as a normal file if it is a symbolic link to a directory
+
+```
+
+
+
+
 ## sort
 
 ```sh

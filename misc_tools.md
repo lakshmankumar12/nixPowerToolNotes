@@ -230,6 +230,9 @@ sudo apt install p7zip-full
 #extract
 7z x file.7z
 
+#list files
+7z l file.7z
+
 ```
 
 
@@ -422,7 +425,6 @@ tar xf data.tar.gz
 sudo apt install -y apt-file
 sudo apt-file update
 apt-file search /path/to/file
-
 ```
 
 * list packages provided by a repostiry
@@ -431,6 +433,13 @@ apt-file search /path/to/file
 grep -h -P -o "^Package: \K.*" /var/lib/apt/lists/repo_name_*_Packages | sort -u
 
 ```
+
+```sh
+# add a apt key
+wget -q -O- http://whatever.io/key/path/key | sudo apt-key add -
+
+```
+
 
 ## remove a pkg
 
@@ -562,6 +571,14 @@ find . -type f \( -path dir1 -o -path dir2 -o -path -dir3 \) -prune -o -print
 # do something with the file
 find . -name '*.c' -exec grep to_find_string '{}' \;
 ```
+
+# cscope
+
+```sh
+grep -E '\.(c|cc|cpp|h|hh|S|s|in|tcc|Y|m4|asm|rc|ash|fuc|x|l|y|asl|bat|tpl|ac|am|cli)$' cscope.files
+
+```
+
 
 # dhclient
 
@@ -801,6 +818,51 @@ lvextend -l +100%FREE /dev/volume-group-name/logical-volume-name
 
 
 ```
+
+## nfs mounting
+
+* At server
+```sh
+# ubuntu - install nfs package
+sudo apt install -y nfs-kernel-server
+# centos
+sudo yum install nfs-utils
+
+# create a bind-mount of your folder
+sudo mkdir -p /srv/nfs4/folder_for_others_to_read
+sudo mount --bind /folder/to/export_as_readonly /srv/nfs4/folder_for_others_to_read
+
+## add to /etc/fstab for mounting on future reboots
+/folder/to/export_as_readonly /srv/nfs4/folder_for_others_to_read none bind 0 0
+
+## in /etc/exports
+## IMPORTANT: Keep the first line as is.
+## On the second line, you can change "ro" to "rw", if you are okay for others to write to this folder.
+/srv/nfs4                           192.168.122.0/24(rw,sync,no_subtree_check,crossmnt,fsid=0)
+/srv/nfs4/folder_for_others_to_read 192.168.122.0/24(ro,sync,no_subtree_check)
+
+#export now
+sudo exportfs -ar
+
+#view the exports
+sudo exportfs -v
+```
+
+* At client
+```sh
+#ubuntu
+sudo apt install nfs-common
+
+# create the mount point
+sudo mkdir -p /folder_of_friend
+sudo mount -t nfs -o vers=4 192.168.122.14:/folder_for_others_to_read /folder_of_friend
+
+# Add to /etc/fstab for permanent mount
+192.168.122.14:/folder_for_others_to_read /folder_of_friend  nfs  defaults,timeo=900,retrans=5,_netdev	0 0
+
+```
+
+
 
 # modules
 
