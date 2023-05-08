@@ -268,6 +268,31 @@ https://www.pcre.org/original/doc/html/pcrepattern.html
 
 ```
 
+# compilation tools
+
+```sh
+# stop at preprocessing
+gcc -E 
+
+# disassemble all function in a binary
+objdump -S binary > disassembled.S
+
+# list all functions in a binary
+nm -C binary > func_list.S
+## arg explanation
+##   -g .. display extern symbols
+##   -C .. demangle
+
+# another otions 
+readelf -sW a.out | awk '$4 == "FUNC"' | c++filt
+## args of readelf
+##   -s  .. list symbols
+##   -W  .. don't cut too long names
+
+
+```
+
+
 # core mgmt in linux
 
 search: coredump
@@ -312,13 +337,20 @@ SUMIF(range, criteria, sum-range)
 # lsof
 
 * find all fd's of a process
-```
-lsof -p <pid>
+```sh
+lsof -Pn -p <pid>
+## args
+###  -P  .. dont convert ports to names
+###  -n  .. dont convert ips to names
 ```
 
 * find the process listeing on a given port
-```
+```sh
 lsof -i :<port>
+
+#search for all processes on a tcp port
+sudo lsof -Pn -i4TCP:61111
+sudo lsof -Pn -i4TCP:25020
 ```
 
 
@@ -518,8 +550,22 @@ rpm -qa
 ## args
 
 ```sh
+##create a tar
+tar zcvf /path/to/target/file.tgz file1 dir2 relative/path/to/dir3
+### args
+###   c         -- create
+###   v         -- list files that's worked on
+###   z         -- compress (gzip)
+###   f <file>  -- tarfile
+
+### extract
+tar zxvf /path/to/tarfile.tgz
+
 # -a               -- automatically detect the compression algo from file suffix
 # -O, --to-stdout  -- cat to stdout
+
+### add to a tar file
+tar rf tarfile.tgz newfileu
 
 ```
 
@@ -576,6 +622,8 @@ find . -name '*.c' -exec grep to_find_string '{}' \;
 
 ```sh
 grep -E '\.(c|cc|cpp|h|hh|S|s|in|tcc|Y|m4|asm|rc|ash|fuc|x|l|y|asl|bat|tpl|ac|am|cli)$' cscope.files
+
+git ls-files | grep -E '\.(c|cc|cpp|h|hh|S|s|in|tcc|Y|m4|asm|rc|ash|fuc|x|l|y|asl|bat|tpl|ac|am|cli)$' > cscope.files
 
 ```
 

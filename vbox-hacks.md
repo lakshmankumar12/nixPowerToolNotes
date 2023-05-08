@@ -88,7 +88,7 @@ ram=16384               ## in KB
 image_path=/path/to/iso
 bridge=virbr0
 hdsize=256              ## in GB
-virt-install --name=${vm_name} --os-variant=${osvariant} \
+virt-install --name=${vmname} --os-variant=${osvariant} \
              --vcpu=${cpu} --ram=${ram} --graphics vnc \
              --cdrom=${image_path} --network bridge=${bridge},model=virtio \
              --disk size=${hdsize}

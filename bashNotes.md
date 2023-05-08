@@ -508,6 +508,17 @@ function f_cursor_up()
 }
 ```
 
+## reset terminal
+
+```sh
+stty sane
+
+#bring cursor back
+tput cnorm
+
+```
+
+
 # Some useful stuff
 
 ## Getting yes/no or other inputs from user
@@ -1354,6 +1365,9 @@ python3
 
 ## here is a command line arg of getting passwd
 pass=$(python3 -c 'import crypt; print(crypt.crypt("clearpass"))')
+
+## update it to use
+usermod -p $pass $user
 ```
 
 
@@ -1414,7 +1428,7 @@ readlink -e ${file}
 ssh-keygen -t rsa -f /path/to/output/dir/with/private_key -N "passphrase" -C "comment"
 
 ### change paraphrase for existing key
-ssh-keygen -p ...other-args..
+ssh-keygen -p -P old-paraphrase -N new-paraphrase -f file
 
 ```
 

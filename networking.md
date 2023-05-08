@@ -726,6 +726,7 @@ sudo iptables -I OUTPUT -m policy --pol ipsec --dir out -j NFLOG --nflog-group 5
 tcpdump -n -i nflog:5
 tcpdump -s 0 -n -i nflog:5 -w ./ipsec.pcap
 ```
+* see ipsec_notes.md in general for wireshark decoding of ipsec
 
 ### random drop
 
@@ -755,6 +756,8 @@ https://wiki.nftables.org/wiki-nftables/index.php/Simple_rule_management
 
 # interactive shell.. better as most rules have chars like !,&,> which shell wont be happy with
 sudo nft -i
+#add rule
+nft> add ip filter output oifname "wwan0" ip protocol gre ip daddr { 192.168.134.2 } accept ;
 
 # list everything
 nft list ruleset
@@ -1095,7 +1098,7 @@ Notes on size
 
 * `-s N` will generate a N+28 byte IP packet.
 * Default is `-s 56` which will generate 84 sized IP pkt
-* Wireshark will show 20-byte IP , 8 byte Icmp, 8 byte time-stamp and only remaining as payload.
+* wireshark will show 20-byte IP , 8 byte Icmp, 8 byte time-stamp and only remaining as payload.
 * Thus if u have `-s N` , you will see N+28 ip pkt and N-8 byte ICMP payload in wireshark.
 
 ### ping operation not permitted
@@ -1108,8 +1111,16 @@ sudo setcap cap_net_raw+p /usr/bin/ping
 ```
 
 
+### wireshark filters
 
-## hping3 args
+```
+oran_fh_cus.iq_user_data[0] > 0x00
+
+```
+
+
+
+# hping3 args
 
 hping3
 
@@ -1129,9 +1140,9 @@ hping3
 -I <interface>  #interface to bind to
 ```
 
-## iperf
+# iperf
 
-### server
+## server
 
 ```
 -s        Start as server
@@ -1140,7 +1151,7 @@ hping3
 ```
 
 
-### help display
+## help display
 
 ```
 Usage: iperf [-s|-c host] [options]
@@ -1205,7 +1216,7 @@ iperf -B ${mip} -p ${port} -u -c ${pip} -i 1 -d -l 300 -t 3600 -b50M
 
 ```
 
-## ab tool
+# ab tool
 
 ```
 #start
