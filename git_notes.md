@@ -497,6 +497,16 @@ git ls-files -u
 git merge|rebase|cherry-pick  --strategy=recursive --strategy-option=patience
 ```
 
+## record merge but retain our file
+
+```sh
+git checkout master
+# merge from release branch, but dont get any changes
+git merge -s ours release -m "merge from release but discard any commits on the release branch by using the merge strategy 'ours'"
+
+```
+
+
 ## To amend dates for a bulk of commits
 
 ```

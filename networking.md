@@ -980,7 +980,7 @@ ss -l -p -n
 [Link to kernel for various interface types](http://lxr.free-electrons.com/source/include/uapi/linux/if_arp.h)
 
 
-# Tcpdump commands
+# tcpdump commands
 
 search: tcpdump
 
@@ -1042,6 +1042,7 @@ icmp
 ip6
 less <size>
 greater <size>
+ip[2:2] == <size>
 
 icmp and greater 500 and less 600
 host 10.1.2.3
@@ -1049,6 +1050,10 @@ src 10.5.2.3 and dst port 3389
 src net 192.168.0.0/16 and dst net 10.0.0.0/8 or 172.16.0.0/16     # or is for the dst net ( .. or .. )
 src mars and not dst port 22
 'src 10.0.2.4 and (dst port 3389 or 22)'
+
+# filter ping pkts that are wrapped with gtpu
+# 84 bytes ping will generate 84+36 = 120 byte pkt
+tcpdump -n -vv -i eth1 'udp and port 2152 and (ip[2:2] == 120)'
 
 # pick a particular vlanid (eg:1000)
 vlan and ether[14:2] & 0xfff == 1000
@@ -1311,10 +1316,17 @@ ip xfrm state show
 options
 
 -n,--numeric       --   dont expand to names
--t                 --   only tcp
 -p                 --   show pids of programs owning the socket
--l                 --   show (only) listening
 -D                 --   enable debugging on socket
+-c [<sec>]         --   continuous refresh every 1s(default)
+
+# exclusive group (a wins)
+-a                 --   display all sockets (listen, established, timewait, closewait)
+-l                 --   show (only) listening
+
+# prot group (you can combine. default is all)
+-t                 --   only tcp
+-u                 --   only udp
 ```
 
 Useful invocations

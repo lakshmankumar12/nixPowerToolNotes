@@ -985,7 +985,24 @@ ln actual_filename link_name
 ```
 
 
+## cp
 
+```sh
+
+cp src dst
+
+## args
+##  -l   hardlink instead of copy
+##  -d   preserve links .. no dereference
+##  -r   recursive (same as -R)
+##  -n   no-clobber, dont overwrite existing file
+##  --preserve=LIST    preserve attributes
+##      LISTOPTIONS:
+##      mode,ownership,timestamps   (default)
+##      context,links,xattr,all
+##  -a   same as -dR --preserve=all
+
+```
 
 ## sort
 
@@ -1105,6 +1122,11 @@ tail -n -10
 
 #print except first n (note that you desire to exclude first n, you should issue n+1 in command)
 tail -n +11
+
+## more args for tail
+## -F     -- follow a file even if its rotated (as long as the new file appears with same name)
+## -c <n> -- start from byte <n>.. tail -c +0 is equivalent of cat wholefile
+
 ```
 
 ## read
@@ -1379,6 +1401,9 @@ Search : password
 username="whoever"
 echo "${username} ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers > /dev/null
 
+# to add to sudo group
+sudo usermod -a -G sudo ${user_to_add}
+
 ```
 
 ### sudoers file syntax
@@ -1418,21 +1443,6 @@ realpath ${file}
 readlink -e ${file}
 
 ```
-
-## ssh-key gen
-
-```sh
-# create key pair
-### -N ""  .. for no passphrase
-### -q  for  quiet mode
-ssh-keygen -t rsa -f /path/to/output/dir/with/private_key -N "passphrase" -C "comment"
-
-### change paraphrase for existing key
-ssh-keygen -p -P old-paraphrase -N new-paraphrase -f file
-
-```
-
-
 
 
 

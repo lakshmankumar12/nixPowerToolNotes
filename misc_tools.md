@@ -21,13 +21,16 @@ rdesktop <hostname/ip> -u "DOMAIN\Username" -z -g "80%" -x 0x81
 rdesktop 135.227.232.97 -u 'ENG\lnara002' -p - -z  -x 0x81 -g 1152x648 -a 32
 ```
 
-# Tmux
+# tmux
 
 * move a window form one session to another
 ```
 #  come to the window to be moved
 :move-window -t target_session_name
 ```
+* Easy-peasy way
+    * mark window1 first `<backtick> m`
+    * come to other window and type `:swap-window`
 
 * capture a pane
 ```
@@ -179,6 +182,37 @@ Host testvm
     UserKnownHostsFile /dev/null
     StrictHostKeyChecking no
 ```
+
+## ssh-key gen
+
+```sh
+# create key pair
+### -N ""  .. for no passphrase
+### -q        for  quiet mode
+### -C ""     for  comment
+### -f ""     specifies key file
+ssh-keygen -t rsa -f /path/to/output/dir/with/private_key -N "passphrase" -C "comment"
+
+### change paraphrase for existing key
+### -p        change paraphrase
+### -P ""     old paraphrase
+### -N ""     new paraphrase
+ssh-keygen -p -P old-paraphrase -N new-paraphrase -f file
+
+### other args
+## -l     show fingerprint of public-key
+## -lv    show fingerprint of public-key and its ascii art
+## -E md5 show fingerprint in md5 hex format instead of base64
+ssh-keygen -lf ~/.ssh/id_rsa.pub -E md5
+
+### get public key from private key
+##  -y     print public key
+ssh-keygen -f private_key.pem -y
+
+```
+
+
+
 
 
 
@@ -349,6 +383,7 @@ lsof -Pn -p <pid>
 lsof -i :<port>
 
 #search for all processes on a tcp port
+#search: ssh detect
 sudo lsof -Pn -i4TCP:61111
 sudo lsof -Pn -i4TCP:25020
 ```
@@ -402,7 +437,7 @@ See general_reading_notes/ipsec_notes.md
 
 ```
 # -f        --> be quiet on failures (Not sure, what failures are okay and what shouldn't be quietened)
-# -s        --> silent or quiet mode. Mute o/p
+# -s        --> silent or quiet mode. What you usually want - no progress bars
 # -S        --> when used with -s, -S will show errors
 # -L        --> Track redirects
 # -C        --> continue from where you left
@@ -414,6 +449,14 @@ See general_reading_notes/ipsec_notes.md
 # -w <format>  -- write given format-string(expaned to values) to stdout
 #                 eg format:
 #                    '\\n%{response_code}'
+### ssl stuff:
+### server auth
+# --cacert $cacert
+### client auth
+# --cert $mycert
+# --key $mykey
+### resolve
+# -- resolve server_url:port:ip
 
 curl 'http://...link' -o out_file
 ```
@@ -543,6 +586,20 @@ rpm -qa
 ```
 
 * Centos debug info - http://debuginfo.centos.org/
+
+
+# grub
+
+```sh
+# edit what you want here
+vi /etc/default/grub
+
+# then build the config
+grub2-mkconfig -o /boot/grub2/grub.cfg
+
+#reboot
+
+```
 
 
 # tar
@@ -726,6 +783,9 @@ blkid
 * get pci device list
 ```
 lspci
+
+#get network info list
+sudo lshw -businfo -c network
 ```
 
 * commandline for gparted
@@ -875,10 +935,13 @@ lvextend -l +100%FREE /dev/volume-group-name/logical-volume-name
 sudo apt install -y nfs-kernel-server
 # centos
 sudo yum install nfs-utils
+### centos doesn't start server automatically
+### systemctl start nfs-server
+### systemctl enable nfs-server
 
 # create a bind-mount of your folder
-sudo mkdir -p /srv/nfs4/folder_for_others_to_read
-sudo mount --bind /folder/to/export_as_readonly /srv/nfs4/folder_for_others_to_read
+sudo mkdir -p /srv/nfs4/folder_for_others_to_refer
+sudo mount --bind /path/to/original_folder /srv/nfs4/folder_for_others_to_refer
 
 ## add to /etc/fstab for mounting on future reboots
 /folder/to/export_as_readonly /srv/nfs4/folder_for_others_to_read none bind 0 0
@@ -886,8 +949,12 @@ sudo mount --bind /folder/to/export_as_readonly /srv/nfs4/folder_for_others_to_r
 ## in /etc/exports
 ## IMPORTANT: Keep the first line as is.
 ## On the second line, you can change "ro" to "rw", if you are okay for others to write to this folder.
-/srv/nfs4                           192.168.122.0/24(rw,sync,no_subtree_check,crossmnt,fsid=0)
-/srv/nfs4/folder_for_others_to_read 192.168.122.0/24(ro,sync,no_subtree_check)
+/srv/nfs4                            192.168.122.0/24(rw,sync,no_subtree_check,crossmnt,fsid=0)
+## recommended .. expose as read-only
+/srv/nfs4/folder_for_others_to_refer 192.168.122.0/24(ro,sync,no_subtree_check)
+## for read-write .. you can also narrow down to single ip
+/srv/nfs4/folder_for_others_to_refer 192.168.122.23/32(rw,sync,no_subtree_check)
+
 
 #export now
 sudo exportfs -ar
@@ -907,6 +974,35 @@ sudo mount -t nfs -o vers=4 192.168.122.14:/folder_for_others_to_read /folder_of
 
 # Add to /etc/fstab for permanent mount
 192.168.122.14:/folder_for_others_to_read /folder_of_friend  nfs  defaults,timeo=900,retrans=5,_netdev	0 0
+
+```
+
+# study cpu of a machine
+
+```sh
+
+# Gives information on sockets/threads/cores
+lscpu
+lscpu | egrep 'Model name|Socket|Thread|NUMA|CPU\(s\)'
+
+# who is main, who is hyperthread (SMT - simultaneous multithreading)
+#  cpu0  has 0 first, so 0 is main and 32 is SMT
+#  cpu32 has 0 first, so 0 is main and 32 is SMT
+cat /sys/devices/system/cpu/cpu0/topology/thread_siblings_list
+0,32
+cat /sys/devices/system/cpu/cpu32/topology/thread_siblings_list
+0,32
+
+# gives l1/l2/l3 cache and numa nodes
+lstopo
+
+# affinity tools
+taskset --cpu_list 0,2 application.exe
+
+numactl --hardware
+
+# show policy
+numactl --show
 
 ```
 
@@ -1036,6 +1132,7 @@ osascript -e 'tell application "Microsoft Outlook" to get selected folder'
 ```
 Current Assignments
 
+# outlook
 
 ## advanced search reference
 
@@ -1052,6 +1149,11 @@ from:
 to:
 category: blue
 ```
+
+# gmail search
+
+Before:YYYY/MM/DD
+After: YYYY/MM/DD
 
 # Spotify search
 

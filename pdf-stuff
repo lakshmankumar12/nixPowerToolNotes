@@ -10,12 +10,24 @@ qpdf --password=sekritPassword --decrypt protected.pdf unprotected.pdf
 protected=
 unprotected=a.pdf
 for i in $(seq 0 9999) ; do
-    pass=$(printf "%04d" $i)
+    pass=$(printf "laks%04d" $i)
     echo "Trying $pass"
     qpdf --password=$pass --decrypt ${protected} ${unprotected}
     if [ $? -eq 0 ] ; then
         break
     fi
+done
+
+#crack dates
+for month in $(seq 1 12) ; do
+    for day in $(seq 1 31) ; do
+        pass=$(printf "laks%02d%02d" $day $month)
+        echo "Trying $pass"
+        qpdf --password=$pass --decrypt ${protected} ${unprotected}
+        if [ $? -eq 0 ] ; then
+            break
+        fi
+    done
 done
 
 # merge 2 pdfs
