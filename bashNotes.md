@@ -181,6 +181,11 @@ search: strip
 var="  one two three  "
 trimmed_var=$(echo "$var" | xargs)
 #trimmed_var="one two three"
+
+# Rarely-appreciated property of xargs:  it can understand quotes.
+# We use it to convert var="asdf" into var=asdf
+echo 'var="value"' | xargs
+# you will see : var=value
 ```
 
 
@@ -267,19 +272,20 @@ echo "got var_name set to $var_name"
 
 ## Appending to argument for a command
 
-```
+```sh
+# flush $@
 set --
+# add to $@
+set -- $@ new_arg_in_end more_args
+# add to beginning of $@
+set -- this_wil_now_be_1 $@
 
-# Rarely-appreciated property of xargs:  it can understand quotes.
-# We use it to convert var="asdf" into var=asdf
-xargs -n 1 < configfile > /tmp/$$
-
+# keep adding more to args from a file,say
 while read LINE
 do
         set -- "$@" -v "$LINE"
-done < /tmp/$$
+done < /some/input/file
 
-rm -f /tmp/$$
 ```
 
 
@@ -450,6 +456,10 @@ exec 4<>filename  # open for both reading/writing
 echo "foo" 2>&1   # writes stderr to stdout
 echo "foo" 1>&2   # rare: writes stdout into stderr
 
+# supress all output /errors .. Order is important
+ls /badfile > /dev/null 2>&1
+
+
 cmd 0<&-          # closes stdin for cmd
 
 cmd &> file       # short for 2>&1 >file.. (the exception to &-not-first rule)
@@ -591,11 +601,16 @@ fi
 
 ## get file-sizes
 
-```
-
+```sh
 cd dir/of/interest
 find . type d | xargs du -sh
 ls -1 | xargs du -sh
+
+find /dir/of/interest -maxdepth 1 | xargs -n 1 du -b -s | sort -n | awk '{cmd="numfmt --to=iec-i --suffix=B --format=\"%9.2f\" " $1; cmd | getline a; $1=a;print}'
+## add -type f  or -type d to find about to filter only files or dirs
+
+# root -- exclude proc and dot
+find / -maxdepth 1 | grep -v -e proc -e '^.$' | xargs -n 1 sudo du -b -s | sort -n | awk 'BEGIN{cmd="numfmt --to=iec-i --suffix=B --format=\"%9.2f\" "} 1{ cmd $1 | getline a; sum+=$1; $1=a;print}END{ cmd sum | getline a; print a}'
 
 ```
 
@@ -620,7 +635,6 @@ is_empty() {
       (*) echo blank
     esac
 }
-
 
 ```
 
@@ -760,13 +774,13 @@ parse_args() {
         esac
     done
 
-    FIRST_ARG="$(echo $1 | xargs)" ; shift
-    if [ -z "$FIRST_ARG" ] ; then
+    EXPECTED_ARG="$(echo $1 | xargs)" ; shift || true
+    if [ -z "$EXPECTED_ARG" ] ; then
         echo "Mandatory arg missing"
         exit 1
     fi
-    SECOND_ARG="$(echo $1 | xargs)"
-    if [ -n "$SECOND_ARG" ] ; then
+    unused_args="$(echo $1 | xargs)"
+    if [ -n "$unused_args" ] ; then
         echo "Ignoring remaining args: $@"
     fi
 }
@@ -928,6 +942,14 @@ pwd -P
 ## ps
 
 ```sh
+## args explan
+-e        every pid in the system
+-f        standard column listing
+-p <pid>  given pid
+-T        list all threads
+-u <user> only processes of this user
+
+
 #with long names
 ps -e -o "pid,user:16,command"
 
@@ -1039,11 +1061,22 @@ date '+%s'
 
 #convert a given epoch into date
 date '-d@<epoch>'
+#work on a given date as input
+date '-dYYYY-MM-DDTHH:MM:SS'
+date '-dYYYYMMDD'
+
+## To assume a given timezone for a input
+TZ=America/Los_Angeles date ...
+
+## list of all timezones
+timedatectl list-timezones
+
 ```
 
-iterate over date
-date also supports addition in linux!
-```
+* iterate over date
+    * date also supports addition in linux!
+
+```sh
 start=20141001
 end=20181201
 date=$start
@@ -1203,12 +1236,12 @@ Arguments
 ## xargs
 
 * To supply one arg at a time for find
-```
+```sh
 find . -print 0 | xargs -0 your_command
 ```
 
 * other useful args
-```
+```sh
 --no-run-if-empty / -r
 -n 1
 -I'{}' your_command '{}'

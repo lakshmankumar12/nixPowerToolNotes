@@ -275,9 +275,13 @@ sudo apt install p7zip-full
 ## options
 
 ```sh
--q       # quiet. quit after first occurence
+-i       # ignore case.
+-q       # quiet. quit after first occurence. Typically useful to test presence
 -m<N>    # stop after getting max N occurences
 -P       # perl regex
+-a       # process a binary file as if its text
+-n       # prefix line number - 1 based
+-H       # prefix file name
 ```
 
 
@@ -352,6 +356,12 @@ echo "/tmp/cores/core.%e.%p.%h.%t" > /proc/sys/kernel/core_pattern
 %: '%' is dropped
 
 ```
+* when appport is enabled, check core dumps in
+```
+/var/crash
+/var/lib/apport/coredump
+
+```
 
 
 
@@ -385,6 +395,7 @@ lsof -i :<port>
 #search for all processes on a tcp port
 #search: ssh detect
 sudo lsof -Pn -i4TCP:61111
+sudo lsof -Pn -i4TCP:48555
 sudo lsof -Pn -i4TCP:25020
 ```
 
@@ -441,7 +452,12 @@ See general_reading_notes/ipsec_notes.md
 # -S        --> when used with -s, -S will show errors
 # -L        --> Track redirects
 # -C        --> continue from where you left
+# -d @/path/to/infile'  --> supply data from input file,
+#                              typically you want to also say
+#                              -H "content-type:application/json"
 # -o <file> --> choose output file
+##                             if output is json, you want to add
+#                              -H "accept:application/json"
 # --interface <ip> -- choose a local-bind-ip
 # -X/--request <cmd> -- specifies a custom command to use (eg: -X GET)
 # -H/--header <hdr>  -- extra header to include in request (eg: -H "accept: application/json")
@@ -477,6 +493,9 @@ Args
 
 
 wget '..' -O out_file
+
+run the file on the fly -- cavent emptor if the file screws up
+wget -q ${url_to_file} -O - | bash -
 ```
 
 # dpkg
@@ -518,8 +537,11 @@ wget -q -O- http://whatever.io/key/path/key | sudo apt-key add -
 
 ## remove a pkg
 
-```
+```sh
 apt-get remove --purge libav-tools
+
+## by directly running dpkg
+dpkg --purge --force-all <packages>
 ```
 
 ## Ubuntu pkg mgmt
@@ -620,9 +642,14 @@ tar zxvf /path/to/tarfile.tgz
 
 # -a               -- automatically detect the compression algo from file suffix
 # -O, --to-stdout  -- cat to stdout
+# -C <dir>         -- extract to a diff dir. Mention after the args. eg .. cat ... | tar xf - -C dir
 
 ### add to a tar file
 tar rf tarfile.tgz newfileu
+
+### remove a file
+tar  -f tarfile.tar --delete path/to/file
+
 
 ```
 
@@ -771,8 +798,9 @@ df -T
 ```
 lsblk
 
-#lsblk with filetypes
+#lsblk with filetypes, label, uuid
 lsblk -f
+
 ```
 
 * get UUIDs of all disks. Also lists the partition-type and fs-type!
@@ -1334,4 +1362,21 @@ jq -n --arg greeting world --arg second more_values '{"hello":$greeting,"another
     * map_values(filter)
         * runs filter on each value in input object. Gives object output
 
+# perf
+
+search : performance analysis
+
+```sh
+## without args will prepare the perf.data in the cwd
+sudo perf record -g -p <pid>
+## arg explanation for record command
+## -g          Enable call graph
+## -p <pid>    Only this pid
+
+
+sudo perf report -f
+## arg explanation for report command
+## -f          Don’t do ownership validation.
+
+```
 

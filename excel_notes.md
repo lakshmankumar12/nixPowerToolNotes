@@ -31,6 +31,11 @@ MATCH(lookup_value;lookup_array; [match_type])
 ## match_type = 0, exact match
 ## match_type = -1, find smallest value that is >= lookup_value, (=>lookup_array is descending)
 ## Gives N/A if the match isnt found, or if list not in order
+
+FILTER(ARRAY,INCLUDE,[IF_EMPTY])
+=FILTER($J$2:$K$28,$L2:$L28="yes","")
+## Say, you have inputs in J2:K28, and you have select crition in L2:L28
+## you do as above
 ```
 
 # finance formulae
@@ -75,7 +80,7 @@ Explanation
 =IFERROR(INDEX($A$2:$A$10, MATCH(0, COUNTIF($B$1:B1, $A$2:$A$10), 0)), "done")
 
 ## if there are blanks in input, stich in a IFBLANK(.., 1, ..) to get it out of way
-=IFERROR(INDEX($A$2:$A$10, MATCH(0,IF(ISBLANK($A$2:$A$10),1,COUNTIF($B$1:B1, $A$2:$A$10)), 0)),"")
+=IFERROR(INDEX($A$2:$A$10, MATCH(0,IF(ISBLANK($A$2:$A$10),1,COUNTIF($B$1:B1, $A$2:$A$10)), 0)),"done")
 
 
 ```

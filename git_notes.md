@@ -80,6 +80,25 @@ git ls-files --others --exclude-standard
 git show treeish:path/to/file
 ```
 
+## staging
+
+search: stage cache
+
+```sh
+#add
+git add file-to-stage
+
+#show
+git ls-files --staged
+
+#unstage
+git restore --staged file-to-unstage
+
+
+
+```
+
+
 # Commits handling
 
 ## come to any commit

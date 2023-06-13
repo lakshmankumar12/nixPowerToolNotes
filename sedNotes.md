@@ -58,6 +58,21 @@
     * just execute what follows. Mostly a hack way to have sed execute something.
         * `sed '1e /bin/bash'`
 
+## character classes
+
+https://www.gnu.org/software/sed/manual/html_node/Character-Classes-and-Bracket-Expressions.html
+
+use extended regular expression `-r` in argument
+
+* `[[:digit:]]`
+* `[[:alnum:]]`
+
+```
+echo "May 11 13:41:37" | sed -r 's/([^[:space:]]+) ([^[:space:]]+) ([^[:space:]]+)/2023-\1-\2T\3/'
+
+```
+
+
 ## Different delimiter
 
 * Other commands. Use backslash before delimiter

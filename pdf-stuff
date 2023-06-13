@@ -18,7 +18,7 @@ for i in $(seq 0 9999) ; do
     fi
 done
 
-#crack dates
+#crack dates -- see below for full year also.
 for month in $(seq 1 12) ; do
     for day in $(seq 1 31) ; do
         pass=$(printf "laks%02d%02d" $day $month)
@@ -28,6 +28,17 @@ for month in $(seq 1 12) ; do
             break
         fi
     done
+done
+
+file=...
+start="19750101"
+for i in $(seq 0 $((30*365)) )  ; do
+    passwd=$(date --date="$start + $i day" +'%d%m%Y');
+    echo $passwd
+    qpdf --password=${passwd} --decrypt ${file} a.pdf
+    if [ $? -eq 0 ] ; then
+        break;
+    fi
 done
 
 # merge 2 pdfs

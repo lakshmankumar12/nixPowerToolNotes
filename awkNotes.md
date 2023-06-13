@@ -71,7 +71,7 @@ for (key in array) { print array[key] }
 # Special variables
 
 * FILENAME
-    * current file being read
+    * current filename being read
 * NR
     * current cumulative record number
 * FNR
@@ -413,6 +413,15 @@ Search: mutual fund
 #Bring everything | seperated
 awk -F\| 'function stripw(var){gsub(/^[ \t]+/,"",var);gsub(/[ \t]+$/,"",var);return var} function printline() { printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\n",folio,fund,units,date,nav,value,registrar } NF > 2 { if (NR>2) { printline() } folio=stripw($1) ; fund=stripw($2) ; units=stripw($3) ; date=stripw($4) ; nav=stripw($5) ; value =stripw($6) ; registrar=stripw($7) } NF == 2 { fund = fund " " stripw($2) } END { printline()  }' statement.txt > statement.csv
 ```
+
+## convert a enum-string to number
+
+Here we convert the Month string to number
+The enum strings SHOULD be of same size
+```
+index("JanFebMarAprMayJunJulAugSepOctNovDec",$2)+2)/3
+```
+
 
 * same above in neat syntax
 
