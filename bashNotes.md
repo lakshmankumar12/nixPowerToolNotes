@@ -134,12 +134,12 @@ ${string#substring}
 ${string##substring}
 ```
 
-* Deletes shortest match of $substring from back of $string.
+* Deletes shortest match of $substring from end of $string.
 ```sh
 ${string%substring}
 ```
 
-* Deletes longest match of $substring from back of $string.
+* Deletes longest match of $substring from end of $string.
 ```sh
 ${string%%substring}
 ```
@@ -623,9 +623,14 @@ date; i=1 ; while [ 1 ] ; do printf "\rThis is iteration $i..." ; i=$((i+1)) ; s
 ## empty check
 
 ```sh
-# simpler
+# lot  simpler
 trimmed_var=$(echo "$var" | xargs)
 
+# even if its multi-lined
+echo "$var" | grep -qP '[^[:space]]'
+test $?
+
+# more detailed
 is_empty() {
     var="$1"
     case ${var+x$var} in
@@ -636,6 +641,46 @@ is_empty() {
     esac
 }
 
+```
+
+## read from stdin or file
+
+search: dash
+
+```sh
+INFILE="${1:-/dev/stdin}"
+```
+
+## truncate a file
+
+```sh
+: > file
+
+#anotherway
+truncate -s 0 file
+
+```
+
+## ensure single instance of a script
+
+search: unique flock
+
+```sh
+if mkdir -- "$LOCKDIR"
+then
+    # Do important, exclusive stuff
+    if rmdir -- "$LOCKDIR"
+    then
+        echo "Victory is mine"
+    else
+        echo "Could not remove lock dir" >&2
+    fi
+else
+    # some one else running
+fi
+
+## you can write a pid into the lock-dir
+## but only for debug purposes. Dont expect that to be atomic
 ```
 
 
@@ -1089,7 +1134,8 @@ done
 
 #try passwords
 file=...
-start="19750101"
+#start="19750101"
+start="20041201"
 for i in $(seq 0 $((30*365)) )  ; do
     passwd=$(date --date="$start + $i day" +'%d%m%Y');
     echo $passwd

@@ -104,6 +104,19 @@ https://www.xda-developers.com/windows-11-keyboard-shortcuts/
 
 * Shift-F10 at explorer will open context-menu
 
+## Windows snipper
+
+screenshots:
+
+win + shift + s  -- save the snippets in %USERPROFILE%\OneDrive\Pictures\Screenshots
+
+recording
+
+win + alt +r -- gamebox recording of app on which this key was pressed.
+Recording stored in %USERPROFILE%\Videos\Captures
+
+
+
 
 # Installing ssh in windows
 

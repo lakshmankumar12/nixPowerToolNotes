@@ -1077,6 +1077,13 @@ protochain GRE && proto IP
 tshark -V -r a.pcap > a.txt ; vi a.txt
 ```
 
+* to apply display filters
+
+```
+tshark -r infile.pcap  -2 -R "<display-filter>" -w outfile.pcap
+```
+
+
 * get timestamp info from a pcap file
 
 ```

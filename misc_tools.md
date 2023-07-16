@@ -244,8 +244,11 @@ python3 -m http.server 8000
 # zip
 
 * create a zip
-```
+```sh
 zip combined.zip file1 file2
+
+## add files recursively also
+zip -r all_in.zip *
 ```
 
 * list files in a zip
@@ -300,7 +303,7 @@ https://www.pcre.org/original/doc/html/pcrepattern.html
 ```
 \K - pretend match began here.. usually combined with the -o grep option.
         grep -Po 'hello \Kworld'   # prints only world
-?= - positive assertion, but not in pattern
+?= - positive assertion, but not in pattern (opposite of \K above)
         grep -Po 'hello (?=world)' # prints hello that is followed by world, but just hello
 ?! - negative assertion
 
@@ -952,6 +955,8 @@ lvs
 # get the vg-name and lv-name from the lvs command
 lvextend -l +100%FREE /dev/volume-group-name/logical-volume-name
 
+# works off the bat for ext4
+resize2fs /dev/volume-group-name/logical-volume-name
 
 ```
 

@@ -52,7 +52,7 @@ docker login
 #copy files into a container
 docker cp /path/to/file/on/host/file container_name:/path/in/container/
 
-#get a shell to some running container
+#get a new shell to some running container
 #get container name using docker ps -a
 #this will die if the original container exits
 docker exec -i -t <container-name> /bin/bash
@@ -190,8 +190,13 @@ registry.example.com:port/organization_name/image_name:version-tag
 ```
 #build from a Dockerfile
 # -t  is the name of the image
-# The . is the path where dockerfile is present.
+# The . is the context for the build ( it will copy contents of the dir into its build-context, and you
+# can refer files from here in the building continer)
 docker build -t friendlyhello .
+
+# use PWD as build-context but find dockerfile elsewhere. use the -f option
+docker build . -f someother/path/Dockerfile
+
 ```
 
 * Note that each line creates a new image.
@@ -208,6 +213,9 @@ docker build -t friendlyhello .
 #    you can have many FROM. See
 #    https://docs.docker.com/develop/develop-images/multistage-build/
 FROM some_base_image:version
+
+#
+AttributeError: 'datetime.datetime' object has no attribute 'timestamp'
 
 #your name or whoever maintains and the email"
 MAINTAINER firstname lastname <firstname.lastname@xyz.com>
