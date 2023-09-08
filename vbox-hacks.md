@@ -25,6 +25,38 @@ resetclipvm () {
 }
 ```
 
+# detect if a machine is baremetal of vm
+
+https://www.pc-freak.net/blog/check-server-physical-virtual-machine/
+
+```sh
+
+onyxedge@awsasbaremetal1:/var/opt/magma/configs$ sudo dmesg | grep "Hypervisor detected"
+[    0.000000] Hypervisor detected: KVM
+onyxedge@awsasbaremetal1:/var/opt/magma/configs$
+
+
+onyxedge@awsasbaremetal1:/var/opt/magma/configs$ hostnamectl status
+   Static hostname: awsasbaremetal1
+         Icon name: computer-vm
+           Chassis: vm                                   <---   You might see desktop for baremetal
+        Machine ID: ec23ef244fa01db178471411db8e9be9
+           Boot ID: d6ef0a81f57446168b2d9c3bc7c60d46
+    Virtualization: kvm
+  Operating System: Ubuntu 20.04.6 LTS
+            Kernel: Linux 5.4.0-1105-aws
+      Architecture: x86-64
+onyxedge@awsasbaremetal1:/var/opt/magma/configs$
+
+
+# none for bare metal
+onyxedge@awsasbaremetal1:/var/opt/magma/configs$ sudo systemd-detect-virt
+kvm
+onyxedge@awsasbaremetal1:/var/opt/magma/configs$
+
+```
+
+
 # KVM
 
 ## virsh
@@ -67,6 +99,11 @@ virsh net-list --all
 #get info of a network
 virsh net-dumpxml <name>
 virsh net-info <name>
+
+#start a network
+virsh net-start <name>
+#start on m/c reboot(kvm start)
+virsh net-autostart --network <name>
 
 virsh net-destory <name>
 virsh net-undefine <name>

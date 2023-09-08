@@ -941,11 +941,14 @@ cd /
 #   not any of "child","daemon" -- original caller
 #   child - first child
 #   daemon - goto work
-if [ "$1" = "child" ] ; then
+if [ "x$1" = "xchild" ] ; then
     umask 0
     $me_DIR/$me_FILE daemon "$@" </dev/null >/dev/null 2>/dev/null &
     exit 0
-elif [ $1 != "daemon" ] ; then
+elif [ "x$1" != "xdaemon" ] ; then
+    ## DO YOUR ARG PROCESSING HERE
+    ## getopts
+    export vars_you_want_in_final_deamon
     setsid $me_DIR/$me_FILE child "$@" &
     exit 0
 fi
@@ -1334,6 +1337,8 @@ Search: syslog
 
 ```sh
 journalctl --list-boots
+### note: this gives the last boot time
+uptime -s
 
 # lists logs of just one unit (service)
 journalctl -u some_service

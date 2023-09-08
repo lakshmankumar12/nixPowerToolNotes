@@ -197,6 +197,9 @@ docker build -t friendlyhello .
 # use PWD as build-context but find dockerfile elsewhere. use the -f option
 docker build . -f someother/path/Dockerfile
 
+## other args
+--no-cache  .. force build from scratch w/o using earling intermediate images.
+
 ```
 
 * Note that each line creates a new image.
@@ -368,6 +371,10 @@ Old notes:
 
 # test image with good networking tools
 
+search: simple_routerish
+
+https://hub.docker.com/r/phusion/baseimage/
+
 ```sh
 
 base_image=phusion/baseimage
@@ -380,13 +387,13 @@ docker run --privileged -t -i ${base_image} /sbin/my_init -- bash -l
 apt update
 apt install -y iproute2 iputils-ping  iptables  net-tools  \
         bridge-utils  conntrack  ethtool  tcpdump  \
-        strongswan iperf3 lsof wget curl wireshark tshark ipcalc jq
+        strongswan strongswan-swanctl iperf3 lsof wget curl wireshark tshark ipcalc jq
 
 exit
 
 docker ps -a
 docker commit <id> my_routerish_container
-
+docker tag my_routerish_container nw_demo_image
 docker tag my_routerish_container lakshmankumar/simple-routerish-docker:latest
 docker push lakshmankumar/simple-routerish-docker
 

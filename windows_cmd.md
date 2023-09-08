@@ -24,6 +24,9 @@ Manufacturer           Product    SerialNumber     Version
 ASUSTeK COMPUTER INC.  Z97M-PLUS  140933017106254  Rev X.0x
 
 C:\Users\lnara002>
+
+#just get serial
+wmic bios get serialnumber
 ```
 
 ## Display Routing Table

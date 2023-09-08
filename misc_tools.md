@@ -295,7 +295,7 @@ sudo apt install p7zip-full
 \grep --color=auto -nH -P  '[^\x00-\x7F]' /tmp/a
 ```
 
-### Perl regex
+### perl regex
 
 search : pcre
 https://www.pcre.org/original/doc/html/pcrepattern.html
