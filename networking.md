@@ -57,6 +57,9 @@ arp
 arp -s <ip> <mac>
 #delete if off
 arp -d <ip>
+
+#add
+ip neigh replace ${ip} lladdr ${mac} dev ${device}
 ```
 
 * actual info is in `/proc/net/arp`
@@ -87,6 +90,8 @@ ip link add ${myname} type veth peer name ${mypeername}
 myns=ns1
 peerns=ns2
 ip link add ${myname} netns ${myns} type veth peer name ${mypeername} netns ${peerns}
+
+## note the netns takes both name as well as a pid arg. (in which case it will be the ns of the process(pid))
 
 ## delete a veth pair .. deleting the one you used to name first.
 ## automatically deletes the other
@@ -495,6 +500,9 @@ network namespaces in linux is a bit quirky
 * Each process belongs to a namespace of every kind. This is visible in its /proc/{pid}/task/{pid}/ns or /proc/{pid}/ns info.
 * the netns created namespaces are visible in the /proc listing only if atleast one active process is mounting that ns.
     * hence lsns (or any proc-walk) might not show up the netns add'ed namespace.
+* `ip netns list` acutally lists whatever namespace is available in /var/run/netns
+    * So, namespaces that are created by processes directly (like docker) aren't visible here.
+    * You can bind mount that namespace to /var/run/netns to make is available
 
 Good answer at https://unix.stackexchange.com/a/113561/345152
 
@@ -525,6 +533,16 @@ ip netns identify ${PID}
 ```
 
 * lsns if available
+
+```sh
+sudo nsenter -t <contanier_pid> -n <command>
+
+container=...
+sudo nsenter -t $(sudo docker inspect --format '{{.State.Pid}}' $container) -n /bin/bash
+```
+
+
+
 
 ### Sample use of namespace - veth pair
 
@@ -564,7 +582,6 @@ ip netns exec netns108 ip route add 10.1.7.0/24 via 10.1.108.2 dev veth108_ns108
         * 1123 - internet host requirements rfc
         * 1035 - domain names
 
-# iptables
 
 Adding a rule
 ```
@@ -735,6 +752,16 @@ tcpdump -s 0 -n -i nflog:5 -w ./ipsec.pcap
 sudo iptables -A OUTPUT -m statistic --mode random --probability 0.5 -d 8.8.8.8 -j DROP
 
 ```
+
+### both snat and dnat
+
+https://serverfault.com/a/782897
+
+```sh
+
+
+```
+
 
 # nft
 
@@ -1087,7 +1114,8 @@ tshark -r infile.pcap  -2 -R "<display-filter>" -w outfile.pcap
 * get timestamp info from a pcap file
 
 ```
-TZ=Etc/UTC capinfos pixel-s1ap.pcap
+file=yourpcap.pcap
+TZ=Etc/UTC capinfos $file
 ```
 
 * filter and save to a smaller file
@@ -1274,6 +1302,20 @@ sudo systemctl restart isc-dhcp-server.service
 
 ```
 
+# dhtest
+
+
+
+```sh
+
+git clone https://github.com/saravana815/dhtest
+cd dhtest
+make
+
+dhtest -m '00:01:02:03:04:05' -i interface -h hostname
+```
+
+
 
 
 # IPsec configuration
@@ -1291,6 +1333,8 @@ ip xfrm state show
 ```
 
 # netcat commands
+
+Search: nc
 
 * As a tcp server
     ```
@@ -1315,12 +1359,31 @@ ip xfrm state show
         nc -u -s 192.2.53.2 -p 19000 192.15.2.2 8090
     ```
 
+```sh
+## some args
+
+# scan
+-z                 --   report open ports
+
+-v                 --   verbose
+-w <timeout>       --   timeout after 10seconds (only as client)
+
+```
+
+* Useful invocations
+
+```sh
+# test for a open port
+nc -zvw10 $ip $port_or_range
+```
+
+
 # Other useful commands
 
 ## netstat
 
-```
-options
+```sh
+## args
 
 -n,--numeric       --   dont expand to names
 -p                 --   show pids of programs owning the socket
@@ -1338,10 +1401,9 @@ options
 
 Useful invocations
 
-```
+```sh
 # dump all sockets and programs
 netstat -np
-
 ```
 
 # Know my public ip

@@ -52,6 +52,20 @@ two.example.com
 three.example.com
 ```
 
+or as yml itself
+
+```yaml
+agws:
+  hosts:
+    cnh:
+      ansible_host: remoteagw
+      ansible_port: 61111
+    utaustin:
+      ansible_host: remoteagw
+      ansible_port: 61112
+```
+
+
 # Modules
 
 * Ansible basic modules in
@@ -61,4 +75,124 @@ three.example.com
 ansible-galaxy collection list
 
 ```
+
+# ad-hoc commands
+
+
+```sh
+ansible -i hosts all -m ping
+
+ansible -i hosts all -m copy -a "src=/root/test_ansible/testfile dest=/tmp/testfile"
+
+ansible -i hosts all -m yum -a 'name=ncdu state=present'
+
+```
+
+## command line args for ansible
+
+* ansible-playbook
+```sh
+
+## run a playbook
+ansible-playbook -i $inventory_file $playbook_file
+
+## --ask-become-pass   ... interactively ask password for become
+
+```
+
+
+# playbook
+
+
+```yaml
+- hosts: group1                               ## which hosts to work on
+  tasks:
+  - name: Install lldpad package
+    yum:                                      ## module name
+      name: lldpad
+      state: latest
+  - name: check lldpad service status
+    service:
+      name: lldpad
+      state: started
+
+```
+
+Another example
+
+```yaml
+- hosts: group1
+  tasks:
+  - name: Enable SELinux
+    selinux:                                    ## selinux module
+      state: enabled
+    when: ansible_os_family == 'Debian'         ## ansible_os_family is a ansible 'fact' collected via
+                                                ##        'gather_facts' functionality that is always run by ansible
+                                                ## when controls if this task should be run or not.
+    register: enable_selinux                    ## the task output is stored in the varialbe enable_selinux for later use.
+
+  - debug:
+      Imsg: "Selinux Enabled. Please restart the server to apply changes."
+    when: enable_selinux.changed == true
+
+```
+
+run a handlers once
+
+```yaml
+- hosts: group2
+  tasks:
+  - name: sshd config file modify port
+    lineinfile:
+     path: /etc/ssh/sshd_config
+     regexp: 'Port 28675'
+     line: '#Port 22'
+    notify:
+       - restart sshd                           ## notify handler to be run later
+
+handlers
+    - name: restart sshd                        ## run only if it was notifed. run once at the end of all tasks
+      service: sshd
+        name: sshd
+        state: restarted
+
+```
+
+# roles
+
+```sh
+## dir structure
+[root@ansible-server test2]# tree
+`-- role1
+    |-- defaults
+    |   `-- main.yml
+    |-- handlers
+    |   `-- main.yml
+    |-- meta                                    ## store author and role dependencies
+    |   `-- main.yml
+    |-- README.md
+    |-- tasks
+    |   `-- main.yml
+    |-- tests
+    |   |-- inventory
+    |   `-- test.yml
+    `-- vars
+        `-- main.yml
+
+
+## create the above tree structure
+$ ansible-galaxy init role
+
+```
+
+# documentation
+
+https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html
+
+# Useful modules
+
+## lineinfile
+
+Link: https://www.middlewareinventory.com/blog/ansible-lineinfile-examples/
+    
 

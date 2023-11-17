@@ -678,6 +678,13 @@ tar tf tarball.tar
 tar xf file.tgz path/in/tar/ball --to-stdout
 ```
 
+# pulp tool
+
+```
+
+```
+
+
 # find
 
 ```sh
@@ -1057,6 +1064,14 @@ onyxedge@svt2agw:~$
 
 ```
 
+# Enable console on a linux machine
+
+```sh
+sudo sed -i -e '/GRUB_CMDLINE_LINUX=/ s/"$/ console=ttyS0,115200n8 console=tty0"/' /etc/default/grub
+sudo grub-mkconfig -o /boot/grub/grub.cfg
+
+```
+
 
 
 # Impitool
@@ -1285,6 +1300,10 @@ cat input.json | jq '.[].key1'
 # the above wont be json output. So to wrap the result into a [], you do:
 cat input.json | jq '[ .[].key1 ]'
 
+# if you want only some keys from an array of dicts.
+# this is call object contruction
+cat input.json | jq '.states[] | {type, newname: .value.TimeMs}'
+
 #if you have dict of dicts and want just one element from inner dict
 # {"level1key1" : { "level2key1" : "value1" }} ..
 ##  returns {"level1key1" : "value1", ...}
@@ -1382,6 +1401,76 @@ sudo perf record -g -p <pid>
 sudo perf report -f
 ## arg explanation for report command
 ## -f          Don’t do ownership validation.
+
+```
+
+
+# openvpn3
+
+Reference: https://community.openvpn.net/openvpn/wiki/OpenvpnSoftwareRepos
+
+```sh
+## for server and client
+mkdir -p /etc/apt/keyrings # directory does not exist on older releases
+curl -fsSL https://swupdate.openvpn.net/repos/repo-public.gpg | gpg --dearmor > /etc/apt/keyrings/openvpn-repo-public.gpg
+arch=amd64  ## or i386, arm64
+version=release/2.6
+
+DISTRO=$(lsb_release -c | awk '{print $2}')
+echo "deb [arch=$arch signed-by=/etc/apt/keyrings/openvpn-repo-public.gpg] http://build.openvpn.net/debian/openvpn/$version $DISTRO main" > /etc/apt/sources.list.d/openvpn-aptrepo.list
+apt-get update
+apt-get install openvpn
+
+```
+
+
+
+```sh
+## for openvpn3 client
+wget https://swupdate.openvpn.net/repos/openvpn-repo-pkg-key.pub
+sudo apt-key add openvpn-repo-pkg-key.pub
+DISTRO=$(lsb_release -c | awk '{print $2}')
+sudo wget -O /etc/apt/sources.list.d/openvpn3.list https://swupdate.openvpn.net/community/openvpn3/repos/openvpn3-$DISTRO.list
+sudo apt update
+sudo apt install -y openvpn3
+
+
+# Onetime
+MY_CONFIGURATION_FILE=...your-client-file
+openvpn3 config-import --config ${MY_CONFIGURATION_FILE}
+#check
+openvpn3 configs-list
+# rmeove that
+openvpn3 config-remove --path ${CONFIG_PATH}
+
+# to fire vpn
+## if you have just one
+CONFIG_PATH=$(openvpn3 configs-list | grep '^/')
+## have many?
+## Find out which one:
+openvpn3 configs-list | awk '/openvpn\/v3/ {p=$1} /.ovpn/ { printf "%s %s\n",p,$1}'
+## Grep out the one
+CONFIG_PATH=$(openvpn3 configs-list | awk '/openvpn\/v3/ {p=$1} /.ovpn/ { printf "%s %s\n",p,$1}' | grep lnarayanan.ovpn | awk '{print $1}')
+## start
+openvpn3 session-start --config-path ${CONFIG_PATH}
+
+# exists?
+openvpn3 sessions-list
+openvpn3 sessions-list | less
+
+# manage-session
+## Only one?
+SESSION_PATH=$(openvpn3 sessions-list | awk '/Path:/ { print $2 }')
+## Many?
+openvpn3 sessions-list | awk '/Path:/ {p=$2} /Config name:/ { printf "%s %s\n",p,$3 }'
+## Grep out the one
+SESSION_PATH=$(openvpn3 sessions-list | awk '/Path:/ {p=$2} /Config name:/ { printf "%s %s\n",p,$3 }' | grep lnarayanan.ovpn | awk '{print $1}')
+
+
+# restart
+openvpn3 session-manage --session-path ${SESSION_PATH} --restart
+# disconnect
+openvpn3 session-manage --session-path ${SESSION_PATH} --disconnect
 
 ```
 

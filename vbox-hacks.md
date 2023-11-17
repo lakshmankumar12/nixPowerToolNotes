@@ -132,7 +132,27 @@ virt-install --name=${vmname} --os-variant=${osvariant} \
 
 # gui
 virt-manager
+
+#import from a qcow2
+vmname=mynewimportedvm
+osvariant=ubuntu20.04
+cpu=4
+ram=16384    ## in KB
+importimage=/path/to/import.qcow2
+bridge=virbr0
+virt-install --name=${vmname} --os-variant=${osvariant} \
+             --vcpu=${cpu} --ram=${ram} --graphics vnc \
+             --disk ${importimage},bus=sata --import --network bridge=${bridge},model=virtio
 ```
+
+* compress a qcow2 .. requires sudo permission
+
+```sh
+src_image=/var/lib/libvirt/iamges/auto_orc8vm.qcow2
+dst_image=$HOME/compressed.qcow2
+qemu-img convert -O qcow2 ${src_image} ${dst_image}
+```
+
 
 * xml snippet to add a cdrom-device (or just add a iso)
 

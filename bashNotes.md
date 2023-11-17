@@ -432,6 +432,7 @@ while read i ; do ... done   < <(another cmd) <- works. as that creates a named-
 # More than one file
 
 https://wiki.bash-hackers.org/howto/redirection_tutorial
+https://catonmat.net/bash-one-liners-explained-part-three
 
 search : redirection stderr
 
@@ -439,8 +440,15 @@ In general `>&` or `<&` is the fd-duplicating operator in bash
 Mnemonic `&` always comes after the direction. Otherwise its backgrounding (with one exception below).
 
 ```sh
+## general open pattern: exec fd>filename
+##    will set fd to the filename as a writable-fd. fd<filename, makes it readable-fd
+
 exec 3>filename   # will duplicate 3 to a write-fd for file. Note no & here.
-exec 1>filename   # will make all stdouts go to this filename
+exec 1>filename   # will make all stdouts go to this filename  ..
+                  #    you will commonly see this to redirect all stdouts to a file in scripts
+                  #    1 is optional, it can be ommitted
+                  #    w/o exec , it affects only one command. And this your standard
+                  #      command > file
 
 echo "happy"      # writes to stdout.. normal
 echo "happy" >&3  # write  to this file!
@@ -449,14 +457,17 @@ exec 3>&-         # closes the fd. Note the number comes first.
 
 exec 4<>filename  # open for both reading/writing
 
-# redirection pattern: target>&source
-#   post that operation, anything sent to target-fd will appear on source-fd
-#   Note that target-fd appears unavailable after this.
+# redirection pattern: exec source>&target
+#   post that operation, source(-fd) is duplicated to target(-fd)
+#   if source-fd is so far non-existant it will be created anew
+#   if source-fd was pointing to something before this, it is now
+#                           unavailable via source after this.
+#   If you omit the exec, then the effect is only for this one command
 
 echo "foo" 2>&1   # writes stderr to stdout
 echo "foo" 1>&2   # rare: writes stdout into stderr
 
-# supress all output /errors .. Order is important
+# suppress all output /errors .. Order is important
 ls /badfile > /dev/null 2>&1
 
 
@@ -642,6 +653,19 @@ is_empty() {
 }
 
 ```
+
+## assign if empty
+
+```sh
+some_command ${value:-defaultvalue}
+
+## also assign to the variable
+some_command ${value:=defaultvalue}
+# this will now print defaultvalue if it was unset before
+echo $value
+
+```
+
 
 ## read from stdin or file
 
@@ -904,7 +928,9 @@ cat <&4
   stream devide for this script. We cant seek back. So open as many
   numbered fd's as you want to read.
 
-# debugging in bash
+# various set usages in bash
+
+## debugging in bash
 
 ```sh
 # turn on debugging
@@ -912,6 +938,25 @@ set -x
 # turn off debugging
 set +x
 ```
+
+## others
+
+```sh
+# exit script as soon as a command fails
+set -e
+# unset variables when used cause a error
+set -u
+# if some command in pipe files, the entire set gets that return error
+set -o pipefail
+# by default its the last commands return value, like below
+$ grep some-string /non/existent/file | sort
+grep: /non/existent/file: No such file or directory
+% echo $?
+0
+# but with pipefail set, its that of the first failing commmand
+
+```
+
 
 # Daemonizing
 
@@ -1051,6 +1096,8 @@ ln actual_filename link_name
 # -s      create softlik
 # -f      force overwrite of link_name
 # -n      (not clear) from man: treat LINK_NAME as a normal file if it is a symbolic link to a directory
+# -T      no target directory.. treate linkname as a regular file
+          (didnt understand this yet)
 
 ```
 
@@ -1191,19 +1238,15 @@ timedatectl set-ntp true
 * Mnemonic: for head, - is change behavior, for tail + if change behavior
 
 ```sh
-#simple first n. Both of below are synonymous
-head -n 10
-head -n +10
 
-#print except last n
-head -n -10
-
-#print last n. Both are synonymous
-tail -n 10
-tail -n -10
-
-#print except first n (note that you desire to exclude first n, you should issue n+1 in command)
-tail -n +11
+head file.txt               # first 10 lines
+tail file.txt               # last 10 lines
+head -n 20 file.txt         # first 20 lines.. syn with head -n +20
+tail -n 20 file.txt         # last 20 lines..  syn with tail -n -20
+head -20 file.txt           # first 20 lines
+tail -20 file.txt           # last 20 lines
+head -n -5 file.txt         # all lines except the 5 last
+tail -n +5 file.txt         # all lines except the 4 first, starts at line 5
 
 ## more args for tail
 ## -F     -- follow a file even if its rotated (as long as the new file appears with same name)
@@ -1323,12 +1366,30 @@ Explanation:
 
 ## numfmt
 
-search : human readable
+search : human readable friendly
 
 ```sh
 numfmt --to=iec-i --suffix=B --format="%9.2f" 1975684956
 
 ```
+
+## reverse lines
+
+* mnemonic .. spell cat backwards!
+
+tac
+
+
+## reverse a single line
+
+rev
+
+```sh
+## works to get rid of last n chars off
+##    note cut only snips the first n chars
+... | rev | cut -c5- | rev
+```
+
 
 
 ## journalctl
@@ -1437,6 +1498,7 @@ if [ $? -ne 0 ] then echo "bad ip" ; fi
 
 ```sh
 user_to_add=lakshman   #or whoever the name is
+pass=...crypt-encrypted-pass...
 #prefer useradd over adduser
 useradd -m -p $pass -s /bin/bash ${user_to_add}
 ## options
@@ -1476,12 +1538,25 @@ pass=$(python3 -c 'import crypt; print(crypt.crypt("clearpass"))')
 usermod -p $pass $user
 ```
 
+* delete user
+
+```sh
+userdel -f -r ${user_to_del}
+
+### 
+##  -r     -- remove home dir and mail spool
+##  -f     -- force remove files even if not owned by user
+
+```
+
+
 
 ### add to sudoers
 
 Search : password
 
 ```sh
+username=$(whoami)
 username="whoever"
 echo "${username} ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers > /dev/null
 

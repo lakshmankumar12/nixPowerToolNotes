@@ -35,6 +35,9 @@ docker rmi <image-id>
 #cleanup old images
 docker image prune
 
+#another command to reclaim space
+docker system prune -a -f
+
 ```
 
 ## Container Management
@@ -106,6 +109,7 @@ docker run hello-world
 #--name <name>          -> start with this name (instead of the auto-assigned crazy,but,cool name)
 #--cap-add=NET_ADMIN    -> if you want to add dummy ifcs (other other networking admin stuff) in the cont
 #--privileged           -> Works as well for above.
+#--device /dev/host/device:/dev/cont/device
 
 docker run -d -p 4000:80 friendlyhello
 
@@ -371,7 +375,7 @@ Old notes:
 
 # test image with good networking tools
 
-search: simple_routerish
+search: simple_routerish nw_demo_image
 
 https://hub.docker.com/r/phusion/baseimage/
 
@@ -384,23 +388,40 @@ docker pull ${base_image}
 
 docker run --privileged -t -i ${base_image} /sbin/my_init -- bash -l
 
+mkdir -p /etc/apt/keyrings
+curl -fsSL https://swupdate.openvpn.net/repos/repo-public.gpg | gpg --dearmor > /etc/apt/keyrings/openvpn-repo-public.gpg
+arch=amd64
+version=release/2.6
+DISTRO=$(lsb_release -c | awk '{print $2}')
+echo "deb [arch=$arch signed-by=/etc/apt/keyrings/openvpn-repo-public.gpg] http://build.openvpn.net/debian/openvpn/$version $DISTRO main" > /etc/apt/sources.list.d/openvpn-aptrepo.list
 apt update
 apt install -y iproute2 iputils-ping  iptables  net-tools  \
         bridge-utils  conntrack  ethtool  tcpdump  \
-        strongswan strongswan-swanctl iperf3 lsof wget curl wireshark tshark ipcalc jq
+        strongswan strongswan-swanctl iperf3 lsof wget curl \
+        wireshark tshark ipcalc jq openvpn isc-dhcp-server dnsmasq
 
 exit
 
 docker ps -a
-docker commit <id> my_routerish_container
-docker tag my_routerish_container nw_demo_image
-docker tag my_routerish_container lakshmankumar/simple-routerish-docker:latest
+docker commit <id> nw_demo_image
+docker tag nw_demo_image my_routerish_container
+docker tag nw_demo_image lakshmankumar/simple-routerish-docker:latest
 docker push lakshmankumar/simple-routerish-docker
 
 #and to use this in other machines
 docker pull lakshmankumar/simple-routerish-docker
 
+#to fire the docker
+docker run -it --name machineA simple-routerish-docker
+
 ```
+
+* fire this image on a host
+
+```sh
+docker run --privileged -v $common_dir:/data --rm --name Server   --hostname Server  --net VpnTest   -t -i nw_demo_image /sbin/my_init -- bash -l
+```
+
 
 
 # Compose

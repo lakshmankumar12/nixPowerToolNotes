@@ -36,6 +36,9 @@ FILTER(ARRAY,INCLUDE,[IF_EMPTY])
 =FILTER($J$2:$K$28,$L2:$L28="yes","")
 ## Say, you have inputs in J2:K28, and you have select crition in L2:L28
 ## you do as above
+
+## count non-blank cells .. search: empty
+COUNTA(RANGE)
 ```
 
 # finance formulae
