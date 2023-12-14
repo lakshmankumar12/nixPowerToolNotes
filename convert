@@ -28,6 +28,9 @@ convert -size 800x800 xc:transparent transparent.png
 
 convert -size 800x800 -type TrueColor canvas:white white.jpg
 
+## get a a4 sized white paper at 150ppx
+convert -size 1240x1754 -type TrueColor canvas:white white.jpg
+
 # Details on A4 size:
 A4 is 210 x 297mm. <Millimeters>
 An image is expressed in pixels x pixels.

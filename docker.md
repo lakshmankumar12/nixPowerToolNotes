@@ -86,7 +86,7 @@ docker inspect -f '{{ .Mounts }}' containerid
 
 ```
 
-### Running a image
+### running a image
 
 ```
 #syntax
@@ -97,10 +97,12 @@ docker run hello-world
 
 #-p host-port:cont-port -> map port 4000 of local machine to 80 of container
 #-p cont-port           -> will random map the container-port to a random host port
+#-p host-port:cont-port/udp  -> map udp port 4000 of local machine to 80 of container
 #-P                     -> (no-arg) auto-map random ports of host to all exposed container ports
 #                       -> use docker port <cont-name> to find the port assigned by host
 #                       -> port/prot.. eg:  -p 8080/tcp
 #-d                     -> run in detached mode (like daemon)
+#--detach               -> opposite of -i -t  .. run as daemon ( but not sure, i see -itd as args )
 #-e NAME=VALUE          -> set env NAME and give VALUE
 #-u userid              -> start as that userid
 #-v host-folder:cont-folder[:ro]    -> mount host-folder at cont-folder
@@ -110,6 +112,7 @@ docker run hello-world
 #--cap-add=NET_ADMIN    -> if you want to add dummy ifcs (other other networking admin stuff) in the cont
 #--privileged           -> Works as well for above.
 #--device /dev/host/device:/dev/cont/device
+#--entrypoint=/bin/bash -> Override the image's entrypoint.
 
 docker run -d -p 4000:80 friendlyhello
 
@@ -122,6 +125,7 @@ docker run -d -p 4000:80 friendlyhello
 --memory <max-memory>
 --cpu-shares <relative-to-other-container>
 --cpu-quota  <to-limit-in-general>
+--net <nwname>    =>  connect to the network. --net none doesn't attach any interface to the container.
 
 #committing a container
 docker commit NameOrIdOfContainer NewImageName
@@ -317,8 +321,13 @@ COPY --from=nginx:latest /etc/nginx/nginx.conf /nginx.conf
     docker network ls
     docker network inspect bridge
 
-    #create an isoated bridge
+    #create an new bridge
     docker network create networkNameX --driver=bridge --subnet=192.168.100.0/24
+    ## add the --internet arg to create an isolated bridge
+    docker network create networkNameX --driver=bridge --subnet=192.168.100.0/24 --internal
+    ##
+    ## more args
+    ## --gateway 192.168.100.100    ## use a diff ip other than .1 for the brige itself.
 
     #connect a container to a bridge
     docker network connect networkNameX container_name
@@ -373,7 +382,7 @@ Old notes:
 
 (I dont understand this fully - for now -v host-dir:container-dir is good enuf)
 
-# test image with good networking tools
+# nw_demo_image
 
 search: simple_routerish nw_demo_image
 
@@ -398,15 +407,21 @@ apt update
 apt install -y iproute2 iputils-ping  iptables  net-tools  \
         bridge-utils  conntrack  ethtool  tcpdump  \
         strongswan strongswan-swanctl iperf3 lsof wget curl \
-        wireshark tshark ipcalc jq openvpn isc-dhcp-server dnsmasq
+        wireshark tshark ipcalc jq openvpn isc-dhcp-server dnsmasq \
+        netcat openconnect traceroute dnsutils isc-dhcp-client \
+        python3-pip
+
+pip3 install twisted
 
 exit
 
 docker ps -a
-docker commit <id> nw_demo_image
-docker tag nw_demo_image my_routerish_container
+commit=...
+docker commit $commit nw_demo_image
 docker tag nw_demo_image lakshmankumar/simple-routerish-docker:latest
 docker push lakshmankumar/simple-routerish-docker
+docker tag nw_demo_image my_routerish_container
+docker image prune
 
 #and to use this in other machines
 docker pull lakshmankumar/simple-routerish-docker
@@ -416,11 +431,52 @@ docker run -it --name machineA simple-routerish-docker
 
 ```
 
-* fire this image on a host
+## fire nw_demo_image on a host
 
 ```sh
-docker run --privileged -v $common_dir:/data --rm --name Server   --hostname Server  --net VpnTest   -t -i nw_demo_image /sbin/my_init -- bash -l
+contname=TestContainer
+contnet=default
+datadir=$HOME
+docker run --privileged -v $datadir:/data --rm --name $contname --hostname $contname --net $contnet -t -i nw_demo_image /sbin/my_init -- bash -l
+#detached
+docker run --privileged -v $datadir:/data --rm --name $contname --hostname $contname --net $contnet -d nw_demo_image /sbin/my_init
 ```
+
+## enable ssh on the host
+
+```sh
+## create this file in a folder
+cat <<EOF > $datadir/initd/enable_ssh.sh
+#!/bin/sh
+rm -f /etc/service/sshd/down
+ssh-keygen -A
+#ssh-keygen -P "" -t dsa -f /etc/ssh/ssh_host_dsa_key
+cat /data/id_rsa.pub >> /root/.ssh/authorized_keys
+chmod 600 /root/.ssh/authorized_keys
+EOF
+
+## create a pub/private pair on the $datadir/data/id_rsa{,.pub}
+
+## and mount this in the container
+cat <<EOF > $datadir/fire.sh
+#!/bin/bash
+initd_for_cont=$datadir/initd
+docker run --privileged -v $datadir:/data -v $initd_for_cont:/etc/my_init.d -p 8822:22 --rm --name VpnClient --hostname VpnClient  --detach nw_demo_image /sbin/my_init
+EOF
+
+#you can now login to the container with:
+ssh -p 8822 root@localhost
+
+
+## to enable ssh on a running host:
+## Note, you should have exposed port at start. Otherwise touch luck
+rm -f /etc/service/sshd/down
+cat /data/id_rsa.pub >> /root/.ssh/authorized_keys
+ssh-keygen -A
+echo x > /etc/service/sshd/supervise/control
+
+```
+
 
 
 

@@ -443,12 +443,16 @@ Mnemonic `&` always comes after the direction. Otherwise its backgrounding (with
 ## general open pattern: exec fd>filename
 ##    will set fd to the filename as a writable-fd. fd<filename, makes it readable-fd
 
-exec 3>filename   # will duplicate 3 to a write-fd for file. Note no & here.
+## mostly what you need
 exec 1>filename   # will make all stdouts go to this filename  ..
                   #    you will commonly see this to redirect all stdouts to a file in scripts
                   #    1 is optional, it can be ommitted
                   #    w/o exec , it affects only one command. And this your standard
                   #      command > file
+
+exec 1> >(tee -a file) 2>&1  ## duplicate both stdout and stderr to a file as well
+
+exec 3>filename   # will open(or reset if 3 exists) fd-3 to a write-fd for file. Note no & here.
 
 echo "happy"      # writes to stdout.. normal
 echo "happy" >&3  # write  to this file!
@@ -1479,7 +1483,15 @@ systemctl show --property MainPID --value $SERVICE
 
 ## just get ip for a hostname
 
-    dig +short hostname
+```sh
+#just the ips alone
+dig +short hostname
+
+#just show a-records alone
+dig +noall +answer hostname
+
+```
+
 
 ### Other ip tools
 

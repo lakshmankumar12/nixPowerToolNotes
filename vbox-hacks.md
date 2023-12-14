@@ -85,7 +85,6 @@ virsh undefine <vm-name>
 virsh undefine --remove-all-storage <vm-name>
 virsh undefine --nvram --remove-all-storage <vm-name>
 
-
 virsh dumpxml <vm-name>  > /some/file
 virsh define /path/to/xml
 
@@ -133,7 +132,9 @@ virt-install --name=${vmname} --os-variant=${osvariant} \
 # gui
 virt-manager
 
-#import from a qcow2
+#import from a qcow2 .. note the imported qcow2 will be used.
+# if you want to start from a backup and still have the backup
+# your should cp your backup first and then import from the new file!
 vmname=mynewimportedvm
 osvariant=ubuntu20.04
 cpu=4
@@ -143,6 +144,20 @@ bridge=virbr0
 virt-install --name=${vmname} --os-variant=${osvariant} \
              --vcpu=${cpu} --ram=${ram} --graphics vnc \
              --disk ${importimage},bus=sata --import --network bridge=${bridge},model=virtio
+             --noautoconsole
+## args
+##   --name=<name>         .. name
+##   --description=<str>   .. description
+##   --vpcu=<num>          .. num cpus
+##   --ram=<value>         .. ran in KB
+##   --graphics <none|vnc>
+##   --cdrom=${image_path}
+##   --location ftp://...iso
+##   --network bridge=${bridge},model=virtio
+##   --disk=${hd-path}     .. path to image disk
+##   --import              .. import from the disk
+##   --noautoconsole       .. will avoid the console, and return immediately
+##   --extra-args='console=ttyS0,115200n8 serial'
 ```
 
 * compress a qcow2 .. requires sudo permission
@@ -150,8 +165,15 @@ virt-install --name=${vmname} --os-variant=${osvariant} \
 ```sh
 src_image=/var/lib/libvirt/iamges/auto_orc8vm.qcow2
 dst_image=$HOME/compressed.qcow2
-qemu-img convert -O qcow2 ${src_image} ${dst_image}
+sudo qemu-img convert -O qcow2 ${src_image} ${dst_image}
 ```
+
+* increase size of a image
+
+```sh
+sudo qemu-img resize /var/lib/libvirt/images/whatever.qcow2 +10G
+```
+
 
 
 * xml snippet to add a cdrom-device (or just add a iso)
@@ -175,6 +197,32 @@ virsh attach-interface --domain lakshmantrfvm --type bridge \
         --source virbr0 --model virtio \
         --mac 52:54:00:4b:73:5f --config
 
+
+```
+
+## snapshots
+
+```sh
+#shut first
+virsh shutdown freebsd
+virsh snapshot-create-as --domain freebsd \
+    --name "5Sep2016_S1" \
+    --description "My First Snapshpot"
+
+#continue running
+virsh start freebsd
+
+# list snapshots
+virsh snapshot-list --domain freebsd
+# detailed view of one snaphost
+virsh snapshot-info --domain freebsd --snapshotname 5Sep2016_S1
+
+#revert to a snapshot
+virsh shutdown --domain freebsd
+virsh snapshot-revert --domain freebsd --snapshotname 5Sep2016_S1 --running
+
+#delete a snapshot
+virsh snapshot-delete --domain freebsd --snapshotname 5Sep2016_S2
 
 ```
 
@@ -221,6 +269,47 @@ virsh detach-disk vmName /path/to/imagefile.raw
     </disk>
 ```
 
+## networks
+
+References: https://linuxconfig.org/how-to-use-bridged-networking-with-libvirt-and-kvm
+
+* natted mode
+
+```xml
+<network>
+  <name>tr0second</name>
+  <uuid>a67395a7-dda8-4a97-8bee-75ae9c30ee46</uuid>
+  <forward mode='nat'>
+    <nat>
+      <port start='1024' end='65535'/>
+    </nat>
+  </forward>
+  <bridge name='tr0second' stp='on' delay='0'/>
+  <mac address='52:54:00:df:14:7b'/>
+  <ip address='192.168.123.1' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='192.168.123.10' end='192.168.123.100'/>
+    </dhcp>
+  </ip>
+</network>
+```
+
+* bridged mode
+
+```xml
+<network>
+    <name>bridged-network</name>
+    <forward mode="bridge" />
+    <bridge name="br0" />
+</network>
+```
+
+```sh
+virsh net-define network.xml
+```
+
+
+
 # secure linux
 
 search : modprobe permitted
@@ -241,6 +330,53 @@ sudo mokutil --disable-validation
 ## on prompt type the individual letters of the passwd
 ## disable.
 
+
+```
+
+
+# vagrant stuff
+
+```sh
+vagrant status
+vagrant up vmname
+
+## dump ssh config
+vagrant ssh-config vmname
+
+```
+
+# vboxmanage
+
+References: https://networkengineer.me/2014/07/11/more-than-4-network-cards-in-virtualbox/
+
+```sh
+"C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" startvm ubuntu
+
+vboxmanage list vms
+
+vboxmanage showvminfo ubuntu
+
+vboxmanage startvm ubuntu
+
+
+#bridge-adapter
+VBoxManage modifyvm network-test --nic5 bridged
+VBoxManage modifyvm network-test --bridgeadapter5 "eth1"
+
+#hostonly
+VBoxManage modifyvm network-test --nic5 hostonly
+VBoxManage modifyvm network-test --hostonlyadapter5 "vboxnet0"
+
+#nat
+VBoxManage modifyvm network-test --nic5 nat
+
+#internal network
+VBoxManage modifyvm network-test --nic5 intnet
+VBoxManage modifyvm network-test --intnet5 "test01"
+
+VBoxManage modifyvm network-test --nicpromisc5 allow-all
+VBoxManage modifyvm network-test --nictype5 82545EM
+VBoxManage modifyvm network-test --cableconnected5 off
 
 ```
 

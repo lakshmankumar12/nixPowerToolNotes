@@ -43,6 +43,17 @@ getmac
 Lowest metric is the highest priority as per http://superuser.com/a/198784[this
 superuser answer]
 
+### display interfaces
+
+```sh
+# quickly show the interfaces
+netsh interface ipv4 show interfaces
+
+netsh interface ipv4 set interface "Ethernet 2" mtu=1200
+
+```
+
+
 # Shortcut names
 
 * Useful variables in explorer
@@ -79,6 +90,11 @@ net view
 tracert www.cisco.com
 nslookup domainname.com
 ```
+
+## hosts file in windows
+
+* Edit this in Notepad-Open as administrator
+c:\windows\system32\drivers\etc\hosts
 
 # Disk-Utility
 

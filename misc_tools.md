@@ -254,6 +254,13 @@ zip -r all_in.zip *
 * list files in a zip
 ```sh
 unzip -l zipfile.zip
+```
+
+* extract
+
+```sh
+# normal extract
+unzip zipfile.zip
 
 #extract one specific file
 # -p prints to stdout
@@ -560,6 +567,19 @@ links:
 * https://ubuntu.com/server/docs/install/autoinstall-reference
 
 
+## popular commands and their packages in ubuntu
+
+
+```
+ps          procps
+ping        iputils-ping
+ssh         openssh-client
+ip          iproute2
+netstat     net-tools
+
+```
+
+
 
 # yum
 
@@ -681,7 +701,19 @@ tar xf file.tgz path/in/tar/ball --to-stdout
 # pulp tool
 
 ```
+pulp python remote create --name upstream_pypi --url 'https://pypi.org/'  --includes "$python_pkgs_json_array" --policy on_demand
+pulp python repository create --name gxc_pypi
+pulp python repository sync --name gxc_pypi --remote upstream_pypi
+pulp python publication create --repository gxc_pypi
+pulp python distribution create --name=gxc-pypi --base-path=gxc-pypi --repository=gxc_pypi
 
+pulp python repository list
+
+pulp python publication destroy --repository --href <from list>
+
+pulp deb distribution list
+
+pulp deb publication list
 ```
 
 
@@ -721,19 +753,6 @@ git ls-files | grep -E '\.(c|cc|cpp|h|hh|S|s|in|tcc|Y|m4|asm|rc|ash|fuc|x|l|y|as
 
 ```
 
-
-# dhclient
-
-dhcp dont update resolv.conf
-```sh
-cat <<EOF | sudo tee /etc/dhcp/dhclient-enter-hooks.d/nodnsupdate > /dev/null
-#!/bin/sh
-make_resolv_conf(){
-   :
-}
-EOF
-sudo chmod +x /etc/dhcp/dhclient-enter-hooks.d/nodnsupdate
-```
 
 # rsyslog
 
@@ -965,6 +984,10 @@ lvextend -l +100%FREE /dev/volume-group-name/logical-volume-name
 # works off the bat for ext4
 resize2fs /dev/volume-group-name/logical-volume-name
 
+## std ubuntu installation
+sudo lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
+sudo resize2fs /dev/ubuntu-vg/ubuntu-lv
+
 ```
 
 ## nfs mounting
@@ -1016,6 +1039,42 @@ sudo mount -t nfs -o vers=4 192.168.122.14:/folder_for_others_to_read /folder_of
 192.168.122.14:/folder_for_others_to_read /folder_of_friend  nfs  defaults,timeo=900,retrans=5,_netdev	0 0
 
 ```
+
+## force fsck on next reboot
+
+https://linuxopsys.com/topics/force-fsck-on-reboot
+https://askubuntu.com/a/1352782
+https://superuser.com/questions/401217/how-to-check-root-partition-with-fsck
+
+```
+
+## in /etc/default/grub
+GRUB_CMDLINE_LINUX_DEFAULT=".... fsck.mode=force fsck.repair=yes"
+## and then 
+sudo update-grub
+
+
+or
+
+sudo tunefs -C 2 -c 1 /dev/root/device
+### -C : current mountcount
+### -c : max mount count
+
+## to see the current mount count of a device
+gxcautotest@auto-gamma:~$ sudo tune2fs -l /dev/md2  | grep -i -e mount -e check
+Last mounted on:          /
+Default mount options:    user_xattr acl
+Last mount time:          Fri Sep  8 07:39:49 2023
+Mount count:              10
+Maximum mount count:      -1
+Last checked:             Mon Jul  3 14:31:15 2023
+Check interval:           0 (<none>)
+Checksum type:            crc32c
+Checksum:                 0x5b34975f
+gxcautotest@auto-gamma:~$
+
+```
+
 
 # study cpu of a machine
 

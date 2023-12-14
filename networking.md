@@ -77,6 +77,15 @@ arp -Ds 192.168.0.253 eth0 pub
 ip tuntap add dev mytap mode tap user md
 ```
 
+* SF question on wanting a vtun pair like a veth pair:
+  https://unix.stackexchange.com/questions/194697/is-there-a-thing-like-veth-but-without-link-level-headers
+  * user-space workaround - use br_select.c from examples - https://vtun.sourceforge.net/tun/
+
+#### Create a tun/tap by code
+
+* See pytuncreate.py in quickscripts to run a line tun/tap.
+
+
 ### create a veth pair
 
 https://developers.redhat.com/blog/2018/10/22/introduction-to-linux-interfaces-for-virtual-networking#veth
@@ -368,6 +377,7 @@ tc [-s] qdisc show
 tc [-s] qdisc show dev <intf>
 
 tc [-s] [-d] class show
+tc [-s] [-d] class show dev <int>    ## note: only this shows the full htb output
 
 tc qdisc add dev <intf> parent <handle> classid <handle> whatever
 ..repl add with del until the classid <handle>
@@ -493,6 +503,49 @@ tc filter add dev eth0 protocol ip parent 1:0 prio 1 u32 match ip dst 10.0.0.1/3
 ```
 Netem explanation at https://wiki.linuxfoundation.org/networking/netem#packet_re-ordering
 
+## nmap
+
+* tcp scan - do a full 3way-HS. uses kernel's connect()
+* syn scan - nmap itself crafts a syn. nmap analyzes just response packets
+
+
+```sh
+nmap -sV -p 1-65535 192.168.1.1/24
+
+nmap -sS <host(s)>  # TCP syn port scan     |  nmap -sS 192.168.1.1
+nmap -sT <host(s)>  # TCP connect port scan |  nmap -sT 192.168.1.1
+nmap -sU <host(s)>  # UDP port scan         |  nmap -sU 192.168.1.1
+nmap -sA <host(s)>  # TCP ack port scan     |  nmap -sA 192.168.1.1
+
+nmap -Pn <host(s)>  # only port scan        |  nmap -Pn 192.168.1.1
+
+## hosts input
+direct args: 192.168.0.24/8 10.0.0,1,3-7
+-iL filename   # - for stdin, hosts separated by \n,\t,spaces
+-iR numTargers # choose targets at random
+--exclude <hosts>  # exclude the hosts.
+--excludefile filename  # exclude the hosts.
+
+## args
+-sL  - dry run. Just print list of hosts that will be scanned.
+-sn  - skip port scanning
+-Pn  - disable ping (i.e disable the first host scanning phase. Do heavy port scanning)
+-PS<port list> -- syn check to these ports.
+-PR  - arp scan
+-PE  - ICMP-ping only scan
+
+
+-v   - be verbose
+-n   - no reverse dns lookup
+-R   - reverse dns lookup (even down ones)
+
+## just do a host listing on a network
+sudo nmap -sn 172.28.1.0/24     ## does a mac probe
+nmap -sn 172.28.1.0/24          ## does ping, syn to 80/443
+
+```
+
+
 ## Network namespace
 
 network namespaces in linux is a bit quirky
@@ -582,6 +635,7 @@ ip netns exec netns108 ip route add 10.1.7.0/24 via 10.1.108.2 dev veth108_ns108
         * 1123 - internet host requirements rfc
         * 1035 - domain names
 
+# iptables
 
 Adding a rule
 ```
@@ -1031,6 +1085,8 @@ https://danielmiessler.com/study/tcpdump/
 -q               # Show less protocol information.
 -E               # Decrypt IPSEC traffic by providing an encryption key.
 
+-l               # line buffered. SHOW OUTPUT IMMEDIATELY  (NOT ON EXIT)
+
 -w <tmpl>       file-name-with-template eg: /tmp/trace-%m-%-%H-%M-%S-%s.pcap
 -W 10           max of 10 files. Stop after that
 -G 120          rollover at 120s
@@ -1302,6 +1358,13 @@ sudo systemctl restart isc-dhcp-server.service
 
 ```
 
+* just for referece.. args for dhcpd
+```
+dhcpd -user dhcpd -group dhcpd -f -4 -pf /run/dhcp-server/dhcpd.pid -cf /etc/dhcp/dhcpd.conf wlan0 eth1
+dhcpd -f -4 -pf /run/dhcp-server/dhcpd.pid -cf /etc/dhcp/dhcpd.conf eth0
+```
+
+
 # dhtest
 
 
@@ -1314,6 +1377,38 @@ make
 
 dhtest -m '00:01:02:03:04:05' -i interface -h hostname
 ```
+
+# dhclient
+
+dhcp dont update resolv.conf
+```sh
+cat <<EOF | sudo tee /etc/dhcp/dhclient-enter-hooks.d/nodnsupdate > /dev/null
+#!/bin/sh
+make_resolv_conf(){
+   :
+}
+EOF
+sudo chmod +x /etc/dhcp/dhclient-enter-hooks.d/nodnsupdate
+```
+
+# dnsmasq
+
+```sh
+
+
+dnsmasq -k --conf-file=/etc/dnsmasq/dnsmasq.conf
+## args
+## -k     # keep in foreground
+
+```
+
+
+# systemd-resolved
+
+```sh
+
+```
+
 
 
 

@@ -4,8 +4,13 @@
     * where ansible is running
     * uses clientless ssh to access remote systems
         * its agentless, so besides requiring ssh in remote systems, nothing else is required.
+        * for windows it uses a winrm module.
     * playbooks written in YAML, ansible its is in python
+    * for now control-node should be linux
+* Managed node
+    * the ones where the tasks are run
 * Ansible Tower
+    * paid version
     * manages ansible itself with a UI server
 * galaxy.ansible.com
     * has lots of roles that have been uploaded
@@ -52,7 +57,7 @@ two.example.com
 three.example.com
 ```
 
-or as yml itself
+or as yaml itself
 
 ```yaml
 agws:
@@ -76,15 +81,42 @@ ansible-galaxy collection list
 
 ```
 
+# global ansible config
+
+```sh
+
+```
+
+
 # ad-hoc commands
 
 
 ```sh
-ansible -i hosts all -m ping
+## General format
+ansible hosts-spec -i inv-file -m module -a module-args
 
-ansible -i hosts all -m copy -a "src=/root/test_ansible/testfile dest=/tmp/testfile"
+## just list hosts
+ansible all -i inv-file --list
 
-ansible -i hosts all -m yum -a 'name=ncdu state=present'
+## host spec
+## all -> all hosts
+
+
+
+## other args
+
+# -m <module>         .. run this module
+# -a <module-args>    .. args for the module
+# -o                  .. one liner output
+# -i <inventory-file> .. inventory
+# -u <user>           .. login with this user
+# --ask-pass          .. ask for password for this user (for ssh)
+# --become            .. become a different user post login
+# --become-user=user  .. post login, become this user. (default is root)
+# --ask-become-pass   .. su/sudo password
+# --become-method=su  .. how to become
+# --list              .. list hosts
+
 
 ```
 
@@ -96,103 +128,326 @@ ansible -i hosts all -m yum -a 'name=ncdu state=present'
 ## run a playbook
 ansible-playbook -i $inventory_file $playbook_file
 
-## --ask-become-pass   ... interactively ask password for become
+## args
+
+## --syntax-check       .. perform syntax-check
+## --check, -C          .. smoke-test
+##                      ..   will evaluate conditionals
 
 ```
+
+# modules
+
+* Some common args for a lot of commands
+    ```
+    state: started, restarted, present, absent, touch
+
+    ```
+
+
+## ping
+
+* ping module verifies reachability
+
+```sh
+ansible -i hosts all -m ping
+```
+
+## copy
+
+https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html
+
+* copy modules copiles a file from controller node to managed node
+
+```sh
+ansible -i hosts all -m copy -a "src=/root/test_ansible/testfile dest=/tmp/testfile"
+```
+
+```yaml
+- name: another copy task
+  copy:
+    content: "Here are some contents for the file"
+    dest: /path/in/node
+```
+
+
+## yum
+
+* yum install package in centos nodes, state=present/absent to install/uninstall
+
+```sh
+ansible -i hosts all -m yum -a 'name=ncdu state=present'
+```
+
+## command
+
+* run any random command
+
+```sh
+ansible -i hosts all -m command -a "uptime"
+```
+
+## user, group
+
+* create a user
+
+```sh
+ansible -i hosts all -m user -a "name=magma uid=9999 shell=/bin/bash comment='mg user'"
+```
+
+* create a group
+
+```sh
+ansible -i hosts all -m group -a "name=magma gid=9999 state=present"
+```
+
+## file
+
+* create a file
+
+```sh
+ansible -i hosts all -m file -a "name=magma state=present mode=0777"
+ansible -i hosts all -m file -a "name=/tmp/somedir state=directory mode=0777"
+ansible -i hosts all -m file -a "name=/tmp/exist_or_new_file state=touch mode=0777"
+```
+
+## lineinfile
+
+```sh
+- name: Ensure SELinux is set to enforcing mode
+  ansible.builtin.lineinfile:
+    path: /etc/selinux/config
+    regexp: '^SELINUX='
+    line: SELINUX=enforcing
+
+- name: Make sure group wheel is not in the sudoers configuration
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers
+    state: absent
+    regexp: '^%wheel'
+
+- name: Replace a localhost entry with our own
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: '^127\.0\.0\.1'
+    line: 127.0.0.1 localhost
+    owner: root
+    group: root
+    mode: '0644'
+```
+
+
+## service
+
+* start a service
+
+```sh
+ansible -i hosts all -m service -a "name=nfs state=started"
+```
+
+## debug
+
+```yaml
+tasks:
+  - name: debug illustration
+    debug: msg="This is just a test for debug module"
+
+  - name: catpure first with register
+    command: "uptime"
+    register: somevariablename
+
+  - name: dump it with debug
+    debug: msg="Output of uptime was {{somevariablename}}"
+
+  - name: another way to show
+    debug: var=somevariablename
+```
+
+## setup
+
+* dump the ansible facts
+
+```sh
+ansible -i hosts all -m setup -a "filter=ansible_all_ipv4_addresses"
+ansible -i hosts all -m setup -a "filter=ansible_date_time"
+ansible -i hosts all -m setup -a "filter=ansible_eth0"
+```
+
+
+
+# facts
+
+* information gathered by ansible from managed nodes
+* `setup` module can show this. This module is automatically run when a playbook is run.
+* are in json format.. so `{{<ansible_facts>}}` would work in the playbook.
+
 
 
 # playbook
 
+## General Structure
 
 ```yaml
-- hosts: group1                               ## which hosts to work on
+---
+- name: Name of first play
+  hosts: hosts-to-run
+  user: remote-user
+  become: true
+  become_method: sudo
+  become_user: privilege_user
+  gather_facts: no
+  var:
+    var1: value
   tasks:
-  - name: Install lldpad package
-    yum:                                      ## module name
-      name: lldpad
-      state: latest
-  - name: check lldpad service status
-    service:
-      name: lldpad
-      state: started
+    - name: Name of first task
+      module: arg1=value1 arg2={{var1}}
 
 ```
 
-Another example
+## variables
+    * can be combined like this:
+        ```yaml
+        vars:
+            onevar: "value/with/spl/chars"
+            anothervar: "{{onevar}}somemore"
+
+        tasks:
+            ...
+            module: arg1="{{homedirprefix}}/{{username}}"
+        ```
+
+### variables from inventory
 
 ```yaml
-- hosts: group1
-  tasks:
-  - name: Enable SELinux
-    selinux:                                    ## selinux module
-      state: enabled
-    when: ansible_os_family == 'Debian'         ## ansible_os_family is a ansible 'fact' collected via
-                                                ##        'gather_facts' functionality that is always run by ansible
-                                                ## when controls if this task should be run or not.
-    register: enable_selinux                    ## the task output is stored in the varialbe enable_selinux for later use.
-
-  - debug:
-      Imsg: "Selinux Enabled. Please restart the server to apply changes."
-    when: enable_selinux.changed == true
-
+[group1]
+1.1.1.1
+1.1.1.2
+[group1:vars]
+user=raheja
 ```
 
-run a handlers once
+## conditionals
+
+* Added to tasks
 
 ```yaml
-- hosts: group2
-  tasks:
-  - name: sshd config file modify port
-    lineinfile:
-     path: /etc/ssh/sshd_config
-     regexp: 'Port 28675'
-     line: '#Port 22'
+tasks:
+  - name: only for ubuntu machines
+    file: path=/var/tmp/something state=touch
+    when: ansible_distribution == "Ubuntu" and (ansible_distribution_major_version == "16" or ..)
+```
+
+## loops
+
+```yaml
+tasks:
+  - name: loop illustration
+    yum:
+      name: "{{item}}"
+      state: installed
+    with_item:
+      - php
+      - gcc
+      - talk
+      - vim
+      - httpd
+
+  - name: another one with dict-items
+    user:
+      name: "{{item.name}}"
+      state: present
+      groups: "{{item.groups}}"
+    with_items:
+      - {name: "user1", groups: "appgroup"}
+      - {name: "user2", groups: "cloud"}
+```
+
+* there are `with_file` , `with_nested`. to learn.
+
+## handler
+
+* `notify` handlers are run when a task has changed something on the managed node
+* `handlers` are very similar to task in definition.
+    * Their names MUST be unique. that is how its referenced.
+
+```yaml
+tasks:
+  - name: copy ntp conf
+    copy: src=/path/in/controller/node  dst=/etc/ntp.conf
     notify:
-       - restart sshd                           ## notify handler to be run later
+      - restart ntp
 
-handlers
-    - name: restart sshd                        ## run only if it was notifed. run once at the end of all tasks
-      service: sshd
-        name: sshd
-        state: restarted
-
+handlers:
+  - name: restart ntp
+    service: name=ntp state=restarted
 ```
 
-# roles
+
+## roles
 
 ```sh
+## create the above tree structure
+$ ansible-galaxy init myrole
+
 ## dir structure
-[root@ansible-server test2]# tree
-`-- role1
+[root@ansible-server test2]# tree myrole
+`-- myrole
     |-- defaults
     |   `-- main.yml
     |-- handlers
     |   `-- main.yml
     |-- meta                                    ## store author and role dependencies
     |   `-- main.yml
-    |-- README.md
+    |-- README.md                               ## doc for your role
     |-- tasks
     |   `-- main.yml
     |-- tests
     |   |-- inventory
     |   `-- test.yml
-    `-- vars
-        `-- main.yml
-
-
-## create the above tree structure
-$ ansible-galaxy init role
-
+    |-- vars
+    |   `-- main.yml
+    |-- files
+    `-- templates
 ```
 
-# documentation
+* sample `meta/main.yml` files
+```yaml
+galaxy_info:
+  author: whoever
+  description: what ist his role
+  company: mycompany
+  license: GPLv2
+  min_ansible_version: 1.2
+  platforms:
+    - name: Centos
+      versions:
+        - 7
 
-https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html
+dependencies: []
 
-# Useful modules
+dependencies:                         ## note that its like include for roles
+  - {role: "another_role"}
+```
 
-## lineinfile
+* Invoke a role from a playbook
+    Just use `roles` instead of `tasks`
 
-Link: https://www.middlewareinventory.com/blog/ansible-lineinfile-examples/
-    
+```yaml
+roles:
+  - myrole
 
+roles:
+  - role: /home/magma/onyx-corenw/orc8r/tools/ansible/roles/apt_cache
+    vars:
+      distribution: "stretch"
+      oai_build: "{{ c_build }}/core/oai"
+      repo: "dev"
+```
+
+* include another file from one file
+
+```
+- name: include a file
+  include: anotherfile.yml
+
+```
