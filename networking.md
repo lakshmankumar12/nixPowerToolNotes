@@ -18,6 +18,12 @@ ip -d -j -p link show ${linkname}
 ## for eg:
 ip -d -j -p link show gtp_br0 | jq '.[0].linkinfo.info_kind'
 
+## args
+##  -j         json output
+##  -p         pretty json
+##  -s         stats
+##  -d         details
+
 # Type of interface
 ethtool -i devicename
     driver-info: igb/tun(for both tun/tap)/ip_gre
@@ -636,6 +642,8 @@ ip netns exec netns108 ip route add 10.1.7.0/24 via 10.1.108.2 dev veth108_ns108
         * 1035 - domain names
 
 # iptables
+
+https://en.wikipedia.org/wiki/Iptables#/media/File:Netfilter-packet-flow.svg
 
 Adding a rule
 ```
@@ -1405,12 +1413,10 @@ dnsmasq -k --conf-file=/etc/dnsmasq/dnsmasq.conf
 
 # systemd-resolved
 
-```sh
-
-```
-
-
-
+https://superuser.com/questions/1687861/domain-based-routing-with-systemd-resolved
+https://gist.github.com/brasey/fa2277a6d7242cdf4e4b7c720d42b567
+https://unix.stackexchange.com/questions/442598/how-to-configure-systemd-resolved-and-systemd-networkd-to-use-local-dns-server-f
+https://blogs.gnome.org/mcatanzaro/2020/12/17/understanding-systemd-resolved-split-dns-and-vpn-configuration/
 
 
 # IPsec configuration

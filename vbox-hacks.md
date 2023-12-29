@@ -337,11 +337,17 @@ sudo mokutil --disable-validation
 # vagrant stuff
 
 ```sh
+#list all vms
 vagrant status
+
+# power up a vm
 vagrant up vmname
 
 ## dump ssh config
 vagrant ssh-config vmname
+
+## stop a vm
+vagrant halt vmname
 
 ```
 

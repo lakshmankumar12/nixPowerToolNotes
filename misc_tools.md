@@ -522,6 +522,9 @@ ar x file.deb
 control.tar.gz  data.tar.gz  debian-binary
 ## your data file are in data.tar.gz
 tar xf data.tar.gz
+
+## or 
+dpkg --contents package.deb
 ```
 
 * find which package provides a file
@@ -529,6 +532,8 @@ tar xf data.tar.gz
 sudo apt install -y apt-file
 sudo apt-file update
 apt-file search /path/to/file
+
+dpkg -S /path/to/file
 ```
 
 * list packages provided by a repostiry
@@ -571,6 +576,10 @@ links:
 
 
 ```
+#kernel headers
+sudo apt-get install linux-headers-$(uname -r)
+
+
 ps          procps
 ping        iputils-ping
 ssh         openssh-client
@@ -578,6 +587,16 @@ ip          iproute2
 netstat     net-tools
 
 ```
+
+# snap
+
+```sh
+snap install cmake --classic
+
+snap list
+
+```
+
 
 
 
@@ -804,6 +823,9 @@ onyxedge@onyxedge-agw:/etc/logrotate.d$ sudo cat /etc/logrotate.d/gxc-magmad
 ```sh
 #mount a vbox folder
 mount -t vboxsf D_DRIVE /path/in/local/vm
+
+## equivalent /etc/fstab entry
+C_DRIVE /home/lakshman/host_c vboxsf uid=1000,gid=1000 0 0
 
 ```
 
@@ -1333,9 +1355,11 @@ Another cheatsheet: https://gist.github.com/olih/f7437fb6962fb3ee9fe95bda8d2c8fa
 ```sh
 
 #args
-# -c   -- compact json
+# -c   -- compact output json
 # -r   -- raw strings (doesnt print quotes)
-# -n   -- create a new json file
+# --null-input/-n   -- null input. Typically used to create a new json file
+# --raw-input/-R   -- raw input. Each line is a string
+# -s/--slurp -- entire input is one string
 # --arg name value  -- assign value to the variable name for use inside of expression
 
 #prettify json
@@ -1350,7 +1374,7 @@ cat input.json | jq 'keys_unsorted'
 #just get one element - assuming the top object is a dict
 cat input.json | jq '.key'
 cat input.json | jq '.key1.key2.key3'
-#if keys are numbers
+#if keys are numbers or has space
 cat input.json | jq '.key1."12345".key3'
 
 #if top object is array
