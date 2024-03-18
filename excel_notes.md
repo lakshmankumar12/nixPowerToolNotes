@@ -56,6 +56,25 @@ COUNTA(RANGE)
 =PMT(...)
 ```
 
+## find cagr of two amounts
+
+```
+=(POWER((FinalAmout/InitialAmount),(1/NumYears))-1)*100
+
+```
+
+# date
+
+```
+=DATE(2023,1,12)
+
+##to build a date from another date.. say add 15 months
+=DATE(YEAR(B2), MONTH(B2) + 15, DAY(B2))
+
+```
+
+
+
 # useful items
 
 ## sum rows that have same name

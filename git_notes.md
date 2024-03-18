@@ -68,6 +68,13 @@ git ls-files
 git ls-tree --full-tree -r <treeish>
 ```
 
+* See permission of a file. Note we will only see 644 or 755 here.
+
+```sh
+git ls-files -s file/to/check/permission
+```
+
+
 ## List all untracked files
 
 ```sh

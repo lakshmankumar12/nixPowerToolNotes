@@ -5,6 +5,8 @@
 
 [Good link to read on](http://lartc.org/howto/)
 
+* different interface types - https://developers.redhat.com/blog/2018/10/22/introduction-to-linux-interfaces-for-virtual-networking
+
 ## L2-ish
 
 ### list all interfaces
@@ -122,7 +124,7 @@ https://developers.redhat.com/articles/2022/04/06/introduction-linux-bridging-co
 * Each interface can be access or trunk, simply based on how many vlans are added to it.
 * Exactly one vlan is marked as `PVID` (port Vlan ID). All untagged ingress pkts belong to this vlan
 * It good practise to mark one vlan as `Egress Untagged`. All pkts from this vlan are put untagged at egress.
-    * But you have have multiple vlans as `Egress Untagged`, which is just mixing them up!
+    * While you can have have multiple vlans as `Egress Untagged`, it is just mixing them up!
 
 ```sh
 #create the bridge
@@ -268,12 +270,22 @@ ip addr del 192.168.50.5 dev eth1
 
 ### add a gre tunnel
 
-```
+```sh
 ip tunnel add netb mode gre remote 172.19.20.21 local 172.16.17.18 ttl 255 dev eth1
 ip link set netb up
 ip addr add 10.0.1.1 dev netb
 ip route add 10.0.2.0/24 dev netb
 ```
+
+* add a gre tunnel in tap mode (eoGRE)
+
+```sh
+ip link add gretap0 type gretap local 172.20.20.51 remote 172.20.20.50 dev eth2 nopmtudisc
+ip link set dev gretap0 up
+ip link set dev gretap0 mtu 1476
+
+```
+
 
 ### create a dummy interface
 
@@ -572,6 +584,15 @@ ip netns list
 # add and del.. when adding, lo gets created for that namespace
 ip netns add mynamespace
 ip netns del mynamespace
+
+# list all namespaces bound to a process
+sudo find /proc/ -name ns 2>/dev/null |xargs -I NS ls -la NS/net 2> /dev/null| awk -F '->' '{print $2}'|sort -u
+## or
+sudo readlink /proc/*/task/*/ns/* | grep net | sort -u
+sudo readlink /proc/*/task/*/ns/* | sort -u
+
+# list all mounted namespaces
+cat /proc/mounts | grep nsfs
 ```
 
 * do anything under that namespace
@@ -628,6 +649,30 @@ ip netns exec netns108 ip route add 10.1.7.0/24 via 10.1.108.2 dev veth108_ns108
 * Collection of `/etc/network/interfaces` files - `https://gist.github.com/evrardjp/f970315fb9094acb65c9e424f54273b0`
 
 
+## vrf
+
+link: https://www.dasblinkenlichten.com/working-with-linux-vrfs/
+
+```sh
+# add a new vrf.  Give it a new tabl name
+ip link add vrf-2 type vrf table 2
+ip link set dev vrf-2 up
+
+# move a interface into a vrf
+ip link set dev ens7 master vrf-2
+ip addr add 192.168.127.1/24 dev ens7
+
+## add a route in the vrf
+ip route add 0.0.0.0/0 via 192.168.127.10 vrf vrf-2
+ip route add 192.168.128.0/24 via 192.168.127.20 vrf vrf-2
+
+## exec a command in the vrf
+ip vrf exec vrf_name bash
+
+
+```
+
+
 ## dns
 
 * RFC 1035 explains the contraints of a label. RFC 1123 also covers this
@@ -644,6 +689,7 @@ ip netns exec netns108 ip route add 10.1.7.0/24 via 10.1.108.2 dev veth108_ns108
 # iptables
 
 https://en.wikipedia.org/wiki/Iptables#/media/File:Netfilter-packet-flow.svg
+https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html#TRAVERSINGOFTABLES
 
 Adding a rule
 ```
@@ -880,6 +926,13 @@ sudo nft flush chain ${table} ${chain}
 sudo nft flush table ${table}
 # flush everything
 sudo nft flush ruleset
+
+
+#change the policy of a table
+sudo nft add chain ip filter input { type filter hook input priority filter\; policy accept\; }
+sudo nft add chain ip filter forward { type filter hook forward priority filter\; policy accept\; }
+sudo nft add chain ip filter output { type filter hook output priority filter\; policy accept\; }
+
 ```
 
 
@@ -1054,6 +1107,76 @@ ovs-ofctl del-flows <bridge> <flow>
 sudo ovs-appctl ofproto/trace gtp_br0 tcp,in_port=patch-up,ip_dst=192.168.201.100,ip_src=8.8.8.8,tcp_src=80,tcp_dst=3372
 ```
 
+# systemd networking service
+
+* Restarting a stuck interface: https://serverfault.com/a/978599
+
+```sh
+ifdown --force -vvv <iface>
+ip address flush dev <iface>
+ip link set <iface> down
+ifup -vvv <iface>
+```
+
+
+# netplan
+
+https://netplan.readthedocs.io/en/stable/examples/
+
+* sample netplan file
+```yaml
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eno1: {}
+    eno2: {}
+  bonds:
+        bond0:
+                interfaces: [eno1, eno2]
+                addresses: [192.168.0.104/24]
+                gateway4: 192.168.0.1
+                parameters:
+                        mode: 802.3ad
+                nameservers:
+                        addresses: [192.168.0.2]
+                dhcp4: false
+                optional: true
+```
+
+* another sample bond-parameters
+```yaml
+  bonds:
+    bond0:
+      parameters:
+        mode: balance-rr
+        mii-monitor-interval: 1
+```
+
+* bridge
+```yaml
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    enp3s0:
+      dhcp4: no
+  bridges:
+    br0:
+      dhcp4: yes
+      interfaces:
+        - enp3s0
+```
+
+
+
+* restart networking
+```sh
+sudo netplan apply
+```
+
+
+
 
 # List all open ports
 
@@ -1187,7 +1310,14 @@ TZ=Etc/UTC capinfos $file
 tcpdump -r infile.pcap -w outfile.pcap host 184.107.41.72 and port 80
 ```
 
-## ping args
+## wireshark filters
+
+```
+oran_fh_cus.iq_user_data[0] > 0x00
+
+```
+
+# ping
 
 ```
 ping <ip>
@@ -1205,7 +1335,7 @@ Notes on size
 * wireshark will show 20-byte IP , 8 byte Icmp, 8 byte time-stamp and only remaining as payload.
 * Thus if u have `-s N` , you will see N+28 ip pkt and N-8 byte ICMP payload in wireshark.
 
-### ping operation not permitted
+## ping operation not permitted
 
 ```
 getcap $(which ping)
@@ -1214,14 +1344,11 @@ sudo setcap cap_net_raw+p /usr/bin/ping
 
 ```
 
+## arping
 
-### wireshark filters
-
-```
-oran_fh_cus.iq_user_data[0] > 0x00
-
-```
-
+* initiates arp request and replies
+* https://www.baeldung.com/linux/arping-command
+* scapy to initiate a g-arp: https://stackoverflow.com/a/17030444
 
 
 # hping3 args

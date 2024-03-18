@@ -141,9 +141,10 @@ cpu=4
 ram=16384    ## in KB
 importimage=/path/to/import.qcow2
 bridge=virbr0
+graphics=none   # or vnc if u want
 virt-install --name=${vmname} --os-variant=${osvariant} \
-             --vcpu=${cpu} --ram=${ram} --graphics vnc \
-             --disk ${importimage},bus=sata --import --network bridge=${bridge},model=virtio
+             --vcpu=${cpu} --ram=${ram} --graphics ${graphics} \
+             --disk ${importimage},bus=sata --import --network bridge=${bridge},model=virtio \
              --noautoconsole
 ## args
 ##   --name=<name>         .. name
@@ -153,12 +154,85 @@ virt-install --name=${vmname} --os-variant=${osvariant} \
 ##   --graphics <none|vnc>
 ##   --cdrom=${image_path}
 ##   --location ftp://...iso
-##   --network bridge=${bridge},model=virtio
+##   --network bridge=${bridge},model=virtio          <-- simply repeat this for a second interf with a diff bridge
 ##   --disk=${hd-path}     .. path to image disk
 ##   --import              .. import from the disk
 ##   --noautoconsole       .. will avoid the console, and return immediately
 ##   --extra-args='console=ttyS0,115200n8 serial'
 ```
+
+## create a new network
+
+. network.xml
+```xml
+<network>
+  <name>tr0second</name>
+  <uuid>a67395a7-dda8-4a97-8bee-75ae9c30ee46</uuid>
+  <forward mode='nat'>
+    <nat>
+      <port start='1024' end='65535'/>
+    </nat>
+  </forward>
+  <bridge name='tr0second' stp='on' delay='0'/>
+  <mac address='52:54:00:df:14:7b'/>
+  <ip address='192.168.123.1' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='192.168.123.10' end='192.168.123.100'/>
+    </dhcp>
+  </ip>
+</network>
+```
+
+* Bridged network
+```xml
+<network>
+  <name>br0</name>
+  <forward mode='bridge'/>
+  <bridge name='br0'/>
+</network>
+```
+
+* Routed mode
+```xml
+<network>
+  <name>routeds1</name>
+  <forward mode='route' dev='br1'/>
+  <bridge name='routeds1' stp='on' delay='2'/>
+  <ip address='10.0.3.1' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='10.0.3.5' end='10.0.3.10'/>
+    </dhcp>
+  </ip>
+</network>
+
+```
+
+
+
+```sh
+virsh net-define network.xml
+virsh net-start tr0second
+virsh net-autostart tr0second
+```
+
+
+
+## qemu-img
+
+```
+args:
+-p        ---   show progress
+-n        ---   write to an existing image instead of a new one
+
+```
+
+
+* information on a qcow2
+```sh
+qemu-img info $file
+
+```
+
 
 * compress a qcow2 .. requires sudo permission
 
@@ -172,6 +246,13 @@ sudo qemu-img convert -O qcow2 ${src_image} ${dst_image}
 
 ```sh
 sudo qemu-img resize /var/lib/libvirt/images/whatever.qcow2 +10G
+```
+
+* create a raw image file
+
+```sh
+image_name=path/to/image.raw
+sudo qemu-img create -f raw ${image_name} 128G
 ```
 
 
@@ -309,6 +390,37 @@ virsh net-define network.xml
 ```
 
 
+## guest agent
+
+Install on guest
+```sh
+apt install -y qemu-guest-agent
+```
+then run this on host:
+```sh
+virsh qemu-agent-command <vm-name> '{"execute":"guest-network-get-interfaces"}'
+
+##or
+virsh domifaddr --source agent lakshmanAgw
+```
+
+* confirm if a guest has agent channel enabled:
+
+```sh
+vm_name=whatever
+virsh dumpxml $vm_name | sed -n '/<channel/,/channel>/ p'
+
+```
+
+## install kvm
+
+```sh
+sudo apt install -y qemu qemu-kvm qemu-utils libvirt-daemon libvirt-daemon-system libvirt-clients bridge-utils virt-manager dnsmasq libosinfo-bin cpu-checker virt-viewer qemu-efi ovms
+sudo reboot
+
+```
+
+
 
 # secure linux
 
@@ -349,6 +461,9 @@ vagrant ssh-config vmname
 ## stop a vm
 vagrant halt vmname
 
+## delete a vm fully
+vagrant destroy vmname
+
 ```
 
 # vboxmanage
@@ -385,4 +500,24 @@ VBoxManage modifyvm network-test --nictype5 82545EM
 VBoxManage modifyvm network-test --cableconnected5 off
 
 ```
+
+## Getting console for a virtual box console
+
+```sh
+## Add a console to the vm
+vboxmanage modifyvm vm_name --uart1 0x3F8 4  --uartmode1 server /tmp/magma_dev_pip1
+
+## Add a socat piping the unix-socket above to pty
+socat UNIX-CONNECT:/tmp/magma_dev_pip1 PTY,link=/tmp/magma_dev_pip1-pty &
+
+## now start a pty reader program like screen
+screen /tmp/magma_dev_pip1-pty
+
+
+## Note: If you exit screen somehow it doesn't reconnect again. Just kill/start socat again and it seems to work
+
+```
+links:
+* https://gist.github.com/snb/284940/11e6354f170be602c9c2f67b59d489ed49ebd143
+* https://www.linuxquestions.org/questions/slackware-14/virtualbox-serial-port-setup-frustration-586971/
 

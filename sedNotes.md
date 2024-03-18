@@ -150,7 +150,16 @@ sed -i 's/[[:space:]]\+$//' myfile
 
 ## Delete nth line
 
+```sh
+# delete 5th line
 sed -e '5d'
+
+## delete from 36 to 40
+sed -e '36,40d'
+
+## delete 2 distinct blocks
+sed -d '5d;36,40d;'
+```
 
 ## Add at nth line
 

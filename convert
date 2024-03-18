@@ -29,7 +29,7 @@ convert -size 800x800 xc:transparent transparent.png
 convert -size 800x800 -type TrueColor canvas:white white.jpg
 
 ## get a a4 sized white paper at 150ppx
-convert -size 1240x1754 -type TrueColor canvas:white white.jpg
+convert -size 1240x1754 -type TrueColor canvas:white a4white.jpg
 
 # Details on A4 size:
 A4 is 210 x 297mm. <Millimeters>
@@ -44,16 +44,15 @@ For professional results (ie a brochure), use 300pxl/inch and an image of 2480 x
 1944x2592
 
 #water marking
-composite -dissolve 50% -quality 100 lnl.png fu.jpg output.jpg
 composite -dissolve 50% -quality 100 mark.png orig.jpg mixed.jpg
 
 In this command:
   composite : to combine two images
-  -dissolve 50% : to make the overlay image (lnl.png) 50% transparent
+  -dissolve 50% : to make the overlay image (mark.png) 50% transparent
   -quality 100 : keep the quality at 100%
-   lnl.png : the image with the text
-   fu.jpg : original picture
-   output.jpg : the output image
+   mark.png : the image with the text
+   orig.jpg : original picture
+   mixed.jpg : the output image
 
 
 #creating a watermark

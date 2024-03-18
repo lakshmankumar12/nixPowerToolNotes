@@ -59,10 +59,9 @@ netsh interface ipv4 set interface "Ethernet 2" mtu=1200
 * Useful variables in explorer
 
 ```
-%AppData%
-%UserProfile%
-%temp%
-%USERPROFILE%
+%UserProfile%  %USERPROFILE%        <-- home folder
+%AppData%   %APPDATA%               <-- home/appdata/roaming
+%temp%                              <-- home/appdata/local/temp
 ```
 
 http://winaero.com/blog/the-full-list-of-shell-commands-in-windows-8/
@@ -97,6 +96,10 @@ nslookup domainname.com
 c:\windows\system32\drivers\etc\hosts
 
 # Disk-Utility
+
+* Standard windows disk manager
+
+Run -> `compmgmt.msc`
 
 https://commandwindows.com/diskpart.htm
 

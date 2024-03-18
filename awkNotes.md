@@ -398,6 +398,12 @@ echo "a  2   4  6" | gawk ' {
 }'
 ```
 
+* print from nth column till last column -- say skip 2
+```sh
+... | gawk ' { n=split($0,a," ",b); for (i=3;i<=NF; i++) { line=(line a[i] b[i]) } ; print line }'
+
+```
+
 
 ## Get non-empty lines alone
 

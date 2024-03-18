@@ -660,6 +660,8 @@ is_empty() {
 
 ## assign if empty
 
+search: unset null
+
 ```sh
 some_command ${value:-defaultvalue}
 
@@ -1043,6 +1045,7 @@ pwd -P
 -e        every pid in the system
 -f        standard column listing
 -p <pid>  given pid
+-t <term> against a particular terminal
 -T        list all threads
 -u <user> only processes of this user
 
@@ -1061,6 +1064,9 @@ ps -u username -o pid,ppid,tt,%mem,bsdstart,args
 
 #info on a given pid
 ps -o args= -p pid
+
+#process against a terminal
+ps -t pts/12 -f
 ```
 
 * useful headings in ps -o
@@ -1102,6 +1108,8 @@ ln actual_filename link_name
 # -n      (not clear) from man: treat LINK_NAME as a normal file if it is a symbolic link to a directory
 # -T      no target directory.. treate linkname as a regular file
           (didnt understand this yet)
+# -A      list all dot-files. Dont show . and ..
+# -a      list all dot-files. show . and ..
 
 ```
 
@@ -1164,6 +1172,9 @@ date '-d@<epoch>'
 date '-dYYYY-MM-DDTHH:MM:SS'
 date '-dYYYYMMDD'
 
+## date in rfc-3399 format
+date +%Y-%m-%dT%T.%9N%:z
+
 ## To assume a given timezone for a input
 TZ=America/Los_Angeles date ...
 
@@ -1214,6 +1225,8 @@ hostnamectl set-hostname "new-hostname" --pretty
 
 ## timedatectl
 
+search: timectl datectl datetimectl
+
 ```sh
 #get status
 timedatectl status
@@ -1231,9 +1244,27 @@ timedatectl set-time "YYYY-MM-DD HH:MM:SS"
 # enable ntp
 timedatectl set-ntp true
 
+# see ntp status
+timedatectl timesync-status
+
+## to edit config .. use
+/etc/systemd/timesyncd.conf
+
 
 
 ```
+
+## timeout
+
+* stop a program after some time
+
+```sh
+timeout -sHUP 90s sleep 200
+# does SIGKILL?
+timeout 2m sleep 200
+
+```
+
 
 
 ## head and tail
@@ -1258,6 +1289,19 @@ tail -n +5 file.txt         # all lines except the 4 first, starts at line 5
 
 ```
 
+## cut
+
+```sh
+
+## args
+
+## -d, --delimiter=DELIM            use DELIM instead of TAB for field delimiter
+## -f, --fields=LIST                select only these fields;
+
+
+```
+
+
 ## read
 
 * this is a shell builtin
@@ -1272,6 +1316,15 @@ bash:
 read -p prompt var_to_assign
 IFS=$':' read -a array_var <<< ${var_to_split}
 ```
+
+* another nifty way.. replace your delimiter with space and array-ize it
+
+```sh
+## assuming ; is your delimiter
+array_var=(${var_to_split//;/ })
+
+```
+
 
 zsh:
 ```
@@ -1308,9 +1361,17 @@ echo "$VAR"
     n=5
     printf "willrepeat%.0s" {1..${n}}
     ```
-* Assigning to a variable.
-    ```
+* Assigning to a variable. snprintf in bash!
+    ```sh
     printf -v var_to_assign "format_str:%s" $value1
+    ```
+* join in bash
+    ```sh
+    # we assume , is the joining char here
+    ## BUT - there will a , at the start of the array as well.
+    joined_var=$(printf ",%0.s" ${my_array[@]})
+    ## strip the first comma
+    joined_var=$(printf ",%0.s" ${my_array[@]} | cut -c 2-)
     ```
 
 ## random shuffle
@@ -1479,6 +1540,35 @@ journalctl --user -u devvm_ssh_starter
 systemctl show --property MainPID --value $SERVICE
 
 ```
+
+* dynamically adjust resources
+
+https://www.linkedin.com/pulse/do-you-know-can-limit-service-memory-cpu-linux-tahmid-ul-muntakim
+
+```sh
+## set once for this incarnation
+ystemctl set-property --runtime fhttpd.servicee CPUQuota=infinity MemoryLimit=infinity
+
+## set forever
+systemctl set-property httpd.service MemoryLimit=500M
+systemctl set-property httpd.service CPUQuota=20%
+```
+
+* man pages
+
+```sh
+man systemd.resource-control
+```
+
+* watch-systemd
+
+```sh
+systemd-cgtop
+
+```
+
+
+
 
 
 ## just get ip for a hostname

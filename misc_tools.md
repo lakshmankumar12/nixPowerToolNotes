@@ -154,7 +154,7 @@ ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no example.com
 * To put ssh in background
 
 ```
-ssh -fN -L 'whatever' user@host
+ssh -fN -L 'forwarding_stuff' user@host
 
 -f  -- go to background
 -N  -- dont execute any command at host
@@ -163,6 +163,10 @@ ssh -fN -L 'whatever' user@host
 ```
 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o ExitOnForwardFailure=yes
 -o LogLevel=ERROR   # suppresses the host-added warnings
+
+-T disable psuedo-terminal allocation
+-t force   psuedo-terminal allocation
+
 ```
 
 ## ssh_config setting
@@ -182,6 +186,9 @@ Host testvm
     UserKnownHostsFile /dev/null
     StrictHostKeyChecking no
 ```
+
+* Match-exec: https://superuser.com/a/1778495
+* Override hostname alone: https://unix.stackexchange.com/a/598532
 
 ## ssh-key gen
 
@@ -222,6 +229,23 @@ ssh-keygen -f private_key.pem -y
 mosh-server new -s -c 8 -p 60000 -l LANG=en_US.UTF-8 -l LANGUAGE=en_US -l LC_CTYPE=en_US.UTF-8
 ```
 
+# login banner in linux
+
+search: motd
+
+```
+/etc/update-motd.d$ ls
+00-header     50-landscape-sysinfo  85-fwupd         90-updates-available       91-release-upgrade      95-hwe-eol      98-fsck-at-reboot   99-custom
+10-help-text  50-motd-news          88-esm-announce  91-contract-ua-esm-status  92-unattended-upgrades  97-overlayroot  98-reboot-required
+```
+
+To check what went wrong if something isn't showing:
+
+```sh
+run-parts /etc/update-motd.d/ > /dev/null
+```
+
+
 # Restarting network in centos
 
 ```
@@ -249,6 +273,9 @@ zip combined.zip file1 file2
 
 ## add files recursively also
 zip -r all_in.zip *
+
+## add a file to a existing file (-u : update)
+zip -u existing.zip newfile
 ```
 
 * list files in a zip
@@ -481,6 +508,9 @@ See general_reading_notes/ipsec_notes.md
 ### client auth
 # --cert $mycert
 # --key $mykey
+### insecure
+# -k, --insecure     --> dont verify tls
+
 ### resolve
 # -- resolve server_url:port:ip
 
@@ -509,6 +539,11 @@ wget -q ${url_to_file} -O - | bash -
 ```
 
 # dpkg
+
+* install a deb
+```
+dpkg -i package-name
+```
 
 * list files in a package
 ```
@@ -549,6 +584,13 @@ wget -q -O- http://whatever.io/key/path/key | sudo apt-key add -
 
 ```
 
+* where does apt store downloaded deb
+
+```sh
+/var/cache/apt/archives/
+```
+
+
 
 ## remove a pkg
 
@@ -557,6 +599,8 @@ apt-get remove --purge libav-tools
 
 ## by directly running dpkg
 dpkg --purge --force-all <packages>
+## also
+dpkg -P package_name
 ```
 
 ## Ubuntu pkg mgmt
@@ -585,6 +629,8 @@ ping        iputils-ping
 ssh         openssh-client
 ip          iproute2
 netstat     net-tools
+arp         net-tools
+dig         dnsutils
 
 ```
 
@@ -838,15 +884,27 @@ C_DRIVE /home/lakshman/host_c vboxsf uid=1000,gid=1000 0 0
 * list all partitions/hard-disks
 ```
 fdisk -l
+
+## extend a primary partition that is the last
+##  the case with resize qcow2 for vms
+##  note the arg is the full disk.. not just a partition!
+fdisk /dev/sda
+command: print  ## show the partition
+command: d      ## delete a partition.. give the last one.
+command: n      ## new partition.. give the same part num, start-sector and the new end-sector
+                ## give no for lvm signature overwrite
+command: w      ## write to partition-table and exit
+
+## you have to reboot after this, and do the pvresize /dev/sdaN and lvextend , resize2fs commands
 ```
 
 * list filetype of all partiions
-```
+```sh
 df -T
 ```
 
 * linux volumes
-```
+```sh
 lsblk
 
 #lsblk with filetypes, label, uuid
@@ -855,12 +913,15 @@ lsblk -f
 ```
 
 * get UUIDs of all disks. Also lists the partition-type and fs-type!
-```
+```sh
 blkid
+
+# this shows the uuid as well.
+lsblk -f
 ```
 
 * get pci device list
-```
+```sh
 lspci
 
 #get network info list
@@ -996,6 +1057,9 @@ pvs
 #lgs
 vgs
 
+# get free space in vg
+vgdisplay --units b
+
 #lvs
 lvs
 
@@ -1009,6 +1073,11 @@ resize2fs /dev/volume-group-name/logical-volume-name
 ## std ubuntu installation
 sudo lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
 sudo resize2fs /dev/ubuntu-vg/ubuntu-lv
+
+
+## more stuff
+## to resize a pv
+pvresize /dev/sda3
 
 ```
 
@@ -1127,6 +1196,13 @@ numactl --show
 
 ```
 
+# motherboard details and stuff
+
+```sh
+dmidecode
+
+```
+
 
 
 # modules
@@ -1172,6 +1248,97 @@ ipmitool lan print 1
 ipmitool user list 1
 ipmitool user set password 2 ADMIN
 ```
+
+# kernel debugging
+
+## ftrace
+
+search: tracking tracing
+
+* https://opensource.com/article/21/7/linux-kernel-ftrace
+
+```sh
+
+cd /sys/kernel/tracing
+
+## see all tracers
+cat /sys/kernel/tracing/available_tracers
+## hwlat blk mmiotrace function_graph wakeup_dl wakeup_rt wakeup function nop
+
+## current tracer
+cat /sys/kernel/tracing/current_tracer
+## function_graph
+
+## dump current trace
+cat /sys/kernel/tracing/trace
+
+## dump available funcs to trace
+cat /sys/kernel/tracing/available_filter_functions
+
+## select functions to filter
+echo -e "func1\nfunc2\n" > /sys/kernel/tracing/set_ftrace_filter
+## enable all functions
+echo > /sys/kernel/tracing/set_ftrace_filter
+## see current filter
+cat /sys/kernel/tracing/set_ftrace_filter
+
+## turn on tracing
+echo 1 > /sys/kernel/tracing/tracing_on ; sleep 10 ; echo 0 > /sys/kernel/tracing/tracing_on
+
+## specific PID
+echo $PID > /sys/kernel/tracing/set_ftrace_pid
+
+```
+
+## list kernel config
+
+```sh
+cat /boot/config-$(uname -r)
+```
+
+## dynamic logs
+
+* check if its enabled first
+
+```sh
+$ grep CONFIG_DYNAMIC_DEBUG /boot/config-$(uname -r)
+CONFIG_DYNAMIC_DEBUG=y   <---
+CONFIG_DYNAMIC_DEBUG_CORE=y
+$
+```
+
+* howto
+
+```sh
+## enable logs
+echo "module openvswitch +p" > /sys/kernel/debug/dynamic_debug/control
+
+## study logs.. they appear in dmesg (-w follows)
+sudo dmesg -w
+
+##disable
+echo "module openvswitch -p" > /sys/kernel/debug/dynamic_debug/control
+```
+
+## performance tuning for networking
+
+```sh
+##read the values
+sudo sysctl net.core.rmem_default
+sudo sysctl net.core.wmem_default
+sudo sysctl net.core.rmem_max
+sudo sysctl net.core.wmem_max
+sudo sysctl net.ipv4.tcp_rmem
+sudo sysctl net.ipv4.tcp_wmem
+
+sudo sysctl -w net.core.rmem_default=$((212992*2))
+sudo sysctl -w net.core.wmem_default=$((212992*2))
+sudo sysctl -w net.core.rmem_max=$((212992*2))
+sudo sysctl -w net.core.wmem_max=$((212992*2))
+sudo sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
+sudo sysctl -w net.ipv4.tcp_wmem="4096 16384 16777216"
+```
+
 
 # Vimium shortcuts
 
@@ -1382,6 +1549,12 @@ cat input.json | jq '.key1."12345".key3'
 cat input.json | jq '.[].key1'
 # the above wont be json output. So to wrap the result into a [], you do:
 cat input.json | jq '[ .[].key1 ]'
+
+## if your input is an array of objects
+## gives all titles followed by all numbers
+cat input.json | jq ' .[].title, .[].number'
+## gives titles/numbers of each object in input array
+cat input.json | jq ' .[] | .title, .number'
 
 # if you want only some keys from an array of dicts.
 # this is call object contruction

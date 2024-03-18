@@ -183,8 +183,11 @@ docker load -i saved_file.tar.gz
 
 ```
 #push a image to repo
-#if :tag is omitted, it tagged as :latest and existing :latest is lost.
+#if :version is omitted, it is tagged as :latest and existing :latest is lost.
 docker tag local_image_name lakshmankumar/repo_name:tag_to_this_version_of_image
+
+docker tag <existing-img:version> <new>
+
 
 docker push lakshmankumar/repo_name:tag
 
