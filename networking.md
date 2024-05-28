@@ -236,6 +236,16 @@ ip -d link show ${brname}
 brctl show
 ```
 
+### ethtool related commands
+
+```sh
+# disable checksumming by drivers
+sudo ethtool --offload eth1 rx off tx off
+sudo ethtool --offload eth2 rx off tx off
+
+```
+
+
 
 ## L3-ish
 
@@ -559,6 +569,7 @@ direct args: 192.168.0.24/8 10.0.0,1,3-7
 
 ## just do a host listing on a network
 sudo nmap -sn 172.28.1.0/24     ## does a mac probe
+sudo nmap -sn 192.168.122.0/24  ## does a mac probe
 nmap -sn 172.28.1.0/24          ## does ping, syn to 80/443
 
 ```
@@ -847,6 +858,7 @@ iptables -t mangle -I PREROUTING -s ${ip} whatever-else-tomatch -j LOG --log-pre
 ```
 sudo iptables -I INPUT -m addrtype --dst-type LOCAL -m policy --pol ipsec --dir in -j NFLOG --nflog-group 5
 sudo iptables -I OUTPUT -m policy --pol ipsec --dir out -j NFLOG --nflog-group 5
+sudo iptables -I FORWARD -m policy --pol ipsec --dir out -j NFLOG --nflog-group 5
 
 tcpdump -n -i nflog:5
 tcpdump -s 0 -n -i nflog:5 -w ./ipsec.pcap
@@ -1231,7 +1243,12 @@ less useful
 
 * to rollover
 ```
--w /tmp/trace-%m-%-%H-%M-%S-%s.pcap -W 10 -G 120 -C 100 -n -s 100
+#for permissions
+sudo apt install apparmor-utils
+sudo aa-complain /usr/sbin/tcpdump
+
+# run
+-w /tmp/trace.pcap -W 10 -C 100
 
 ```
 
@@ -1446,6 +1463,18 @@ iperf -B ${mip} -p ${port} -u -c ${pip} -i 1 -d -l 300 -t 3600 -b50M
 
 
 ```
+
+# socat
+
+```sh
+
+## forward a tcp connection
+##  listen on 9000 and forward to 5924
+socat TCP-LISTEN:9000,fork TCP:127.0.0.1:5924
+
+
+```
+
 
 # ab tool
 

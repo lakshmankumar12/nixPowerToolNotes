@@ -164,6 +164,10 @@ ssh -fN -L 'forwarding_stuff' user@host
 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o ExitOnForwardFailure=yes
 -o LogLevel=ERROR   # suppresses the host-added warnings
 
+# ssh options quick copy
+-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o ExitOnForwardFailure=yes -o LogLevel=ERROR
+
+
 -T disable psuedo-terminal allocation
 -t force   psuedo-terminal allocation
 
@@ -187,6 +191,13 @@ Host testvm
     StrictHostKeyChecking no
 ```
 
+```sh
+### To use a dynamic ip on the sshconfig
+Host chaningiphost
+  ProxyCommand socat stdio tcp:${BUILD_MACHINE_IP}:22
+```
+
+* Dynamic ip host: https://superuser.com/a/338314
 * Match-exec: https://superuser.com/a/1778495
 * Override hostname alone: https://unix.stackexchange.com/a/598532
 
@@ -502,6 +513,7 @@ See general_reading_notes/ipsec_notes.md
 # -w <format>  -- write given format-string(expaned to values) to stdout
 #                 eg format:
 #                    '\\n%{response_code}'
+# -I         --> just get headers only.. and not the BODY
 ### ssl stuff:
 ### server auth
 # --cacert $cacert
@@ -602,6 +614,19 @@ dpkg --purge --force-all <packages>
 ## also
 dpkg -P package_name
 ```
+
+## upgrade a pkg
+
+```sh
+## --only-upgrade ensure it only a upgrade.
+## mere install will also upgrade if it exists
+apt-get install --only-upgrade <packagename>
+
+## to a select version
+sudo apt-get install <package name>=<version>
+sudo apt-get install gparted=0.16.1-1
+```
+
 
 ## Ubuntu pkg mgmt
 
@@ -711,6 +736,12 @@ grub2-mkconfig -o /boot/grub2/grub.cfg
 
 ```
 
+# ubuntu iso-install
+
+* subiquity
+* cloud-init
+* https://ubuntu.com/server/docs/install/autoinstall
+* https://askubuntu.com/a/1322129
 
 # tar
 
@@ -815,6 +846,7 @@ find . -name '*.c' -exec grep to_find_string '{}' \;
 grep -E '\.(c|cc|cpp|h|hh|S|s|in|tcc|Y|m4|asm|rc|ash|fuc|x|l|y|asl|bat|tpl|ac|am|cli)$' cscope.files
 
 git ls-files | grep -E '\.(c|cc|cpp|h|hh|S|s|in|tcc|Y|m4|asm|rc|ash|fuc|x|l|y|asl|bat|tpl|ac|am|cli)$' > cscope.files
+cscope -bqi cscope.files
 
 ```
 
@@ -879,7 +911,7 @@ C_DRIVE /home/lakshman/host_c vboxsf uid=1000,gid=1000 0 0
 
 
 
-# Linux Hard-disk related tools
+# linux Hard-disk related tools
 
 * list all partitions/hard-disks
 ```
@@ -1203,6 +1235,14 @@ dmidecode
 
 ```
 
+## tool to edit bios / uefi
+
+```
+eifbootmgr
+
+```
+
+
 
 
 # modules
@@ -1228,6 +1268,22 @@ sudo sed -i -e '/GRUB_CMDLINE_LINUX=/ s/"$/ console=ttyS0,115200n8 console=tty0"
 sudo grub-mkconfig -o /boot/grub/grub.cfg
 
 ```
+
+# shutdown / reboot linux
+
+no matter what, this will reboot the kernel
+
+* https://en.wikipedia.org/wiki/Magic_SysRq_key
+* https://unix.stackexchange.com/a/183101
+
+
+```sh
+echo s > /proc/sysrq-trigger
+echo u > /proc/sysrq-trigger
+echo s > /proc/sysrq-trigger
+echo b > /proc/sysrq-trigger
+```
+
 
 
 
@@ -1729,4 +1785,15 @@ openvpn3 session-manage --session-path ${SESSION_PATH} --restart
 openvpn3 session-manage --session-path ${SESSION_PATH} --disconnect
 
 ```
+
+
+# oathtool
+
+search: totp MFA 2FA mfa 2fa oauth
+
+```sh
+secret=IPEKMAEFVMEW3TZS33XTDCPJJFJDWVHN
+oathtool -b --totp ${secret}
+```
+
 

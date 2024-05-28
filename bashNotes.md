@@ -199,6 +199,18 @@ echo 'var="value"' | xargs
 ${parameter/pattern/string}
 ```
 
+## prefixing suffixing in array
+
+```sh
+prefix=192.168.122.
+array=(14 15 16)
+
+echo ${array[@]/#/${prefix}}  ## 192.168.122.14 ...and so on.
+echo ${array[@]/%/${suffix}}
+
+```
+
+
 # Filenames and extractions
 
 ```sh
@@ -994,6 +1006,7 @@ cd /
 #   daemon - goto work
 if [ "x$1" = "xchild" ] ; then
     umask 0
+    shift # get rid of the child arg
     $me_DIR/$me_FILE daemon "$@" </dev/null >/dev/null 2>/dev/null &
     exit 0
 elif [ "x$1" != "xdaemon" ] ; then
@@ -1631,6 +1644,9 @@ python3
 ### We can pass it as second arg to get the same hash back
 >>> crypt.crypt('clearpassword','$6$o.bhfCRTBCUr71Qm$')
 '$6$o.bhfCRTBCUr71Qm$Ljmb3Oh8jrSvwzu.S5sdJ/mQorXuBOk9xbQiTY/jQn.FTXYF/gE08Tg09MEK.OAcFPOTCV4A1kuH0QXVWEpeN0'
+### if you want to add rounds
+>>> crypt.crypt('clearpassword','$6$rounds=5000$o.bhfCRTBCUr71Qm$')
+'$6$rounds=5000$o.bhfCRTBCUr71Qm$Ljmb3Oh8jrSvwzu.S5sdJ/mQorXuBOk9xbQiTY/jQn.FTXYF/gE08Tg09MEK.OAcFPOTCV4A1kuH0QXVWEpeN0'
 >>>
 
 ## here is a command line arg of getting passwd

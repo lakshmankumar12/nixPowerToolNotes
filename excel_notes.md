@@ -53,8 +53,11 @@ COUNTA(RANGE)
 ## Periodic mortgate values
 
 ```
-=PMT(...)
+=PMT(rate_per_perion, num_periods, present_value_in_negative, fv, loan_type)
 ```
+
+* `fv` - residual value after the num_periods. Default: 0
+* `loan_type` - 0 -- end of period (defalut),  1 -- beginning of period
 
 ## find cagr of two amounts
 

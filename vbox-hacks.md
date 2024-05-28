@@ -116,6 +116,11 @@ virsh pool-info <pool-name>
 virsh vol-list <pool-name>
 virsh vol-delete --pool <pool-name> <vol-name>
 
+## increase memory
+ virsh dominfo hemanth
+ virsh setmaxmem hemanth 16G --config
+ virsh setmem hemanth 16G --config
+
 ## create a new vm
 vmname=mynewvm
 osvariant=ubuntu20.04   ## use virt-install --os-variant list to find options
@@ -478,6 +483,10 @@ vboxmanage list vms
 vboxmanage showvminfo ubuntu
 
 vboxmanage startvm ubuntu
+
+vboxmanage controlvm NAMEOFVM poweroff
+
+vboxmanage unregistervm NAMEOFVM --delete
 
 
 #bridge-adapter

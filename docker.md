@@ -112,7 +112,7 @@ docker run hello-world
 #--cap-add=NET_ADMIN    -> if you want to add dummy ifcs (other other networking admin stuff) in the cont
 #--privileged           -> Works as well for above.
 #--device /dev/host/device:/dev/cont/device
-#--entrypoint=/bin/bash -> Override the image's entrypoint.
+#--entrypoint=/bin/bash -> Override the image's entrypoint. (make sure to give all args before image name)
 
 docker run -d -p 4000:80 friendlyhello
 

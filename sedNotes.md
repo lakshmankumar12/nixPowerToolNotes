@@ -4,8 +4,9 @@
     * will suppress the default printing.
 * `-i`
     * in place replacement (ensure to have backup!)
-* `-r`
+* `-r`, `-E`
     * use extended regex in script.
+    * `-r` is used in GNU sed, while `-E` is used in BSD/macos sed
 
 * pattern space
     * Where all sed executation take place

@@ -214,6 +214,16 @@ Check repo_root/.git/config and see if you have this:
 ```
 * If you are missing the fetch line, add it.
 
+## reset the origin url
+
+search: uri remote
+
+```sh
+git remote set-url origin new.git.url/here
+
+```
+
+
 # log
 
 ## To see all changes to a file across all branch
