@@ -65,6 +65,9 @@ onyxedge@awsasbaremetal1:/var/opt/magma/configs$
 * https://blog.programster.org/kvm-cheatsheet
 
 ```sh
+
+export LIBVIRT_DEFAULT_URI="qemu:///system"
+
 virt-host-validate
 
 virsh nodeinfo
@@ -137,6 +140,13 @@ virt-install --name=${vmname} --os-variant=${osvariant} \
 # gui
 virt-manager
 
+
+## copy the image
+vmname=mynewimportedvm
+target_path=/var/lib/libvirt/images/${vmname}.qcow2
+sudo cp $src_path $target_path
+
+
 #import from a qcow2 .. note the imported qcow2 will be used.
 # if you want to start from a backup and still have the backup
 # your should cp your backup first and then import from the new file!
@@ -144,7 +154,7 @@ vmname=mynewimportedvm
 osvariant=ubuntu20.04
 cpu=4
 ram=16384    ## in KB
-importimage=/path/to/import.qcow2
+importimage=/path/to/import.qcow2     ## W-A-R-N-I-N-G: copy from your source image. This will be the img of the new VM
 bridge=virbr0
 graphics=none   # or vnc if u want
 virt-install --name=${vmname} --os-variant=${osvariant} \
@@ -164,7 +174,11 @@ virt-install --name=${vmname} --os-variant=${osvariant} \
 ##   --import              .. import from the disk
 ##   --noautoconsole       .. will avoid the console, and return immediately
 ##   --extra-args='console=ttyS0,115200n8 serial'
+##   --boot uefi
+##   --boot loader=/usr/share/OVMF/OVMF_CODE.fd,loader_ro=yes,loader_type=pflash,nvram_template=/usr/share/OVMF/OVMF_VARS.fd
 ```
+
+* note for uefi build , we have to install `sudo apt install ovmf`
 
 ## create a new network
 
@@ -189,6 +203,7 @@ virt-install --name=${vmname} --os-variant=${osvariant} \
 ```
 
 * Bridged network
+  * Not clear - in this mode, looks like kvm wont create the bridge itself.
 ```xml
 <network>
   <name>br0</name>
@@ -264,14 +279,18 @@ sudo qemu-img create -f raw ${image_name} 128G
 
 * xml snippet to add a cdrom-device (or just add a iso)
 
-```
+```xml
     <disk type='file' device='cdrom'>
       <driver name='qemu'/>
       <target dev='sda' bus='sata'/>
-      <source file='/path/to/your/file.iso'/>         <!-- Mostly this is what you should add -->
+      <!-- Mostly this is what you should add -->
+      <source file='/path/to/your/file.iso'/>
       <readonly/>
       <alias name='sata0-0-0'/>
+      <!-- not sure fi the following is needed.
+           Adding it stops it from being a boot device! -->
       <address type='drive' controller='0' bus='0' target='0' unit='0'/>
+      <boot order='1'/>
     </disk>
 ```
 
@@ -285,6 +304,43 @@ virsh attach-interface --domain lakshmantrfvm --type bridge \
 
 
 ```
+
+* attach a disk to a vm
+
+```sh
+virsh attach-disk ${vmname} --source ${diskfile} --target vdb --persistent
+
+```
+
+## mounting a qcow2
+
+```sh
+
+## check if module is already there
+lsmod | grep nbd
+
+## load the module if needed
+modprobe nbd max_part=8
+
+## connect qcow2
+qemu-nbd --connect=/dev/nbd0 /path/to/your/qcow2.img
+
+## find the partition name..
+fdisk /dev/nbd0 -l
+## or
+lsblk
+
+## mount
+mount /dev/nbd0p1 /mnt/somepoint/
+
+## once done: cleanup
+umount /mnt/somepoint/
+qemu-nbd --disconnect /dev/nbd0
+rmmod nbd
+
+```
+
+
 
 ## snapshots
 
@@ -337,6 +393,16 @@ virsh snapshot-delete --domain freebsd --snapshotname 5Sep2016_S2
 </os>
 ```
 
+## adjust memory of a guest
+
+```sh
+virsh setmem <vm name> 16G --live
+virsh setmaxmem <vm name> 16G --config
+virsh setmem <vm name> 16G --config
+
+```
+
+
 ## Put in a image-file as usb device
 
 ```
@@ -372,9 +438,9 @@ References: https://linuxconfig.org/how-to-use-bridged-networking-with-libvirt-a
   </forward>
   <bridge name='tr0second' stp='on' delay='0'/>
   <mac address='52:54:00:df:14:7b'/>
-  <ip address='192.168.123.1' netmask='255.255.255.0'>
+  <ip address='192.168.124.1' netmask='255.255.255.0'>
     <dhcp>
-      <range start='192.168.123.10' end='192.168.123.100'/>
+      <range start='192.168.124.10' end='192.168.124.100'/>
     </dhcp>
   </ip>
 </network>
@@ -407,7 +473,15 @@ virsh qemu-agent-command <vm-name> '{"execute":"guest-network-get-interfaces"}'
 
 ##or
 virsh domifaddr --source agent lakshmanAgw
+
+## execute any random command -- 2 stage thing
+virsh qemu-agent-command test-vm   '{"execute": "guest-exec", "arguments": { "path": "apt", "arg": [ "install","cowsay","-y" ], "capture-output": true }}'  --pretty
+## that gives you the pid of the prcess. you have to now get the result of the pid
+virsh qemu-agent-command test-vm   '{"execute": "guest-exec-status", "arguments": { "pid": 1993 }}' --pretty
+## and do base64 decode to get both stdout/stderr
+
 ```
+
 
 * confirm if a guest has agent channel enabled:
 
@@ -449,6 +523,78 @@ sudo mokutil --disable-validation
 
 
 ```
+
+# ubuntu install from cloud image
+
+
+ubuntu images -https://cloud-images.ubuntu.com/focal/current/
+
+* Prepare a cloud-init user-data
+* To understand how to get this - you have to study the cloud-data-sensitive logs generated in a
+  spinned up image.
+
+```sh
+second_disk_src=/home/gxcautotest/lakshman/from_official_ubuntu_qcow2/user-data.src
+cat >${second_disk_src} <<EOF
+#cloud-config
+ssh_pwauth: True
+password: onyxedge
+chpasswd: { expire: False }
+hostname: onyxedge-agw
+system_info:
+  default_user:
+    gecos: Ubuntu
+    groups:
+      - adm
+      - audio
+      - cdrom
+      - dialout
+      - dip
+      - floppy
+      - lxd
+      - netdev
+      - plugdev
+      - sudo
+      - video
+    lock_passwd: False
+    name: onyxedge
+    shell: /bin/bash
+    sudo:
+      - "ALL=(ALL) NOPASSWD:ALL"
+EOF
+```
+
+```sh
+## copy the cloud image downloaded to your vm-img. This will be its hard-disk
+## you will have to increase the qcow if you want to at this stage. - TODO
+vmname=ubuntu_imported
+src_path=/home/gxcautotest/lakshman/from_official_ubuntu_qcow2/focal-server-cloudimg-amd64.img
+target_path=/var/lib/libvirt/images/${vmname}.qcow2
+sudo cp $src_path $target_path
+
+## prepare a iso image of the cloud-data
+second_disk=/home/gxcautotest/lakshman/from_official_ubuntu_qcow2/user-data.img
+cloud-localds ${second_disk} ${second_disk_src}
+
+vmname=ubuntu_imported
+osvariant=ubuntu20.04
+cpu=2
+ram=8192
+importimage=${target_path}
+bridge=virbr0
+graphics=vnc
+virt-install --name=${vmname} --os-variant=${osvariant} \
+             --vcpu=${cpu} --ram=${ram} --graphics ${graphics} \
+             --disk ${importimage},bus=sata --disk path=${second_disk},format=raw --import --network bridge=${bridge},model=virtio \
+             --noautoconsole
+
+vncof ${vmname}
+
+vmname=ubuntu_imported
+virsh destroy $vmname
+virsh undefine --remove-all-storage $vmname
+```
+
 
 
 # vagrant stuff

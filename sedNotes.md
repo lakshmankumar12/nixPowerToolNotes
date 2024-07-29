@@ -248,6 +248,16 @@ cat file |   tr -dc '[\011\012\015\040-\176]' > result
 cat file |   tr -dc '[\011\012\040-\176]' > result
 ```
 
+## print exactly nth line
+
+```sh
+sed 'NUMq;d' file
+```
+
+* note that the `d` keeps deleting lines without printing
+  until the `NUM`th line, which it prints and sed exits.
+
+
 ## Print from nth line to end of file
 
 ```sh

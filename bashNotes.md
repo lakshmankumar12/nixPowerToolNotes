@@ -188,6 +188,26 @@ echo 'var="value"' | xargs
 # you will see : var=value
 ```
 
+## regex matching
+
+```sh
+## ingeneral
+if [[ "$haystack" =~ $needle ]] ; then
+fi
+
+
+  #   /dev/sda1 : start=        2048, size=     1048576, type=C12A7328-F81F-11D2-BA4B-00A0C93EC93B, uuid=2FFCC127-F6CE-40F0-9932-D1DFD14E9462, name="EFI System Partition"
+  #   /dev/sda1 : start=        2048, size=     1048576, type=C12A7328-F81F-11D2-BA4B-00A0C93EC93B, uuid=2FFCC127-F6CE-40F0-9932-D1DFD14E9462
+  for partition_data_line in "${partition_data_array[@]}" ; do
+    if [[ $partition_data_line =~ ^([^[:blank:]]+)[[:blank:]]:[[:blank:]].*[[:blank:]]uuid=([^,]+) ]] ; then
+      device=${BASH_REMATCH[1]}
+      uuid="${BASH_REMATCH[2]}"
+    fi
+  done
+
+```
+
+
 
 # Parameter expansion
 
@@ -550,8 +570,13 @@ function f_cursor_up()
 ```sh
 stty sane
 
+#or to restore
+echo -e '\0033\0143'
+
+
 #bring cursor back
 tput cnorm
+
 
 ```
 
@@ -1386,6 +1411,10 @@ echo "$VAR"
     ## strip the first comma
     joined_var=$(printf ",%0.s" ${my_array[@]} | cut -c 2-)
     ```
+* escape a variable
+    ```sh
+    printf -v escaped_var "%q" original_var
+    ```
 
 ## random shuffle
 
@@ -1402,6 +1431,13 @@ Arguments
 * `-p <pid>` - only these pids. Can repeat
 * `-b` - batch mode. Useful when dumping output
 * `-n <count>` - Only dump count samples
+
+```
+## in batch mode, just collect first few lines -- leverage grep -A on the first line
+top -n 15 -H -d 1 -b | grep "load average" -A 30
+
+```
+
 
 ## xargs
 
@@ -1483,10 +1519,10 @@ uptime -s
 journalctl -u some_service
 
 # list log of a particular boot
-journalctl -b 1
+journalctl -b -1
 
 # list log since current boot only
-journalctl -b
+journalctl -b 0
 
 # only from till
 journalctl --since "3 hours ago"
@@ -1505,7 +1541,7 @@ systemctl list-units --type=service
 
 # This will make systemd read all services and update
 # its database
-systemctl daemon-reload
+sudo systemctl daemon-reload
 
 # verify a definition file
 sudo systemd-analyze verify phy_ifc_map_check.service

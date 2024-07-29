@@ -522,6 +522,7 @@ See general_reading_notes/ipsec_notes.md
 # --key $mykey
 ### insecure
 # -k, --insecure     --> dont verify tls
+# -D <file>  --> save the response headers in a file
 
 ### resolve
 # -- resolve server_url:port:ip
@@ -551,6 +552,9 @@ wget -q ${url_to_file} -O - | bash -
 ```
 
 # dpkg
+
+https://www.debian.org/doc/manuals/debian-faq/pkgtools.en.html
+https://wiki.debian.org/MaintainerScripts
 
 * install a deb
 ```
@@ -582,6 +586,11 @@ apt-file search /path/to/file
 
 dpkg -S /path/to/file
 ```
+* Some if your pkg magmt is stuck, rebuild the config database
+```
+sudo dpkg --configure -a
+```
+
 
 * list packages provided by a repostiry
 ```sh
@@ -593,6 +602,9 @@ grep -h -P -o "^Package: \K.*" /var/lib/apt/lists/repo_name_*_Packages | sort -u
 ```sh
 # add a apt key
 wget -q -O- http://whatever.io/key/path/key | sudo apt-key add -
+
+# list all keys
+apt-key list
 
 ```
 
@@ -627,6 +639,34 @@ sudo apt-get install <package name>=<version>
 sudo apt-get install gparted=0.16.1-1
 ```
 
+## only download without install
+
+```sh
+sudo apt-get install --download-only pppoe
+
+## and find the debs in
+/var/cache/apt/archives
+
+```
+
+## apt commands
+
+```sh
+apt-get update             ->  apt update
+apt-get upgrade            ->  apt upgrade
+apt-get dist-upgrade       ->  apt full-upgrade
+apt-get install package    ->  apt install package
+apt-get remove package     ->  apt remove package
+apt-get autoremove         ->  apt autoremove
+apt-cache search string    ->  apt search string
+apt-cache policy package   ->  apt list -a package
+apt-cache show package     ->  apt show package
+apt-cache showpkg package  ->  apt show -a package
+
+```
+
+
+
 
 ## Ubuntu pkg mgmt
 
@@ -634,11 +674,37 @@ https://askubuntu.com/questions/170348/how-to-create-a-local-apt-repository
 
 ### Installation of ubuntu
 
-search: autoinstall cloudinit
+search: autoinstall cloudinit auto-install
 
 links:
 * https://gist.github.com/s3rj1k/55b10cd20f31542046018fcce32f103e
 * https://ubuntu.com/server/docs/install/autoinstall-reference
+* https://canonical-subiquity.readthedocs-hosted.com/en/latest/howto/autoinstall-quickstart.html
+
+source: https://github.com/canonical/subiquity.git
+
+* storage config
+```
+disk   [ match: , ptable: gpt ]
+|
++-- partition (refers to disk by device==id  [ size: flag:boot label: grub_device:true ]
+|   |
+|   +-- format (refers to parition by volume==id) [fstype: ]
+|       |
+|       +-- mount (refers to format by device==id) [path: ]
+|
++-- partition
+|   |
+|   +-- lvm_volgroup (includes partitions by way of devices:[])   [ name ]
+|       |
+|       +-- lvm_partition (refers to lvm_volgroup by volgroup==id) [ name, size ]
+|           |
+|           +-- format (refers to lvm_parition by volume==id) [fstype: label: ]
+|               |
+|               +-- mount (refers to format by device==id) [path: ]
+
+```
+
 
 
 ## popular commands and their packages in ubuntu
@@ -656,6 +722,7 @@ ip          iproute2
 netstat     net-tools
 arp         net-tools
 dig         dnsutils
+lstopo      hwloc
 
 ```
 
@@ -738,10 +805,12 @@ grub2-mkconfig -o /boot/grub2/grub.cfg
 
 # ubuntu iso-install
 
-* subiquity
+* subiquity / curtin
 * cloud-init
 * https://ubuntu.com/server/docs/install/autoinstall
 * https://askubuntu.com/a/1322129
+* Login-details of installer - https://askubuntu.com/a/1322129
+    * default sheel is `/usr/bin/subiquity-shell`
 
 # tar
 
@@ -762,6 +831,7 @@ tar zxvf /path/to/tarfile.tgz
 # -a               -- automatically detect the compression algo from file suffix
 # -O, --to-stdout  -- cat to stdout
 # -C <dir>         -- extract to a diff dir. Mention after the args. eg .. cat ... | tar xf - -C dir
+# --strip-components N -- leave N-many prefix-dirs
 
 ### add to a tar file
 tar rf tarfile.tgz newfileu
@@ -911,7 +981,7 @@ C_DRIVE /home/lakshman/host_c vboxsf uid=1000,gid=1000 0 0
 
 
 
-# linux Hard-disk related tools
+# linux hard-disk related tools
 
 * list all partitions/hard-disks
 ```
@@ -991,6 +1061,9 @@ losetup -Pf  CentOS-7-x86_64-Minimal-1810.iso
 losetup -d /dev/loop0
 ```
 
+* naming of hard disks - https://wiki.archlinux.org/title/Device_file#Block_device_names
+    * sda, vda, nvme0n1, mmcblk, vda, sr0
+
 * usb-serial in linux
 ```
 lsusb
@@ -1013,10 +1086,24 @@ dmesg
 screen /dev/ttyUSB0 115200
 ```
 
+### force unmount a nfs stuck partition
+
+* Note -- obviously causes data losses
+```sh
+sudo umount -l -f /path/to/mount/dir
+```
+* `-l` is lazy unmount
+* `-f` is force unmount
+
+
 ## Eject a cdrom
 
 ```
 eject /dev/cdrom
+
+## reinsert a eject ussb disk
+
+sudo eject -t /dev/sdb
 ```
 
 
@@ -1032,7 +1119,19 @@ cdparanoia -vsQ
 cdparanoia -B
 ```
 
-## build a usb-raw image
+## dd
+
+* show progress
+```sh
+dd if=input of=output status=progress
+
+## use thse
+dd if=input of=output status=progress conv=fsync oflag=direct bs=100M
+
+```
+
+
+### build a usb-raw image
 
 ```sh
 dd if=/dev/zero of=usb.img bs=1M count=8192
@@ -1073,6 +1172,28 @@ sudo chown -R user:group /mountpoint
 
 ```
 
+## get uuid of partitions
+
+```
+sfdisk -d /dev/sda
+
+onyxedge@onyxedge-nr:~$ sudo sfdisk -d /dev/sda
+label: gpt
+label-id: 407831D1-4ABD-4445-9852-173B542FD260
+device: /dev/sda
+unit: sectors
+first-lba: 34
+last-lba: 62914526
+sector-size: 512
+
+/dev/sda1 : start=        2048, size=     2201600, type=C12A7328-F81F-11D2-BA4B-00A0C93EC93B, uuid=3952B232-62C3-4FD2-ACD6-DE869F747DAD
+/dev/sda2 : start=     2203648, size=     4194304, type=0FC63DAF-8483-4772-8E79-3D69D8477DE4, uuid=B4F7AE03-003D-4364-B76D-04A6918295F8
+/dev/sda3 : start=     6397952, size=    56514560, type=0FC63DAF-8483-4772-8E79-3D69D8477DE4, uuid=4A558994-7E6C-40E5-870C-8CFDD416941B
+onyxedge@onyxedge-nr:~$
+
+```
+
+
 
 ## LVM
 
@@ -1112,6 +1233,31 @@ sudo resize2fs /dev/ubuntu-vg/ubuntu-lv
 pvresize /dev/sda3
 
 ```
+
+### mounting lvm across disks
+
+```sh
+## install stuff if its not already tehre
+sudo yum install lvm2
+sudo modprobe dm-mod
+
+## find the availalbe volume-groups
+sudo vgscan
+
+## activate the volume
+sudo vgchange -ay VolGroup00
+
+## list the logical volumes
+sudo lvs
+
+## mount your lv
+sudo mkdir /mnt/fcroot
+sudo mount /dev/VolGroup00/LogVol00 /mnt/fcroot -o ro,user
+
+
+```
+
+
 
 ## nfs mounting
 
@@ -1198,6 +1344,14 @@ gxcautotest@auto-gamma:~$
 
 ```
 
+# create a kernel panic
+
+```sh
+echo c | sudo tee /proc/sysrq-trigger
+
+```
+
+
 
 # study cpu of a machine
 
@@ -1207,6 +1361,18 @@ gxcautotest@auto-gamma:~$
 lscpu
 lscpu | egrep 'Model name|Socket|Thread|NUMA|CPU\(s\)'
 
+# see which are hyperthreads on the same core
+lscpu --all --extended
+
+## Legend for lscpu and lstopo
+#  PU P# = Processing Unit Processor #. (hyper-threads)
+#  PU L# = Not sure what this is.
+#
+#  L#i = Instruction Cache,
+#  L#d = Data Cache.
+#  L1 = Level 1 cache.
+
+
 # who is main, who is hyperthread (SMT - simultaneous multithreading)
 #  cpu0  has 0 first, so 0 is main and 32 is SMT
 #  cpu32 has 0 first, so 0 is main and 32 is SMT
@@ -1215,8 +1381,11 @@ cat /sys/devices/system/cpu/cpu0/topology/thread_siblings_list
 cat /sys/devices/system/cpu/cpu32/topology/thread_siblings_list
 0,32
 
-# gives l1/l2/l3 cache and numa nodes
+# gives l1/l2/l3 cache and numa nodes (apt install hwloc)
 lstopo
+lstopo --output-format png -v --no-io > /tmp/cpu.png
+# on terminal:
+lstopo-no-graphics --no-io --no-legend --of txt
 
 # affinity tools
 taskset --cpu_list 0,2 application.exe
@@ -1237,10 +1406,34 @@ dmidecode
 
 ## tool to edit bios / uefi
 
-```
-eifbootmgr
+```sh
+efibootmgr
+
+## list the boot options
+efibootmgr
+
+## just set a boot option for next boot
+efibootmgr -n 0002
+
+## set the boot options permenantly
+efibootmgr -o 0001,0002,0003,0005
 
 ```
+
+* for realtime kernels add this to the kernel args
+  i.e edit `/etc/default/grub` .. `GRUB_CMDLINE_LINUX=`
+  and run `sudo update-grub`
+
+```
+efi=runtime
+```
+
+* want to change the boot-order:
+
+```
+https://raw.githubusercontent.com/s-n-ushakov/rename-efi-entry/master/rename-efi-entry.bash
+```
+
 
 
 
@@ -1278,6 +1471,7 @@ no matter what, this will reboot the kernel
 
 
 ```sh
+sudo bash
 echo s > /proc/sysrq-trigger
 echo u > /proc/sysrq-trigger
 echo s > /proc/sysrq-trigger
@@ -1796,4 +1990,22 @@ secret=IPEKMAEFVMEW3TZS33XTDCPJJFJDWVHN
 oathtool -b --totp ${secret}
 ```
 
+# tesseract
+
+* devnagiri trained source : 
+
+https://github.com/tesseract-ocr/tessdata
+https://github.com/Shreeshrii/tessdata_shreetest
+
+```sh
+export TESSDATA_PERFIX=.../tessdata
+
+$ tree $TESSDATA_PERFIX
+├── san-siddhanta-float.traineddata
+└── san.traineddata
+
+gs -o img.tiff -sDEVICE=tiffg4 -r1200 -dAutoRotatePages=/PageByPage source.pdf
+tesseract img.tiff texted_output -l san-siddhanta-float
+
+```
 

@@ -697,6 +697,17 @@ ip vrf exec vrf_name bash
         * 1123 - internet host requirements rfc
         * 1035 - domain names
 
+## sys proc arrangment
+
+```
+The real path:          /sys/devices/pci0000:42/0000:42:01.0/0000:43:00.3
+By pci:                 /sys/bus/pci/devices/${pci}
+
+By name:                /sys/class/net/${devname}
+If net, realpath:       /sys/devices/pci0000:42/0000:42:01.0/0000:43:00.3/net/${devname}
+There is a backlink:    device -> ../../
+```
+
 # iptables
 
 https://en.wikipedia.org/wiki/Iptables#/media/File:Netfilter-packet-flow.svg
@@ -882,6 +893,11 @@ https://serverfault.com/a/782897
 
 ```
 
+## ipsets
+
+* Represents a collection of ip
+* see https://unix.stackexchange.com/a/557494
+
 
 # nft
 
@@ -944,6 +960,38 @@ sudo nft flush ruleset
 sudo nft add chain ip filter input { type filter hook input priority filter\; policy accept\; }
 sudo nft add chain ip filter forward { type filter hook forward priority filter\; policy accept\; }
 sudo nft add chain ip filter output { type filter hook output priority filter\; policy accept\; }
+
+## You can create any custom table. table is just a place holder of chains
+## You have to create a chain in a table and
+##           The type filter hook <where> priority <what>  --> decides how your chain will participate in the whole process
+
+## sample match rules
+iifname "virbr0"
+oifname "virbr0"
+oif eno12399
+
+ip daddr 192.168.122.20/24
+ip saddr 192.168.122.0/24
+ip protocol gre
+ip flags '&' 0x1 != 0
+
+vlan id 500
+
+meta l4proto tcp
+tcp dport 22
+udp sport 67
+
+ct state related,established
+
+##same actions
+dnat to 10.1.1.1:22
+masquerade
+masquerade to :1024-65535
+reject
+drop
+accept
+jump <chainname>
+
 
 ```
 
@@ -1180,6 +1228,8 @@ network:
         - enp3s0
 ```
 
+## netplan commands
+
 
 
 * restart networking
@@ -1187,6 +1237,40 @@ network:
 sudo netplan apply
 ```
 
+
+# ufw
+
+```sh
+
+# basic:
+# ufw [--dry-run] [options] [rule syntax]
+
+# some sample rules
+sudo ufw allow 22
+sudo ufw deny 22
+sudo ufw deny 22/tcp
+ufw route deny out on eno8303 to 50.112.90.181 from 10.0.20.2
+ufw allow from 192.168.2.0/24 to 192.168.2.25 port 22 proto tcp comment 'why-this-rule'
+
+
+# show the rules now
+sudo ufw status numbered
+
+# delete rule
+#   you can delete one by one only
+#   mind-you numbers change after deletion
+sudo ufw delete 1
+
+
+# you can also delete by the exact syntax
+sudo ufw delete deny 22
+## using awk to delete grepped rules
+ufw show added | awk '/192.168.184.8/{ gsub("ufw","ufw delete",$0); system($0)}'
+
+# diable firewall
+sudo ufw disable
+sudo ufw enable
+```
 
 
 
@@ -1573,6 +1657,13 @@ https://superuser.com/questions/1687861/domain-based-routing-with-systemd-resolv
 https://gist.github.com/brasey/fa2277a6d7242cdf4e4b7c720d42b567
 https://unix.stackexchange.com/questions/442598/how-to-configure-systemd-resolved-and-systemd-networkd-to-use-local-dns-server-f
 https://blogs.gnome.org/mcatanzaro/2020/12/17/understanding-systemd-resolved-split-dns-and-vpn-configuration/
+
+```
+## note the spelling - its resolve
+systemd-resolve --status
+
+```
+
 
 
 # IPsec configuration

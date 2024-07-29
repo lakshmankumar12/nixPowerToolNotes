@@ -88,6 +88,8 @@ docker inspect -f '{{ .Mounts }}' containerid
 
 ### running a image
 
+search: docker run args
+
 ```
 #syntax
 docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
@@ -104,10 +106,14 @@ docker run hello-world
 #-d                     -> run in detached mode (like daemon)
 #--detach               -> opposite of -i -t  .. run as daemon ( but not sure, i see -itd as args )
 #-e NAME=VALUE          -> set env NAME and give VALUE
+#                       -> mere -e NAME , will get current value from environment.
+#                       -> useful if you dont want to expose the value in commandline
+#--env-file ./env-list  -> file with NAME=VALUE pairs. Useful if you have lots or dont want env on command line
 #-u userid              -> start as that userid
 #-v host-folder:cont-folder[:ro]    -> mount host-folder at cont-folder
 #-t                     -> Give a tty
 #-i                     -> Interactive mode
+#-w <dir>               -> set working directory in the container to this dir.
 #--name <name>          -> start with this name (instead of the auto-assigned crazy,but,cool name)
 #--cap-add=NET_ADMIN    -> if you want to add dummy ifcs (other other networking admin stuff) in the cont
 #--privileged           -> Works as well for above.
