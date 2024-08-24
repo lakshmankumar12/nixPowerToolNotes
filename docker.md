@@ -24,7 +24,7 @@ sudo du -sh /var/lib/docker
 
 ## Image Management
 
-```
+```sh
 #list images
 docker images
 docker images -a
@@ -35,14 +35,37 @@ docker rmi <image-id>
 #cleanup old images
 docker image prune
 
+## explicitly remove the <none> images
+docker image rm $(docker image ls | awk '/<none>/ {print $3}')
+
 #another command to reclaim space
 docker system prune -a -f
 
+# to see which images are dependendant on a given image
+#   https://gist.github.com/altaurog/21ea7afe578a523e3dfe8d8a746f1e7d
+python3 docker_descendants.py <image_id>
+
 ```
+
+### save and load
+
+```sh
+#save an image locally into a file
+docker save existing_image_name | gzip > saved_image.tgz
+#or
+docker save -o outputfile.tar.gz existing_image_name
+
+#load save images
+gunzip < saved_image.tgz | docker load
+#or
+docker load -i saved_file.tar.gz
+```
+
+
 
 ## Container Management
 
-```
+```sh
 #list containers
 docker ps
 
@@ -51,6 +74,7 @@ docker ps -q
 
 #login to your docker-account from command-shell
 docker login
+docker login http://myregistry.com
 
 #copy files into a container
 docker cp /path/to/file/on/host/file container_name:/path/in/container/
@@ -174,17 +198,6 @@ docker inspect  container_name
 docker inspect --format '{{.State.Pid}}' container_name
 ```
 
-### save and load
-
-```
-#save an image locally into a file
-docker save -o outputfile.tar.gz existing_image_name
-
-#load save images
-docker load -i saved_file.tar.gz
-```
-
-
 # Repository mgmt
 
 ```
@@ -233,9 +246,6 @@ docker build . -f someother/path/Dockerfile
 #    you can have many FROM. See
 #    https://docs.docker.com/develop/develop-images/multistage-build/
 FROM some_base_image:version
-
-#
-AttributeError: 'datetime.datetime' object has no attribute 'timestamp'
 
 #your name or whoever maintains and the email"
 MAINTAINER firstname lastname <firstname.lastname@xyz.com>
@@ -332,7 +342,7 @@ COPY --from=nginx:latest /etc/nginx/nginx.conf /nginx.conf
 
     #create an new bridge
     docker network create networkNameX --driver=bridge --subnet=192.168.100.0/24
-    ## add the --internet arg to create an isolated bridge
+    ## add the --internal arg to create an isolated bridge
     docker network create networkNameX --driver=bridge --subnet=192.168.100.0/24 --internal
     ##
     ## more args
@@ -418,15 +428,15 @@ apt install -y iproute2 iputils-ping  iptables  net-tools  \
         strongswan strongswan-swanctl iperf3 lsof wget curl \
         wireshark tshark ipcalc jq openvpn isc-dhcp-server dnsmasq \
         netcat openconnect traceroute dnsutils isc-dhcp-client \
-        python3-pip
+        python3-pip netperf
 
 pip3 install twisted
 
 exit
 
 docker ps -a
-commit=...
-docker commit $commit nw_demo_image
+containerid=...
+docker commit $containerid nw_demo_image
 docker tag nw_demo_image lakshmankumar/simple-routerish-docker:latest
 docker push lakshmankumar/simple-routerish-docker
 docker tag nw_demo_image my_routerish_container
@@ -436,7 +446,7 @@ docker image prune
 docker pull lakshmankumar/simple-routerish-docker
 
 #to fire the docker
-docker run -it --name machineA simple-routerish-docker
+docker run -it --name machineA nw_demo_image
 
 ```
 
@@ -465,6 +475,7 @@ chmod 600 /root/.ssh/authorized_keys
 EOF
 
 ## create a pub/private pair on the $datadir/data/id_rsa{,.pub}
+ssh-keygen -t rsa -N "" -C "test-keys" -f $datadir/id_rsa
 
 ## and mount this in the container
 cat <<EOF > $datadir/fire.sh

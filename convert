@@ -60,7 +60,7 @@ gimp -> new
      -> advanced options -> background -> tranparent
                          -> size-> required size
      -> text box -> write ur text
-     -> rotate -> rotate ur image
+     -> rotate -> rotate ur image    (Shift+R opens up rotate tool)
      -> move -> center it.
      -> export as png
 

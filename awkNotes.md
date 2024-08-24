@@ -361,8 +361,9 @@ paste -d'\t' - - - - < in_file
 search: col column table tabularize
 
 ```sh
-# separator as -s
-cat output | column -t -s "|"
+# -t    ..  tabular output
+# -s    ..  input-separator
+cat output | column -t -s "|" --output-separator "|"
 
 ```
 
@@ -425,7 +426,8 @@ awk -F\| 'function stripw(var){gsub(/^[ \t]+/,"",var);gsub(/[ \t]+$/,"",var);ret
 Here we convert the Month string to number
 The enum strings SHOULD be of same size
 ```
-index("JanFebMarAprMayJunJulAugSepOctNovDec",$2)+2)/3
+m=(index("JanFebMarAprMayJunJulAugSepOctNovDec",$2)+2)/3;
+m=sprintf("%02d",(index("JanFebMarAprMayJunJulAugSepOctNovDec",$2)+2)/3);
 ```
 
 

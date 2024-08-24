@@ -101,6 +101,8 @@ git ls-files --staged
 #unstage
 git restore --staged file-to-unstage
 
+#add exec bit
+git update-index --chmod=+x ${file}
 
 
 ```

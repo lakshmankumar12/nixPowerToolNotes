@@ -46,6 +46,7 @@ See https://stackoverflow.com/a/3427931
 ```sh
 $?  -- last command exit status
 $$  -- invoker's pid
+$!  -- last command pid
 $#  -- number of arguments.
 
 ```
@@ -1288,8 +1289,13 @@ timedatectl timesync-status
 ## to edit config .. use
 /etc/systemd/timesyncd.conf
 
+```
 
+### phc ptp
 
+```sh
+sudo phc_ctl enp25s0f3 get ; sudo phc_ctl CLOCK_REALTIME  get ; date ; wget --method=HEAD -qSO- --max-redirect=0 google.com 2>&1 | sed -n 's/^ *Date: *//p'
+sudo phc_ctl enp25s0f3 set $(python -c 'from dateutil.parser import parse ; import sys;  print(parse(sys.argv[1]).strftime("%s")) '  "$(wget --method=HEAD -qSO- --max-redirect=0 google.com 2>&1 | sed -n 's/^ *Date: *//p')")
 ```
 
 ## timeout
@@ -1518,6 +1524,10 @@ uptime -s
 # lists logs of just one unit (service)
 journalctl -u some_service
 
+##other args
+##  -f                 --  follow
+##  -n 100             --  last 100 lines
+
 # list log of a particular boot
 journalctl -b -1
 
@@ -1532,9 +1542,18 @@ journalctl --since "2015-06-26 23:15:00" --until "2015-06-26 23:20:00"
 #only form processes running as a user
 journalctl _UID=108
 
+#only for one service and only from last invocation/start
+journalctl _SYSTEMD_INVOCATION_ID=$(systemctl show --value -p InvocationID magma@magmad)
+
+# clean up / clear
+journalctl --vacuum-time=2d
+journalctl --vacuum-size=500M
+
 ```
 
 ## systemctl
+
+search: systemd
 
 ```sh
 systemctl list-units --type=service
@@ -1546,11 +1565,28 @@ sudo systemctl daemon-reload
 # verify a definition file
 sudo systemd-analyze verify phy_ifc_map_check.service
 
+# show prperties of a aservice
+systemctl show $SERVICE
+
+# any specific one .. Get pid of main process
+#  --value avoids printing PropertyName=
+systemctl show --property MainPID --value $SERVICE
+
+# gives active inactive .. also exit status gives info
+systemctl is-active application.service
 ```
-Types:
+
 ```sh
+# Types:
 Type=simple
 Type=oneshot
+
+# unit configs
+StartLimitInterval=3600
+StartLimitBurst=5            ## together StartLimitInterval and StartLimitBurst
+                             ## control how much the service can restart in
+                             ## the interval. Beyond that systemd will not
+                             ## restart the service.
 
 ```
 
@@ -1583,12 +1619,6 @@ systemctl --user status devvm_ssh_starter.service
 journalctl --user -u devvm_ssh_starter
 ```
 
-* Get pid of main process
-
-```sh
-systemctl show --property MainPID --value $SERVICE
-
-```
 
 * dynamically adjust resources
 
@@ -1616,6 +1646,8 @@ systemd-cgtop
 
 ```
 
+* for timers:
+    * https://documentation.suse.com/sle-micro/6.0/html/Micro-systemd-working-with-timers/index.html
 
 
 
@@ -1649,7 +1681,7 @@ if [ $? -ne 0 ] then echo "bad ip" ; fi
 
 ```sh
 user_to_add=lakshman   #or whoever the name is
-pass=...crypt-encrypted-pass...
+cpass=...crypt-encrypted-pass...
 #prefer useradd over adduser
 useradd -m -p $pass -s /bin/bash ${user_to_add}
 ## options
@@ -1671,7 +1703,14 @@ sudo passwd username
 ```
 
 * Getting crypted password
+
 ```
+#one liner
+pass=clearpass
+cpass=$(python3 -c 'import crypt;print(crypt.crypt("'"$pass"'"))' 2> /dev/null)
+echo $cpass
+
+
 python3
 >>> import crypt
 >>> crypt.crypt('clearpassword')

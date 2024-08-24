@@ -170,15 +170,24 @@ virt-install --name=${vmname} --os-variant=${osvariant} \
 ##   --cdrom=${image_path}
 ##   --location ftp://...iso
 ##   --network bridge=${bridge},model=virtio          <-- simply repeat this for a second interf with a diff bridge
-##   --disk=${hd-path}     .. path to image disk
+##   --disk=${hd-path}     .. path to image disk, use --disk none to avoid creating a disk
 ##   --import              .. import from the disk
 ##   --noautoconsole       .. will avoid the console, and return immediately
 ##   --extra-args='console=ttyS0,115200n8 serial'
 ##   --boot uefi
 ##   --boot loader=/usr/share/OVMF/OVMF_CODE.fd,loader_ro=yes,loader_type=pflash,nvram_template=/usr/share/OVMF/OVMF_VARS.fd
+
+## To create a nvme disk:
+
+##            --qemu-commandline="-drive file=${target_path},format=raw,if=none,id=NVME1" \
+##            --qemu-commandline='-device nvme,drive=NVME1,serial=nvme1' \
+
 ```
 
 * note for uefi build , we have to install `sudo apt install ovmf`
+
+* notes on emulating various block devices
+    * https://blogs.oracle.com/linux/post/how-to-emulate-block-devices-with-qemu
 
 ## create a new network
 

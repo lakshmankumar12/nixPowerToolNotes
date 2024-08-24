@@ -167,6 +167,9 @@ ssh -fN -L 'forwarding_stuff' user@host
 # ssh options quick copy
 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o ExitOnForwardFailure=yes -o LogLevel=ERROR
 
+# keepalive
+## will timeout in interval*(count+1) seconds post the last exchanged data
+-o ServerAliveInterval=60 -o ServerAliveCountMax=3
 
 -T disable psuedo-terminal allocation
 -t force   psuedo-terminal allocation
@@ -190,6 +193,14 @@ Host testvm
     UserKnownHostsFile /dev/null
     StrictHostKeyChecking no
 ```
+
+* proxycommand
+    * should provide a means so that the stdin/stdout of the command thus invoked
+      serves as a tcp-connection to the target host.
+      * ssh -W targethost:targetport does just that.
+      * the stdin/out of the ssh program connects to the targethost/port
+      * so proxy command is effectively - ssh -W targethost:targetport user@jumperhost
+
 
 ```sh
 ### To use a dynamic ip on the sshconfig
@@ -543,6 +554,7 @@ Args
 --http-user <username>   (overrides user)
 --http-password <passwd>   (overrides user)
 --ask-password
+-S / --server-response   -- print server response
 
 
 wget '..' -O out_file
@@ -609,6 +621,8 @@ apt-key list
 ```
 
 * where does apt store downloaded deb
+    * but this will get auto-cleared after any time.
+    * use `--download-only` to get a deb here
 
 ```sh
 /var/cache/apt/archives/
@@ -662,6 +676,23 @@ apt-cache search string    ->  apt search string
 apt-cache policy package   ->  apt list -a package
 apt-cache show package     ->  apt show package
 apt-cache showpkg package  ->  apt show -a package
+
+## list all isntalled pkgs
+apt list --installed
+
+```
+
+
+* list all packges in a repo
+
+```sh
+## update
+sudo apt update
+
+## get info
+file1=/var/lib/apt/lists/3rdparty-210-onyx-debian.gxc.io_repository_3rdparty%5f210%5fonyx%5fdebian_dists_focal_main_binary-all_Packages
+file2=/var/lib/apt/lists/3rdparty-210-onyx-debian.gxc.io_repository_3rdparty%5f210%5fonyx%5fdebian_dists_focal_main_binary-amd64_Packages
+cat $file1 $file2 | awk '/Package:/ {pkg=$2} /Version:/ {ver=$2} /Architecture:/ {print pkg " | " ver "  | " $2 } '
 
 ```
 
@@ -723,6 +754,7 @@ netstat     net-tools
 arp         net-tools
 dig         dnsutils
 lstopo      hwloc
+nc          netcat
 
 ```
 
@@ -800,6 +832,9 @@ vi /etc/default/grub
 grub2-mkconfig -o /boot/grub2/grub.cfg
 
 #reboot
+
+## to get grub prompt (in KVMs)
+keep pressing shift
 
 ```
 
@@ -1086,7 +1121,7 @@ dmesg
 screen /dev/ttyUSB0 115200
 ```
 
-### force unmount a nfs stuck partition
+## force unmount a nfs stuck partition
 
 * Note -- obviously causes data losses
 ```sh
@@ -1169,6 +1204,9 @@ mount -o umask=filePermissions,gid=1000,uid=1000 /dev/loop8p1 /mnt/extra_data
 
 #for ext4 partitions, do this after mounting
 sudo chown -R user:group /mountpoint
+
+## list all useful mounts
+mount | grep -v -e tmpfs -e nsfs -e tracefs -e squashfs -e cgroup -e sysfs -e proc -e overlay -e debugfs -e rpc_pipefs -e securityfs
 
 ```
 
@@ -1483,10 +1521,11 @@ echo b > /proc/sysrq-trigger
 
 # Impitool
 
-```
+```sh
 yum install -y OpenIPMI OpenIPMI-tools
 
 
+## confirm ipmi from kernel
 ipmitool lan set 1 ipsrc static
 ipmitool lan set 1 ipaddr 172.18.11.205
 ipmitool lan set 1 netmask 255.255.0.0
@@ -1497,6 +1536,33 @@ ipmitool lan set 1 access on
 ipmitool lan print 1
 ipmitool user list 1
 ipmitool user set password 2 ADMIN
+
+
+## access ipmi from a different server
+ipmitool -I lanplus  -H <ip-of-server> -U <user> -P <pass> your ipmi command
+
+
+## access console .. type ~. to exit console
+ipmitool -I lanplus  -H 172.26.10.55 -U admin -P adminpasswd sol activate
+
+### C-A-R-E-F-U-L-L !!!
+ipmitool -I lanplus  -H 172.26.10.55 -U admin -P adminpasswd chassis power cycle
+### C-A-R-E-F-U-L-L !!!
+
+
+```
+
+## dell idrac
+
+```
+
+console com2
+
+## C-A-R-E-F-U-L-L !!!
+## reboot the server
+racadm serveraction hardreset
+## C-A-R-E-F-U-L-L !!!
+
 ```
 
 # kernel debugging
@@ -2006,6 +2072,15 @@ $ tree $TESSDATA_PERFIX
 
 gs -o img.tiff -sDEVICE=tiffg4 -r1200 -dAutoRotatePages=/PageByPage source.pdf
 tesseract img.tiff texted_output -l san-siddhanta-float
+
+```
+
+# adb
+
+```
+adb devices
+
+adb -s ZY22GCL44Z shell /data/local/tmp/iperf3 -c 172.26.2.119   -p 5679 -i 1 -t 20 -b100M -u -R
 
 ```
 

@@ -239,6 +239,25 @@ brctl show
 ### ethtool related commands
 
 ```sh
+
+# plain invocation.
+##  gives speed/duplex .. supported link modes .. link detected
+
+# -i
+## gives driver, version, firmware, bus-info
+
+# -k / --show-features / --show-offload
+## gives various settings on the device.
+# -K
+## configures those settings
+
+# -S
+## gives stats
+
+# -T
+## shows timestamp capabilities
+
+
 # disable checksumming by drivers
 sudo ethtool --offload eth1 rx off tx off
 sudo ethtool --offload eth2 rx off tx off
@@ -706,6 +725,31 @@ By pci:                 /sys/bus/pci/devices/${pci}
 By name:                /sys/class/net/${devname}
 If net, realpath:       /sys/devices/pci0000:42/0000:42:01.0/0000:43:00.3/net/${devname}
 There is a backlink:    device -> ../../
+```
+
+## device naming
+
+```sh
+
+/usr/lib/systemd/network/99-default.link
+
+## create link file here to match and config - man systemd.link
+## [Match] .. match
+## [Link] .. configures
+/etc/systemd/network/
+
+## eg:
+## cat /etc/systemd/network/wwan0.link
+[Match]
+Path=pci-0000:04:00.3-usb-0:3.1.4:1.2
+
+[Link]
+Name=wwan0
+##
+
+## get details of device (the realpath .../device of your chosen device)
+sudo udevadm info /sys/devices/pci0000:00/0000:00:08.1/0000:04:00.3/usb1/1-3/1-3.1/1-3.1.4/1-3.1.4:1.2
+
 ```
 
 # iptables
@@ -1544,6 +1588,38 @@ iperf3 -B ${mip} -p ${port} -u -c ${pip} -i 1 -t 3600 -b2M
 iperf -s -B ${mip} -p ${port} -i 1 -u -l 300
 iperf -B ${mip} -p ${port} -u -c ${pip} -i 1 -d -l 300 -t 3600 -b50M
 
+
+
+```
+
+# netperf
+
+* https://hewlettpackard.github.io/netperf/doc/netperf.html
+
+```sh
+# at server -- it just daemonizes itself.
+## remember to kill once you are done!
+## default port is 12865
+netserver
+
+# throughput
+netperf -H 192.168.222.2 -l 10 -t TCP_STREAM
+# latency
+netperf -H 192.168.222.2 -l 10 -t TCP_RR -- -o min_latency,mean_latency,max_latency
+netperf -H 172.26.11.46 -l 30 -t UDP_RR -v 2 -- -r 300,300 -O min_latency,mean_latency,max_latency,stddev_latency,transaction_rate
+
+## args
+
+-t <typetype>    -- TCP_STREAM (throughput), TCP_RR (latency), UDP_RR,
+-l <secs>        -- duration of one iteration of test
+-H <server>      -- server
+-v 1/2           -- verbosity
+-o               -- csv,style o/p
+-O               -- human readable o/p -- https://hewlettpackard.github.io/netperf/doc/netperf.html#Omni-Output-Selection
+--               -- separates global args from per-test args
+
+# specific to _RR tests
+-r <sizespec>    -- req/resp size. Default 1 byte each. Eg: -r 128,16K
 
 
 ```

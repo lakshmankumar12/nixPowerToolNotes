@@ -58,6 +58,8 @@
         * e followed by p, will do the above trick and then print the pattern space.
     * just execute what follows. Mostly a hack way to have sed execute something.
         * `sed '1e /bin/bash'`
+* `r`
+    * replace pattern space with the contents of the file
 
 ## character classes
 
@@ -152,7 +154,7 @@ sed -i 's/[[:space:]]\+$//' myfile
 ## Delete nth line
 
 ```sh
-# delete 5th line
+# delete 5th line / nth
 sed -e '5d'
 
 ## delete from 36 to 40
@@ -231,6 +233,18 @@ perl -ne -i 's/regex/replace/' file_to_work_inline
 ```sh
 \grep --color=auto -n -P '[^\x00-\x7F]+' <file>
 ```
+
+* remove those chars
+
+```sh
+perl -pi -e 's/[^[:ascii:]]//g' filename
+
+## -p .. iterate over every line and run the perl statement
+## -i .. edit in place
+## -e .. perl expression to evaulate
+
+```
+
 
 ## Grep source-files for cscope for a file-list
 
