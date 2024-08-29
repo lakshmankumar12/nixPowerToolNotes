@@ -416,6 +416,18 @@ ip tun show
 
 * vti related:
 
+### conntrack
+
+```sh
+# flush all conns
+conntrack -F
+
+# dump
+conntrack -L
+
+```
+
+
 ## tc commands
 
 ### Quick reference
@@ -1272,6 +1284,9 @@ network:
         - enp3s0
 ```
 
+* arrange to run scripts as part of netplan apply
+  * https://askubuntu.com/a/1080483
+
 ## netplan commands
 
 
@@ -1441,6 +1456,17 @@ tshark -V -r a.pcap > a.txt ; vi a.txt
 ```
 tshark -r infile.pcap  -2 -R "<display-filter>" -w outfile.pcap
 ```
+
+* show like in wireshark
+
+```sh
+## get to know the columns
+tshark -G column-formats
+
+tshark -o 'gui.column.format:"No.","%m","Time","%Yut","Source","%s","Destination","%d","Protocol","%p","Length","%L","Info","%i"' -r infile.pcap > /tmp/output
+
+```
+
 
 
 * get timestamp info from a pcap file

@@ -1697,6 +1697,8 @@ usermod [optoins] $USER
 
 #eg:
 sudo usermod -a -G libvirt ${user_to_add}
+# change shell
+sudo usermod -s /sbin/nologin ${user}        ## interestingly /bin/nologin totally prevents, while /sbin/nologin allows ssh-forwarding
 
 ## change password for a user as root
 sudo passwd username

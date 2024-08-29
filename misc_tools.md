@@ -172,7 +172,7 @@ ssh -fN -L 'forwarding_stuff' user@host
 -o ServerAliveInterval=60 -o ServerAliveCountMax=3
 
 -T disable psuedo-terminal allocation
--t force   psuedo-terminal allocation
+-t force   psuedo-terminal allocation (useful if you want to run cms on login shell)
 
 ```
 
@@ -240,10 +240,17 @@ ssh-keygen -f private_key.pem -y
 
 ```
 
+## sftp
 
+```
+put
+get
 
+##args
+-a        .. resume partial transfer
+-r        .. recursively get/put directory
 
-
+```
 
 ## Mosh command to pick a particular port
 
@@ -1401,6 +1408,10 @@ lscpu | egrep 'Model name|Socket|Thread|NUMA|CPU\(s\)'
 
 # see which are hyperthreads on the same core
 lscpu --all --extended
+## heading:
+## CPU NODE SOCKET CORE L1d:L1i:L2:L3 ONLINE    MAXMHZ    MINMHZ      MHZ
+##
+## whatever cpu that sharee the same "NODE SOCKET CORE" are hyperthreads on same core
 
 ## Legend for lscpu and lstopo
 #  PU P# = Processing Unit Processor #. (hyper-threads)
@@ -1635,6 +1646,35 @@ sudo dmesg -w
 ##disable
 echo "module openvswitch -p" > /sys/kernel/debug/dynamic_debug/control
 ```
+
+## sysctl
+
+* https://www.cyberciti.biz/faq/reload-sysctl-conf-on-linux-using-sysctl/
+
+```sh
+#dump all values
+sudo sysctl -a
+
+#show on or more values
+sudo sysctl net.core.rmem_default net.core.wmem_default
+
+#set value
+sudo syssctl -w var=value
+
+#read from all files
+sudo sysctl --system
+## /run/sysctl.d/*.conf
+## /etc/sysctl.d/*.conf
+## /usr/local/lib/sysctl.d/*.conf
+## /usr/lib/sysctl.d/*.conf
+## /lib/sysctl.d/*.conf
+## /etc/sysctl.conf
+
+#read from a specfic file
+sudo sysctl -p /etc/sysctl.d/myval.conf
+
+```
+
 
 ## performance tuning for networking
 
