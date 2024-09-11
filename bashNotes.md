@@ -1527,6 +1527,7 @@ journalctl -u some_service
 ##other args
 ##  -f                 --  follow
 ##  -n 100             --  last 100 lines
+##  -r                 --  reverse .. newer entries first
 
 # list log of a particular boot
 journalctl -b -1

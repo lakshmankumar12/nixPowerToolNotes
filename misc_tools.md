@@ -31,6 +31,8 @@ rdesktop 135.227.232.97 -u 'ENG\lnara002' -p - -z  -x 0x81 -g 1152x648 -a 32
 * Easy-peasy way
     * mark window1 first `<backtick> m`
     * come to other window and type `:swap-window`
+      * or press `<backtick> <` and choose `swap marked (s)`
+
 
 * capture a pane
 ```
@@ -345,7 +347,7 @@ sudo apt install p7zip-full
 -q       # quiet. quit after first occurence. Typically useful to test presence
 -m<N>    # stop after getting max N occurences
 -P       # perl regex
--a       # process a binary file as if its text
+-a       # process a binary file as if its text (useful to grep files that have stray binary chars in them)
 -n       # prefix line number - 1 based
 -H       # prefix file name
 ```
@@ -866,6 +868,7 @@ tar zcvf /path/to/target/file.tgz file1 dir2 relative/path/to/dir3
 ###   v         -- list files that's worked on
 ###   z         -- compress (gzip)
 ###   f <file>  -- tarfile
+###   -T <file> -- take list of files from this file
 
 ### extract
 tar zxvf /path/to/tarfile.tgz
@@ -950,6 +953,15 @@ find . -type f \( -path dir1 -o -path dir2 -o -path -dir3 \) -prune -o -print
 
 # do something with the file
 find . -name '*.c' -exec grep to_find_string '{}' \;
+
+# find with exact perm
+find . -perm 775
+# find with all of these bits set
+###   755 will match all of 755, 757, 775, 777
+find . -perm -755
+# find with alteast any these bits set
+###   111 will match all writable files for any - u,g,o
+find . -perm /111
 ```
 
 # cscope
@@ -1412,6 +1424,7 @@ lscpu --all --extended
 ## CPU NODE SOCKET CORE L1d:L1i:L2:L3 ONLINE    MAXMHZ    MINMHZ      MHZ
 ##
 ## whatever cpu that sharee the same "NODE SOCKET CORE" are hyperthreads on same core
+lscpu --all --extended | sort -k2 -k3 -k4 -n
 
 ## Legend for lscpu and lstopo
 #  PU P# = Processing Unit Processor #. (hyper-threads)
@@ -1446,11 +1459,16 @@ numactl --show
 
 ```
 
+### bios quirks
+
+* asus
+    * diable hyper threading ..
+        * set LP(s) to Single LP
+
 # motherboard details and stuff
 
 ```sh
 dmidecode
-
 ```
 
 ## tool to edit bios / uefi

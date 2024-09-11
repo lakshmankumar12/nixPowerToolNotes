@@ -949,6 +949,19 @@ https://serverfault.com/a/782897
 
 ```
 
+### nat localhost/port to a IP/port
+
+* https://serverfault.com/a/907324
+```sh
+## localhost:4242 to 11.22.33.44:5353
+iptables -t nat -A OUTPUT -p tcp -d 127.0.0.1 --dport 4242 -j DNAT --to 11.22.33.44:5353
+## choose the right ifc or all.
+sysctl -w net.ipv4.conf.eth0.route_localnet=1
+iptables -t nat -A POSTROUTING -p tcp -s 127.0.0.1 -d 11.22.33.44 --dport 5353 -j MASQUERADE
+
+```
+
+
 ## ipsets
 
 * Represents a collection of ip
@@ -1165,6 +1178,16 @@ ovs-vsctl set-controller gtp_br0 connection-mode=out-of-band
 ## adding a flow
 sudo ovs-ofctl add-flow -Oopenflow13 gtp_br0 'table=20,priority=30,reg1=0x1,ip,nw_dst=192.168.203.3 actions=set_field:52:54:00:7a:74:a3->eth_dst,"patch-up"'
 
+## control num threads / revert back
+###  note that this handler-thread is just what handles slow-path packets
+###  that missed ovs-dpctl flows (The real runtime flows setup in kernel)
+sudo ovs-vsctl set Open_vSwitch . other_config:n-handler-threads=1
+sudo ovs-vsctl set Open_vSwitch . other_config:n-revalidator-threads=1
+sudo ovs-vsctl remove Open_vSwitch . other_config n-handler-threads
+sudo ovs-vsctl remove Open_vSwitch . other_config:n-revalidator-threads
+## list settings
+sudo ovs-vsctl list Open_vSwitch
+
 ```
 
 ## ovs-ofctl
@@ -1222,6 +1245,15 @@ ovs-ofctl del-flows <bridge> <flow>
 # one of the best. Trace the pkt
 sudo ovs-appctl ofproto/trace gtp_br0 tcp,in_port=patch-up,ip_dst=192.168.201.100,ip_src=8.8.8.8,tcp_src=80,tcp_dst=3372
 ```
+
+## ovs-dpctl
+
+```sh
+## see stats on misses and no of flows given to user path
+sudo ovs-dpctl show
+
+```
+
 
 # systemd networking service
 
@@ -1660,6 +1692,18 @@ socat TCP-LISTEN:9000,fork TCP:127.0.0.1:5924
 
 
 ```
+
+# iftop
+
+* https://www.tecmint.com/iftop-linux-network-bandwidth-monitoring-tool/
+
+search: monitoring iftop bandwidth bw consumption
+
+```sh
+sudo iftop -n
+
+```
+
 
 
 # ab tool

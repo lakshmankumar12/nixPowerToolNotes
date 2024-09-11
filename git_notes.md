@@ -166,7 +166,7 @@ See section on refspec
 
 ## checkout remote branch with tracking
 
-```
+```sh
 git checkout --track -b <local branch> <remote>/<tracked branch>
 
 # if -b <name> is to be same as remote's name, you can skip it
@@ -178,6 +178,14 @@ git branch --set-upstream-to=upstream/remote_branch_name
 
 # to set the refspec right.
 git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+```
+
+## delete branches
+
+```sh
+git push -d <remote_name> <branchname>   # Delete remote
+git branch -d <branchname>               # Delete local
+git branch -D <branchname>               # force delete local even if it has unmerged commits
 
 # if remote deleted branches, then use this to clear if off ur local repo too
 git remote prune origin
@@ -631,6 +639,19 @@ git config credentials.helper store
 
 #your password will bein ~/.git-credentials in clear text.
 ```
+
+* you can also use .netrc , that is common for git and curl
+
+```sh
+machine github.com
+login technoweenie
+password SECRET
+
+machine api.github.com
+login technoweenie
+password SECRET
+```
+
 
 # gitlab urls
 
