@@ -215,6 +215,8 @@ for (x in first_level_keys) {
 * split(string,array,delim)
     * Note that you get a array, whose key is 1,2,3..N and split-values
       against these keys
+* split(string,array,delim,separators)
+    * Optional 4th arg saves separators
 * strtonum   # search: atoi , hex to dec
 
 ## run shell commands
@@ -400,10 +402,18 @@ echo "a  2   4  6" | gawk ' {
 ```
 
 * print from nth column till last column -- say skip 2
+  * leverage split to save the actual separators
 ```sh
 ... | gawk ' { n=split($0,a," ",b); for (i=3;i<=NF; i++) { line=(line a[i] b[i]) } ; print line }'
 
 ```
+
+* simple print from nth column till last column
+```sh
+awk ' for (i=3;i<NF;++i) { print $i }'
+
+```
+
 
 
 ## Get non-empty lines alone

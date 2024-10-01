@@ -101,18 +101,22 @@ https://developers.redhat.com/blog/2018/10/22/introduction-to-linux-interfaces-f
 ```sh
 myname=vethA1
 mypeername=vethA2
-ip link add ${myname} type veth peer name ${mypeername}
+sudo ip link add ${myname} type veth peer name ${mypeername}
+sudo ip link set ${myname} up
+sudo ip link set ${mypeername} up
 
 # you can put them in different namespaces right on creation
 myns=ns1
 peerns=ns2
-ip link add ${myname} netns ${myns} type veth peer name ${mypeername} netns ${peerns}
+sudo ip link add ${myname} netns ${myns} type veth peer name ${mypeername} netns ${peerns}
+sudo ip netns exec ${myns} ip link set ${myname} up
+sudo ip netns exec ${peerns} ip link set ${mypeername} up
 
 ## note the netns takes both name as well as a pid arg. (in which case it will be the ns of the process(pid))
 
 ## delete a veth pair .. deleting the one you used to name first.
 ## automatically deletes the other
-ip link del ${myname}
+sudo ip link del ${myname}
 ```
 
 ### vlan filtering
@@ -854,6 +858,13 @@ R-D: Routing-Decision
 -A INPUT -t filter -p tcp -s 10.1.1.11 -d 10.1.1.2 -j REJECT --reject-with icmp-host-unreachable
 ```
 
+## policy of a chain/table
+
+```sh
+sudo iptables --policy FORWARD ACCEPT
+
+```
+
 
 ## Sample commands
 
@@ -1252,6 +1263,9 @@ sudo ovs-appctl ofproto/trace gtp_br0 tcp,in_port=patch-up,ip_dst=192.168.201.10
 ## see stats on misses and no of flows given to user path
 sudo ovs-dpctl show
 
+## show the actual kernel-fast-path flows
+sudo ovs-dpctl dump-flows
+
 ```
 
 
@@ -1271,7 +1285,25 @@ ifup -vvv <iface>
 
 https://netplan.readthedocs.io/en/stable/examples/
 
-* sample netplan file
+* simple static ip
+```yaml
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    enp0s3:
+      dhcp4: false
+      dhcp6: false
+      addresses:
+      - 192.168.1.122/24
+      routes:
+      - to: default
+        via: 192.168.1.1
+      nameservers:
+       addresses: [8.8.8.8,8.8.4.4]
+```
+
+* bond interface
 ```yaml
 network:
   version: 2
@@ -1318,6 +1350,8 @@ network:
 
 * arrange to run scripts as part of netplan apply
   * https://askubuntu.com/a/1080483
+    * /usr/lib/networkd-dispatcher
+    * /etc/networkd-dispatcher (not this)
 
 ## netplan commands
 

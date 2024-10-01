@@ -363,6 +363,19 @@ for i in over these individual words ; do
 done
 ```
 
+* does array contain a value
+```sh
+printf '%s\0' "${myarray[@]}" | grep -F -x -z -- 'myvalue'
+
+## printf -- null-separates and prints the elements
+## grep
+##  -F -- fixed strings.. dont interprety any patterns
+##  -z -- null spearated (and not \n separated) input
+##  -x -- only match whole lines
+
+```
+
+
 
 reference: http://www.tldp.org/LDP/abs/html/arrays.html#ARRAYSTROPS
 
@@ -433,6 +446,44 @@ for i in $arrayOfWords ; do echo "word in this iteration is $i"; done
 for i (word1 word2) { cmd1 $i ; cmd2 $i }
 for i (word1 word2) only_cmd $i
 ```
+
+# bash completion
+
+* Existing builtin completions for `complete`
+    * https://www.gnu.org/software/bash/manual/html_node/Programmable-Completion-Builtins.html#Programmable-Completion-Builtins
+    * List:
+        ```sh
+        # complete with dirs
+        complete -A directory my_command_that_wants_directories_as_arg
+
+        # complete with this funciton
+        complete -F _do_complete_for_my_func  my_func
+        ```
+
+* completion command expectation
+    * Return the current list in `COMPREPLY` array
+    * build that array using `compgen`
+        * `compgen -W "array_of_all_words" -- "prefix"` will automatically filter out that `array_of_all_words` having only `prefix`
+    * it gets a array var - `COMP_WORDS`, where
+        * `COMP_CWORD` index of current word under cursoe
+
+```
+
+_docomplete_for_command() {
+  ## this prevents auto-complete unless its exactly the second arg in that command
+  if [ "${#COMP_WORDS[@]}" != "2" ]; then
+    return
+  fi
+
+  ## Mind the array that is to be returned!!
+  COMPREPLY=($(compgen -W "$(whatever_you_want)" -- "${COMP_WORDS[1]}"))
+}
+
+complete -F _docomplete_for_command my_command
+
+
+```
+
 
 
 # Iterating over each line of a  file
@@ -1438,11 +1489,56 @@ Arguments
 * `-b` - batch mode. Useful when dumping output
 * `-n <count>` - Only dump count samples
 
-```
-## in batch mode, just collect first few lines -- leverage grep -A on the first line
-top -n 15 -H -d 1 -b | grep "load average" -A 30
+Commands while interactive
+* `H` - thread enable
+* `p` - sort by cpu
+* `m` - sort by memory
+* `f` - adjust columns
+* `W` - save config
 
 ```
+## in batch mode, just collect first few lines -- leverage grep -A on the first line
+## adjust -n to what you want
+top -n 15 -H -d 1 -b | grep "load average" -A 30
+
+## say you have cpu in col-12
+top -n 1 -H -d 1 -b | sort -n -k 12 > /tmp/a
+
+```
+
+## nice
+
+* https://askubuntu.com/a/1078563
+
+search: priority realtime rt
+
+* For non-realtime:  priority = 20 + nice
+* realtime:          priority = -1 - realtime_priority
+
+* for non-realtime:
+    * nice value: -20 to 19 => prio = 0 to 39
+        * nice:-20, prio:0 is highest
+        * nice:19, prio:39 is lowest
+    * sched-classes
+        * SCHED_OTHER   the standard round-robin time-sharing policy
+        * SCHED_BATCH   for "batch" style execution of processes
+        * SCHED_IDLE    for running very low priority background jobs.
+* for real-time:
+    * nice is always 0
+        * final_prio: -100, realtime_priority:99 is highest
+        * final_prio: -1  , realtime_priority:0  is lowest
+    * sched-classes
+        * SCHED_FIFO    a first-in, first-out policy
+        * SCHED_RR      a round-robin policy
+
+
+```sh
+
+# run as realtime with final-prio= -51
+chrt --rr 50 my_prog
+
+```
+
 
 
 ## xargs
@@ -1778,6 +1874,10 @@ sudo usermod -a -G sudo ${user_to_add}
 lakshman ALL=(ALL:ALL) NOPASSWD: ALL
 
 syslog  ALL=NOPASSWD: /usr/local/bin/rotater_script.sh
+
+remoteagwuser ALL=(root) NOPASSWD: /usr/local/bin/list_listeners.sh
+some_admin_user ALL=(remoteagwuser:remoteagwuser) /usr/local/bin/manage_authorized_keys.py
+
 
 ```
 

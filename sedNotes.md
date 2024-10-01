@@ -78,6 +78,8 @@ echo "May 11 13:41:37" | sed -r 's/([^[:space:]]+) ([^[:space:]]+) ([^[:space:]]
 
 ## Different delimiter
 
+search: substitute char
+
 * Other commands. Use backslash before delimiter
     ```
     sed '\,some/path,d'
@@ -102,6 +104,14 @@ sed -n '/pat1/,/pat2/p'
 sed -n '1,/pat/p'    # print from beg-of-file to pat
 sed -n '/pat/,$p'    # print from pat to end-of-file
 ```
+
+## substitute a whole line matching pattern
+
+```sh
+sed '/pattern/s/.*/replacement for the whole line/' file
+
+```
+
 
 ## prints from 2nd line, every 3rd line.
 

@@ -34,6 +34,17 @@ rdesktop 135.227.232.97 -u 'ENG\lnara002' -p - -z  -x 0x81 -g 1152x648 -a 32
       * or press `<backtick> <` and choose `swap marked (s)`
 
 
+* move a pane from one session/window to another
+
+```
+## get the number of the source pane (`Q)
+
+## come to the target-window
+tmux join-pane -s <src-pane-num>
+
+```
+
+
 * capture a pane
 ```
 tmux capture-pane -S- -t <target>
@@ -666,6 +677,8 @@ sudo apt-get install gparted=0.16.1-1
 
 ```sh
 sudo apt-get install --download-only pppoe
+#if its already installed
+sudo apt-get install --reinstall --download-only pppoe
 
 ## and find the debs in
 /var/cache/apt/archives
@@ -855,6 +868,12 @@ keep pressing shift
 * https://askubuntu.com/a/1322129
 * Login-details of installer - https://askubuntu.com/a/1322129
     * default sheel is `/usr/bin/subiquity-shell`
+* static ip during install
+    * https://askubuntu.com/a/1361022
+    ```
+    ip=<client-ip>:<server-ip>:<gw-ip>:<netmask>:<hostname>:<device>:<autoconf>:<dns0-ip>:<dns1-ip>:<ntp0-ip>:...
+    ip=192.168.122.53::192.168.122.1:255.255.255.0:onyxedge-nr:ens3::8.8.8.8
+    ```
 
 # tar
 
@@ -1303,6 +1322,8 @@ sudo vgscan
 
 ## activate the volume
 sudo vgchange -ay VolGroup00
+#### deactivate a volume (if needed)
+## sudo vgchange -an VolGroup00
 
 ## list the logical volumes
 sudo lvs
@@ -1521,6 +1542,14 @@ onyxedge@svt2agw:~$
 
 ```
 
+* update initramfs if you update /etc/modprobe.d/ files (https://askubuntu.com/a/783922)
+
+```sh
+sudo update-initramfs -u
+
+```
+
+
 # Enable console on a linux machine
 
 ```sh
@@ -1696,7 +1725,16 @@ sudo sysctl -p /etc/sysctl.d/myval.conf
 
 ## performance tuning for networking
 
+search: buffer
+
 ```sh
+
+# rmem_{deafult,max} -- receive window size
+# wmem_{deafult,max} -- send window size
+# tcp_rmem           -- tcp received window (min default max) (see man tcp)
+# tcp_wmem           -- tcp send window (min default max)
+
+
 ##read the values
 sudo sysctl net.core.rmem_default
 sudo sysctl net.core.wmem_default

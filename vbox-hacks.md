@@ -124,9 +124,18 @@ virsh vol-delete --pool <pool-name> <vol-name>
  virsh setmaxmem hemanth 16G --config
  virsh setmem hemanth 16G --config
 
+# gui
+virt-manager
+
+```
+
+## virt-install
+
+```sh
+
 ## create a new vm
 vmname=mynewvm
-osvariant=ubuntu20.04   ## use virt-install --os-variant list to find options
+osvariant=ubuntu20.04   ## use `virt-install --os-variant list` to find options
 cpu=4
 ram=16384               ## in KB
 image_path=/path/to/iso
@@ -136,10 +145,6 @@ virt-install --name=${vmname} --os-variant=${osvariant} \
              --vcpu=${cpu} --ram=${ram} --graphics vnc \
              --cdrom=${image_path} --network bridge=${bridge},model=virtio \
              --disk size=${hdsize}
-
-# gui
-virt-manager
-
 
 ## copy the image
 vmname=mynewimportedvm
@@ -176,18 +181,35 @@ virt-install --name=${vmname} --os-variant=${osvariant} \
 ##   --extra-args='console=ttyS0,115200n8 serial'
 ##   --boot uefi
 ##   --boot loader=/usr/share/OVMF/OVMF_CODE.fd,loader_ro=yes,loader_type=pflash,nvram_template=/usr/share/OVMF/OVMF_VARS.fd
+##   --print-xml [STEP]    .. USEFUL TO GET XML AND NOT START VM!!
+##                         .. step is 1/2 if (--cdrom, --location, --pxe or --install) AND (withouth --no-install) is used.
+##                         .. you probably want 1st step, define it.. and once done, explicitly remove the cd/onreboot-destory elements later
 
 ## To create a nvme disk:
 
 ##            --qemu-commandline="-drive file=${target_path},format=raw,if=none,id=NVME1" \
 ##            --qemu-commandline='-device nvme,drive=NVME1,serial=nvme1' \
-
 ```
 
 * note for uefi build , we have to install `sudo apt install ovmf`
 
 * notes on emulating various block devices
     * https://blogs.oracle.com/linux/post/how-to-emulate-block-devices-with-qemu
+
+
+### To replace xml args during install
+
+search: spice
+
+https://unix.stackexchange.com/a/620880
+
+```
+    --xml 'xpath.delete=./devices/graphics' \
+    --xml './devices/graphics/@defaultMode=insecure' \
+    --xml './devices/graphics/@autoport=no' \
+    --xml './devices/graphics/@type=spice' \
+    --xml "./devices/graphics/@port=20001"
+```
 
 ## create a new network
 
@@ -508,7 +530,65 @@ sudo reboot
 
 ```
 
+## install a macvtap
 
+
+https://developers.redhat.com/blog/2018/10/22/introduction-to-linux-interfaces-for-virtual-networking#macvtap_ipvtap
+https://www.ibm.com/docs/en/linux-on-systems?topic=configurations-kvm-guest-virtual-network-configuration-using-macvtap
+
+ip link add link eth0 macvlan0 type macvlan mode bridge
+
+```
+
+<interface type="direct">
+  <mac address="12:34:56:78:9a:bc"/>
+  <source dev="o5s_10g_1" mode="bridge"/>
+  <model type="virtio"/>
+  <driver name="vhost"/>
+</interface>
+
+```
+
+## sriov
+
+https://www.intel.com/content/www/us/en/developer/articles/technical/configure-sr-iov-network-virtual-functions-in-linux-kvm.html
+
+option-1 : direct pci using hostdev
+
+```xml
+    <hostdev mode='subsystem' type='pci' managed='yes'>
+      <source>
+        <address domain='0x0000' bus='0x19' slot='0x01' function='0x0'/>
+      </source>
+    </hostdev>
+```
+
+option-2 : passthrough interface using name
+
+```xml
+<devices>
+   <interface type='direct'>
+      <source dev='enp3s16f1' mode='passthrough'/>
+   </interface>
+</devices>
+```
+
+option-3: create a network first , and add a interface into the network
+
+```xml
+<network>
+ <name>sr-iov-net-40G-XL710</name>
+ <forward mode='hostdev' managed='yes'>
+  <pf dev='ens802f0'/>
+ </forward>
+</network>
+```
+
+```xml
+<interface type='network'>
+  <source network='sr-iov-net-40G-XL710'/>
+</interface>
+```
 
 # secure linux
 
@@ -684,4 +764,32 @@ screen /tmp/magma_dev_pip1-pty
 links:
 * https://gist.github.com/snb/284940/11e6354f170be602c9c2f67b59d489ed49ebd143
 * https://www.linuxquestions.org/questions/slackware-14/virtualbox-serial-port-setup-frustration-586971/
+
+
+# proxmox
+
+```sh
+
+## list all vms
+qm list
+
+## list settings of one vm
+qm config <vmid>
+## or just cat /etc/pve/qemu-server/<vmid>.conf
+
+## add a termial to a vm (when its off)
+qm set 103 -serial0 socket
+
+## open the terminal
+qm terminal 103
+
+## show the kvm commands
+qm showcmd 103
+
+## monitor --> place hwere you can type other commands
+qm monitor <vmid>
+## command eg:
+## change vnc password
+
+```
 
