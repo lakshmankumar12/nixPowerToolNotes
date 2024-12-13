@@ -52,7 +52,7 @@ avconv -i audio.mp3 -i video.mp4 -acodec copy -vcodec copy mixed.mp4
 
 
 
-## Extract subset of time
+## extract subset of time
 
 
 strip minutes out

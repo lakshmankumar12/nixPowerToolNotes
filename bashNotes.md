@@ -288,7 +288,7 @@ $@    -- all args are intact, as invidivual quoted strings
 
 ## pass arg as reference / pass a name to which value is to be assigned
 
-Search: pass by reference
+Search: pass by reference dereference
 
 ```sh
 function implementor()
@@ -470,13 +470,14 @@ for i (word1 word2) only_cmd $i
 ```
 
 _docomplete_for_command() {
-  ## this prevents auto-complete unless its exactly the second arg in that command
-  if [ "${#COMP_WORDS[@]}" != "2" ]; then
+  ## this prevents auto-complete unless its exactly the second(0-basedindex) arg in that command
+  if [ "${COMP_CWORD}" != "1" ]; then
     return
   fi
 
-  ## Mind the array that is to be returned!!
-  COMPREPLY=($(compgen -W "$(whatever_you_want)" -- "${COMP_WORDS[1]}"))
+  ## arr is the array of the choices
+  one_per_line="$(printf '%s\n' ${arr[@]})"
+  COMPREPLY=($(compgen -W "$one_per_line" -- "${COMP_WORDS[COMP_CWORD]}"))
 }
 
 complete -F _docomplete_for_command my_command
@@ -1130,6 +1131,7 @@ pwd -P
 
 ## ps
 
+
 ```sh
 ## args explan
 -e        every pid in the system
@@ -1153,30 +1155,58 @@ ps -o pid=
 ps -u username -o pid,ppid,tt,%mem,bsdstart,args
 
 #info on a given pid
-ps -o args= -p pid
+ps -o args= -p $pid
+
+#show processro assignment of all threads in a process
+ps -o spid,pid,ppid,%mem,bsdstart,psr,s,class,pri,comm -T -p $pid
 
 #process against a terminal
 ps -t pts/12 -f
+
+# show all processed sorted on cpu
+ps -o spid,pid,ppid,%mem,bsdstart,psr,s,class,pri,comm -T -e | sort -n -k 6,6
+# show proceses on a single cpu, eg:5
+ps -o spid,pid,ppid,%mem,bsdstart,psr,s,class,pri,comm -T -e | awk '$6 == 5'
+
+
 ```
 
-* useful headings in ps -o
-* args, cmd, command  -- full list of command and args. Keep it last
-* comm, ucmd, ucomm   -- just the command.
-* time, cputime       -- cumulative cpu time
-* etime               -- elapsed time since process started in hh:mm:ss.sss format
-* etimes              -- etime in secs.
-* bsdstart            -- start-time in Month/Day or HH:MM
-* lstart              -- full blow up of start time.
-* tt                  -- terminal
-* pid,ppid            -- pid and parent pid resp
-* rss                 -- resident set size (inKB) (Most meaningful)
-* %mem                -- rss as a % of total memory
-* trs,drz             -- text resident size, data resident size
-* vsz                 -- virtual size (in 1024b units)
-* size                -- approximate amount of swap space that would
-                         be required if the process were to dirty
-                         all writable pages and then be swapped out.
-                         This number is very rough! (Dont follow)
+
+```
+## search STANDARD FORMAT SPECIFIERS in https://man7.org/linux/man-pages/man1/ps.1.html
+## format names for -o arg
+pid                - pid
+ppid               - parentpid
+args               - invocation args
+args, cmd, command - full list of command and args. Keep it last
+ucmd, ucomm        - just the command.
+comm               - threadname
+
+
+bsdstart           - uptime since process start in Month/Day or HH:MM
+etime              - elapsed time since process started in hh:mm:ss.sss format
+etimes             - etime in secs.
+lstart             - full blow up of start time.
+
+psr                - cpu running on
+rtprio             - realtimeprio
+ni                 - nicevalue
+class              - sched class - (FF, RR are real-time , TS(other), .. are others)
+
+s                  - state code - R, S, I, D, Z
+
+rss                - resident set size (inKB) (Most meaningful)
+%mem               - rss as a % of total memory
+trs,drz            - text resident size, data resident size
+vsz                - virtual size (in 1024b units)
+size               - approximate amount of swap space that would
+                        be required if the process were to dirty
+                        all writable pages and then be swapped out.
+                        This number is very rough! (Dont follow)
+
+tt                 - associate tty
+
+```
 
 
 
@@ -1228,11 +1258,22 @@ cp src dst
 ```sh
 
 #args
+-z         # every line is NUL-terminated, not \n
 -t SEP     # field separator
 -k f1,f2   # use only from field f1 to f2
 
 ```
 
+## column
+
+search: col table tabularize tabular output
+
+```sh
+# -t    ..  tabular output
+# -s    ..  input-separator
+cat output | column -t -s "|" --output-separator "|"
+
+```
 
 ## date
 
@@ -1315,7 +1356,7 @@ hostnamectl set-hostname "new-hostname" --pretty
 
 ## timedatectl
 
-search: timectl datectl datetimectl
+search: timectl datectl datetimectl ntp NTP
 
 ```sh
 #get status
@@ -1392,6 +1433,12 @@ tail -n +5 file.txt         # all lines except the 4 first, starts at line 5
 
 ## -d, --delimiter=DELIM            use DELIM instead of TAB for field delimiter
 ## -f, --fields=LIST                select only these fields;
+## -c1-2                            take the chars 1,2 only (1-based index)
+## -c5-                             remove first 4 chars
+
+
+## to achieve cutting last N chars, use 2 rev. Eg to remove last-4 chars
+...whatever.. | rev | cut -c5- | rev
 
 
 ```
@@ -1479,6 +1526,26 @@ echo "$VAR"
 shuf -i lo-hi -n output_count
 ```
 
+## strace
+
+```sh
+## trace child process
+strace -f whatever_program
+
+```
+
+## watch
+
+```sh
+instr="command1 | command2 | command3 arg1 arg2"
+watch "$instr"
+
+instr="source yourfiles.sh ; alias_there"
+watch "$instr"
+
+```
+
+
 ## top
 
 Arguments
@@ -1512,21 +1579,34 @@ top -n 1 -H -d 1 -b | sort -n -k 12 > /tmp/a
 
 search: priority realtime rt
 
-* For non-realtime:  priority = 20 + nice
-* realtime:          priority = -1 - realtime_priority
+* Final priority is a number from -100 to 39 (-100 being the top prio)
+    * Real time processes: final priotity: -100 to -1
+    * Non-RT processes:    final priotity:    0 to 39
+* Real time processes have a RT-prioity a number.
+    * RT-prio is a number from 99 to 0
+    * RT-99 maps to Final-Prio: -100 Highest
+    * RT-0  maps to Final-Prio: -1   Lowest in RT
+    * final-prior = -1 - realtime_priority
+* non-realtime proceses have a nice value
+    * Nice is a number from -20 to 19
+    * nice: -20 maps to final priority:  0 (highest)
+    * nice:  19 maps to final priority: 39 (lowest)
+    * final-prior = 0 + nice
+    * nice for RT is always 0
+
+
+* In ps,
+    * pri -> final priority
+    * ni  -> nice
+    * rtprio -> realtime priority
+* Unfortunately, there is nothing to show the final priority!
 
 * for non-realtime:
-    * nice value: -20 to 19 => prio = 0 to 39
-        * nice:-20, prio:0 is highest
-        * nice:19, prio:39 is lowest
     * sched-classes
         * SCHED_OTHER   the standard round-robin time-sharing policy
         * SCHED_BATCH   for "batch" style execution of processes
         * SCHED_IDLE    for running very low priority background jobs.
 * for real-time:
-    * nice is always 0
-        * final_prio: -100, realtime_priority:99 is highest
-        * final_prio: -1  , realtime_priority:0  is lowest
     * sched-classes
         * SCHED_FIFO    a first-in, first-out policy
         * SCHED_RR      a round-robin policy
@@ -1536,6 +1616,9 @@ search: priority realtime rt
 
 # run as realtime with final-prio= -51
 chrt --rr 50 my_prog
+
+# to change a running pids prio to realtime
+chrt --rr -p 50 $pid
 
 ```
 
@@ -1606,8 +1689,6 @@ rev
 ... | rev | cut -c5- | rev
 ```
 
-
-
 ## journalctl
 
 Search: syslog
@@ -1646,7 +1727,28 @@ journalctl _SYSTEMD_INVOCATION_ID=$(systemctl show --value -p InvocationID magma
 journalctl --vacuum-time=2d
 journalctl --vacuum-size=500M
 
+## find the earliest log
+journalctl --no-pager --reverse | tail -n1
+# or more directly:
+journalctl --no-pager --output=short-iso --since "1970-01-01" | head -n1
+
 ```
+
+## logger
+
+* useful to log from shell scripts
+
+```sh
+## args
+## -i                 ..   include pid in logline
+## -p facility.level  ..   eg: local3.info
+##                              levels: emerg alert crit err warning notice info debug
+##                              facility: user local0 .. local7
+## -s                 ..   output to stderr also
+## -t                 ..   use this tag (instead of username)
+
+```
+
 
 ## systemctl
 
@@ -1780,7 +1882,7 @@ if [ $? -ne 0 ] then echo "bad ip" ; fi
 user_to_add=lakshman   #or whoever the name is
 cpass=...crypt-encrypted-pass...
 #prefer useradd over adduser
-useradd -m -p $pass -s /bin/bash ${user_to_add}
+useradd -m -p $cpass -s /bin/bash ${user_to_add}
 ## options
 # -m, --create-home    -- creates home directory
 # -p <passwd>          -- supply crypted password over commandline
@@ -1852,6 +1954,10 @@ username=$(whoami)
 username="whoever"
 echo "${username} ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers > /dev/null
 
+## add a particular command for one user
+echo "${USER_NAME}  ALL=NOPASSWD: /usr/local/bin/collect_tech_dump.sh" >> /etc/sudoers
+
+
 # to add to sudo group
 sudo usermod -a -G sudo ${user_to_add}
 
@@ -1881,13 +1987,42 @@ some_admin_user ALL=(remoteagwuser:remoteagwuser) /usr/local/bin/manage_authoriz
 
 ```
 
+### sudo quirks
+
+```sh
+# env var having real user
+echo $SUDO_USER
+
+```
+
+### hosed sudoers file
+
+https://unix.stackexchange.com/a/677592
+
+* open 2 shells
+* ON first, gets its pid - `echo $$`
+* On second, run
+    ```sh
+    pid=...bashofotherterm..
+    pkttyagent --process $pid
+    ```
+* On first, run
+    ```sh
+    pkexec bash
+    ```
+* you will have password prompted on other shell, type in and you have a sudo bash on the first
 
 ## chomp last line in file
 
-```
+```sh
 perl -pe 'chomp if eof' filename > new_filename
 perl -pi -e 'chomp if eof' inline_filename
+
+#using bash -- printf
+printf %s "$(< $file)" > $file
 ```
+
+
 
 ## expand filename soft links
 

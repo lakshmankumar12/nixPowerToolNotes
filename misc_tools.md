@@ -131,13 +131,32 @@ tmux show-options -g
 tmux show-options -w
 ```
 
-# screen
+# gnu-screen
 
 * Minimal screenrc
 
 ```sh
 hardstatus alwayslastline "%H %-Lw%{= BW}%50>%n%f* %t%{-}%+Lw%<"
 ```
+
+* standard commands
+
+```
+CtrlChar + A -- rename
+CtrlChar + <n> -- go to nth window
+CtrlChar + '   -- ask for n, and go to nth window
+CtrlChar + H   -- start logging to screen-pwd/screenlog.N. Same to stop
+CtrlChar + [   -- go into copy mode. Space bar to mark start and stop
+CtrlChar + :   -- command mode (See commands below)
+
+
+command mode
+:number <n>  -- swap current window with that number
+
+
+
+```
+
 
 
 # ssh
@@ -225,7 +244,9 @@ Host chaningiphost
 * Match-exec: https://superuser.com/a/1778495
 * Override hostname alone: https://unix.stackexchange.com/a/598532
 
-## ssh-key gen
+## ssh-keygen
+
+search : key gen
 
 ```sh
 # create key pair
@@ -241,9 +262,13 @@ ssh-keygen -t rsa -f /path/to/output/dir/with/private_key -N "passphrase" -C "co
 ### -N ""     new paraphrase
 ssh-keygen -p -P old-paraphrase -N new-paraphrase -f file
 
+### change comment
+### -c change comment
+ssh-keygen -c -C "new comment" -f file
+
 ### other args
-## -l     show fingerprint of public-key
-## -lv    show fingerprint of public-key and its ascii art
+## -l     show fingerprint and comments
+## -lv    show fingerprint, comments of public-key and its ascii art
 ## -E md5 show fingerprint in md5 hex format instead of base64
 ssh-keygen -lf ~/.ssh/id_rsa.pub -E md5
 
@@ -543,7 +568,7 @@ See general_reading_notes/ipsec_notes.md
 # -m, --max-time <fractional seconds>  -- max time for each transfer to take
 # -w <format>  -- write given format-string(expaned to values) to stdout
 #                 eg format:
-#                    '\\n%{response_code}'
+#                    '\\n%{response_code}'  // http_code was older
 # -I         --> just get headers only.. and not the BODY
 ### ssl stuff:
 ### server auth
@@ -560,6 +585,17 @@ See general_reading_notes/ipsec_notes.md
 
 curl 'http://...link' -o out_file
 ```
+
+## decode tls in wireshark
+
+```sh
+SSLKEYLOGFILE=/tmp/tls-keys.log curl https://whatever...
+
+## and in wireshark
+edit->preferences->protocol->tls->keyfile to tls-keys.log
+
+```
+
 
 # wget
 
@@ -718,6 +754,47 @@ cat $file1 $file2 | awk '/Package:/ {pkg=$2} /Version:/ {ver=$2} /Architecture:/
 
 ```
 
+## version pin
+
+https://douglasrumbaugh.com/post/apt-pinning/
+
+```
+   P >= 1000
+       causes a version to be installed even if this constitutes a
+       downgrade of the package
+
+   990 <= P < 1000
+       causes a version to be installed even if it does not come from the
+       target release, unless the installed version is more recent
+
+   500 <= P < 990
+       causes a version to be installed unless there is a version
+       available belonging to the target release or the installed version
+       is more recent
+
+   100 <= P < 500
+       causes a version to be installed unless there is a version
+       available belonging to some other distribution or the installed
+       version is more recent
+
+   0 < P < 100
+       causes a version to be installed only if there is no installed
+       version of the package
+
+   P < 0
+       prevents the version from being installed
+
+   P = 0
+       has undefined behaviour, do not use it.
+```
+
+```sh
+$ cat /etc/apt/preferences.d/99mychoices
+Package: libopenvswitch
+Pin: version 2.15.4-9gxc
+Pin-Priority: 1001
+```
+
 
 
 
@@ -771,12 +848,14 @@ sudo apt-get install linux-headers-$(uname -r)
 ps          procps
 ping        iputils-ping
 ssh         openssh-client
+sshd        openssh-server
 ip          iproute2
 netstat     net-tools
 arp         net-tools
 dig         dnsutils
 lstopo      hwloc
 nc          netcat
+column      bsdmainutils
 
 ```
 
@@ -860,6 +939,31 @@ keep pressing shift
 
 ```
 
+# uefi shell
+
+* https://mricher.fr/post/boot-from-an-efi-shell/
+
+search: UEFI Uefi
+
+```sh
+# go back to UEFI mgmt interface
+exit
+
+# scroll in the shell - shift pgup/pgdown
+
+# dump all entries
+bcfg boot dump -b
+
+# boot a particular entry
+bcfg boot boot 0001
+
+# move one entry on top
+# moves option-6 to 0(first) and slides 0-5 down
+bcfg mv 6 0
+
+```
+
+
 # ubuntu iso-install
 
 * subiquity / curtin
@@ -902,6 +1006,11 @@ tar rf tarfile.tgz newfileu
 
 ### remove a file
 tar  -f tarfile.tar --delete path/to/file
+
+### exclude a folder
+###  put exclude before -czf
+###  folder doesnt have the ending /
+tar --exclude='./gnodeb' -czf /tmp/coredev-configs.tgz  .
 
 
 ```
@@ -1138,7 +1247,7 @@ losetup -d /dev/loop0
     * sda, vda, nvme0n1, mmcblk, vda, sr0
 
 * usb-serial in linux
-```
+```sh
 lsusb
 ...
 Bus 005 Device 002: ID 067b:2303 Prolific Technology, Inc. PL2303 Serial Port
@@ -1157,6 +1266,14 @@ dmesg
 [83780.254926] usb 2-1.2: pl2303 converter now attached to ttyUSB0
 ...
 screen /dev/ttyUSB0 115200
+
+## to know the pci of a usb
+root@svt2-proxmox:~# lsusb |grep Telit
+Bus 002 Device 002: ID 1bc7:1070 Telit Wireless Solutions FN990   <== Bus 2 
+
+root@svt2-proxmox:~# readlink /sys/bus/usb/devices/usb2
+../../../devices/pci0000:00/0000:00:08.1/0000:c5:00.3/usb2      <== c5:00.3
+
 ```
 
 ## force unmount a nfs stuck partition
@@ -1200,6 +1317,61 @@ dd if=input of=output status=progress
 
 ## use thse
 dd if=input of=output status=progress conv=fsync oflag=direct bs=100M
+
+
+## dd image of local disk to another m/c
+dd if=/dev/sda bs=1G status=progress | gzip -c | ssh remotemc 'cat > proxmox_clone.img.gz'
+
+## dd image from antoher m/c
+ssh remotemc "cat /path/to/image.img.gz" | sudo gunzip -c | sudo dd of=/dev/sda bs=1M status=progress
+```
+
+## parted
+
+https://www.gnu.org/software/parted/manual/parted.html
+
+* on units
+```
+s -- sector
+KiB/MiB/GiB/TiB  -- 1024^n bytes
+kB/MB/GB/TB      -- 1000^n bytes
+%                -- percent of device
+
+```
+
+
+```sh
+parted /dev/sda
+
+##in the parted prompt
+
+## show the partition table
+print
+
+
+## create a gpt Partition Table
+mklabel gpt
+
+## create a msdos Partition Table
+mklabel msdos
+
+## create a partition
+## type is always primary for gpt
+##                primary,extended,logical for msdos
+## name must for gpt, not give for msdos
+mkpart [part-type name fs-type] start end
+## eg (-1s is the last sector on disk):
+mkpart primary 64s 4MiB
+mkpart primary 4MiB -1s
+
+## resize -- moves the end of the partition
+resize partitionnum end
+
+## remote a partition
+rm partitionnum
+
+## change device
+select /dev/sdb
 
 ```
 
@@ -1245,6 +1417,10 @@ sudo chown -R user:group /mountpoint
 
 ## list all useful mounts
 mount | grep -v -e tmpfs -e nsfs -e tracefs -e squashfs -e cgroup -e sysfs -e proc -e overlay -e debugfs -e rpc_pipefs -e securityfs
+
+# quickly mount a tmpfs
+mkdir /mnt/temp
+mount -o size=8G -t tmpfs none /mnt/temp
 
 ```
 
@@ -1307,6 +1483,15 @@ sudo resize2fs /dev/ubuntu-vg/ubuntu-lv
 ## more stuff
 ## to resize a pv
 pvresize /dev/sda3
+
+## grow a physical partition - disk and partition number
+growpart -v /dev/sda 3
+
+## list the names of the lvms
+###   the lv_path is usually a sym-link to the lv_dm_path
+###   the lv_dm_path is the device file
+###   or both are sym-links to an underlying blockfile.
+lvdisplay -C -o "lv_path,lv_dm_path,lv_kernel_minor"
 
 ```
 
@@ -1422,13 +1607,133 @@ gxcautotest@auto-gamma:~$
 
 ```
 
-# create a kernel panic
+# boot from a iso on the disk
 
-```sh
-echo c | sudo tee /proc/sysrq-trigger
+* https://www.linuxbabe.com/desktop-linux/boot-from-iso-files-using-grub2-boot-loader
+* Ensure to set type to menu and timeout to 15s in /etc/default/grub
+
+* add to `/etc/grub.d/40_custom`
+    * the UUID is as shown in `blkid` against UUID (not PARTUUID)
+```
+menuentry "Reinstall via iPXE" {
+  insmod part_gpt
+  insmod chain
+  search --no-floppy --fs-uuid --set=root 84d5ce35-af85-44fe-bd15-c26b8418d0d6
+  chainloader /ipxe.efi
+}
 
 ```
 
+* ubuntu
+
+```
+menuentry "ubuntu-boot-stop" --class arch --class gnu-linux --class gnu --class os --id 'ubuntu'  {
+    insmod lvm
+    insmod ext2
+    set isofile="/nr-3.0.0-34-5g-gxcr-1727087649-7c9ffa1c89-21.iso"
+    search --no-floppy --fs-uuid --set=root e59da571-3cd5-443b-86c2-ef2e16e4f4c8
+    loopback loop ($root)$isofile
+    linux   (loop)/casper/vmlinuz boot=casper iso-scan/filename=$isofile noeject noprompt autoinstall ds=nocloud\;s=/cdrom/nocloud_nvme/ console=ttyS0,115200n8 console=tty0 ip=192.168.122.208::192.168.122.1:255.255.255.0:install-point:::192.168.122.1 gxc-disk-choice=nonexist ---
+    initrd  (loop)/casper/initrd
+}
+```
+
+* system-rescue
+
+search: sysrecue
+
+https://www.system-rescue.org/manual/Booting_SystemRescue/
+
+* boot-options: copytoram nofirewall
+* there is still a `/dev/sda1`  that points to the file-system where iso is. This is required. Yet to find a replacement reference to that by uuid
+* remember to copy the file first and also to edit the path
+```
+menuentry "rescue-cd" --class arch --class gnu-linux --class gnu --class os  {
+    insmod ext2
+    set isofile="/home/onyxedge/systemrescue-11.02-amd64.iso"
+    search --no-floppy --fs-uuid --set=root fb654b4b-df47-40dc-b18d-064cfaf3970a
+    loopback loop ($root)$isofile
+    linux (loop)/sysresccd/boot/x86_64/vmlinuz archisobasedir=sysresccd img_dev=/dev/sda1 img_loop=$isofile archisolabel=RESCUE1102 iomem=relaxed console=tty0 console=ttyS0,115200n8 copytoram nofirewall
+    initrd (loop)/sysresccd/boot/intel_ucode.img (loop)/sysresccd/boot/amd_ucode.img (loop)/sysresccd/boot/x86_64/sysresccd.img
+}
+```
+
+
+* Find the position of the menuentry:
+  ```sh
+    grep -e '^menuentry' -e '^submenu' /boot/grub/grub.cfg
+  ```
+
+
+
+# ipxe
+
+* https://medium.com/@peter.bolch/how-to-netboot-with-ipxe-6a41db514dee
+* that which should be baked in image:
+
+```sh
+apt install gcc binutils make perl liblzma mtools mkisofs syslinux syslinux-utils
+
+#git clone git@github.com:ipxe/ipxe.git
+git clone https://github.com/ipxe/ipxe
+
+cd ipxe/src
+make bin/ipxe.lkrn bin-x86_64-efi/ipxe.efi EMBED=boot.ipxe
+./util/genfsimg -o ipxe.iso bin/ipxe.lkrn bin-x86_64-efi/ipxe.efi
+```
+
+* contents of boot.ipxe
+
+```
+#!ipxe
+echo Configure dhcp ....
+dhcp
+chain http://192.168.122.1:8999/boot-http.ipxe
+```
+
+* contents of a boot-http.ipxe
+
+```
+#!ipxe
+
+set uri http://192.168.122.1:8999/alpine-boot.ipxe
+
+:loading
+chain ${uri}
+goto loading
+```
+
+* contents of aplineboot
+
+```
+#!ipxe
+
+set local_address http://192.168.122.1:8999
+set alpine_repo http://dl-cdn.alpinelinux.org/alpine/v3.15/main
+set ipval 192.168.122.100::192.168.122.1:255.255.255.0::::192.168.122.1
+set key "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDcJKY4Yb1ECAab+ufX8uIx1M8fRsME232fEVXrfDWAYfd/bezJ3P/Cx6TL+bYy8reEGMgT2CdsI8DvVqfBZdTbZ2QqHOnBuMZyK4LeCmc+E5Ou6iDL1HAZSLYel89u3xgd8F0M73T9cQGWuZ+lrdS0NNy1MBS3/O0TilnE/j29/HsLxkggK+sWY154PucJYymB2m+kNBqeNXaaYeWx31662o4zg7fekZ5Wpav6Zbqr8WLUzhdYZN/BywQqAryRfqs/T9UTEsFWhVgFgKhj+QGy343Nmt91NsWdTJUGoXzcdjAtBgX5Z7zA1ZDUgAf7Fj1sH9QhIKJI0HtIsVW2ykLRyFQWPLNtV5aVqD4DNwgepMRuyNzMhmJPwzDJgqhJBygMJyExNrKzopeC3EaORy4bEv7B0XdA48G3ykC6GwAf7Gp4+Xlk0VJvXVlaATbtdVchGQbFDECsTcthSBsSkVZk/l950DkMBPYh6USPcS2XpOxmUb+Nl4OzE2vMXfKes2E= magma@tr0golden"
+
+kernel ${local_address}/vmlinuz-virt modloop=${base-url}/modloop-virt ip=${ipval} alpine_repo=${alpine_repo} initrd=initramfs-virt ssh_key=${key}
+initrd ${local_address}/initramfs-virt
+
+boot
+```
+
+* for ubuntu netboot
+    * doesnt work that reliably https://ipxe.org/appnote/ubuntu_live
+    * works fine (below) https://forum.ipxe.org/showthread.php?tid=22147&pid=43021#pid43021
+        * keep the iso file as-is and just extrac the vmlinuz/initrd from it (from the casper/ location)
+        * keep cloud-data, meta-data, vendor-data at the same place.
+```
+#!ipxe
+
+set server_ip http://192.168.122.110:8999
+kernel ${server_ip}/ubuntu/vmlinuz || sleep 3600
+initrd ${server_ip}/ubuntu/initrd || sleep 3600
+set ipval 192.168.122.100::192.168.122.1:255.255.255.0::::192.168.122.1
+imgargs vmlinuz initrd=initrd boot=casper ip=${ipval} cloud-config-url=/dev/null url=${server_ip}/ubuntu/ubuntu-22.04.4-live-server-amd64.iso autoinstall ds=nocloud-net;s=${server_ip}/ --- || sleep 3600
+boot || sleep 3600
+```
 
 
 # study cpu of a machine
@@ -1490,6 +1795,9 @@ numactl --show
 
 ```sh
 dmidecode
+
+# show only one section
+dmidecode -t <type>
 ```
 
 ## tool to edit bios / uefi
@@ -1505,6 +1813,15 @@ efibootmgr -n 0002
 
 ## set the boot options permenantly
 efibootmgr -o 0001,0002,0003,0005
+
+## delete a boot number
+efibootmgr --bootnum 0005 --delete-bootnum
+
+## add a boot number
+efibootmgr --create --disk /dev/sda --part 2 --label 'My new label' --loader '\EFI\ubuntu\shimx64.efi'
+
+## '*' in the o/p shows if the entry is active or not, -a => active, -A => inactive
+efibootmgr -a <0002>
 
 ```
 
@@ -1554,7 +1871,9 @@ sudo update-initramfs -u
 
 ```sh
 sudo sed -i -e '/GRUB_CMDLINE_LINUX=/ s/"$/ console=ttyS0,115200n8 console=tty0"/' /etc/default/grub
-sudo grub-mkconfig -o /boot/grub/grub.cfg
+sudo update-grub
+
+##sudo grub-mkconfig -o /boot/grub/grub.cfg
 
 ```
 
@@ -1574,8 +1893,12 @@ echo s > /proc/sysrq-trigger
 echo b > /proc/sysrq-trigger
 ```
 
+# create a kernel panic
 
+```sh
+echo c | sudo tee /proc/sysrq-trigger
 
+```
 
 # Impitool
 
@@ -1672,6 +1995,8 @@ cat /boot/config-$(uname -r)
 
 ## dynamic logs
 
+* link: https://www.kernel.org/doc/html/v4.19/admin-guide/dynamic-debug-howto.html
+
 * check if its enabled first
 
 ```sh
@@ -1687,12 +2012,29 @@ $
 ## enable logs
 echo "module openvswitch +p" > /sys/kernel/debug/dynamic_debug/control
 
-## study logs.. they appear in dmesg (-w follows)
+## study logs.. they appear in dmesg
+## turn on debug level
+sudo dmesg -n 7
+## -w tails the logs
 sudo dmesg -w
 
 ##disable
 echo "module openvswitch -p" > /sys/kernel/debug/dynamic_debug/control
+
+## study the points that have logs enabled
+sudo awk '$3 != "=_"' /sys/kernel/debug/dynamic_debug/control
 ```
+
+In code the following functions log:
+```cpp
+pr_debug("just formatstring:%d", args);
+netdev_debug(devptr, "fmt-string", args);
+
+// dump bytes
+print_hex_dump_bytes("your prefix str:", DUMP_PREFIX_NONE, startbyteptr, len);
+
+```
+
 
 ## sysctl
 
@@ -2056,7 +2398,7 @@ jq -n --arg greeting world --arg second more_values '{"hello":$greeting,"another
 
 # perf
 
-search : performance analysis
+search : performance analysis profiling profile
 
 ```sh
 ## without args will prepare the perf.data in the cwd
@@ -2069,6 +2411,17 @@ sudo perf record -g -p <pid>
 sudo perf report -f
 ## arg explanation for report command
 ## -f          Don’t do ownership validation.
+
+```
+
+# vnc
+
+```sh
+#install
+sudo snap install novnc
+
+#start
+novnc --listen localhost:10055 --vnc localhost:5904
 
 ```
 
@@ -2160,13 +2513,13 @@ https://github.com/tesseract-ocr/tessdata
 https://github.com/Shreeshrii/tessdata_shreetest
 
 ```sh
-export TESSDATA_PERFIX=.../tessdata
+export TESSDATA_PREFIX=.../tessdata
 
-$ tree $TESSDATA_PERFIX
+$ tree $TESSDATA_PREFIX
 ├── san-siddhanta-float.traineddata
 └── san.traineddata
 
-gs -o img.tiff -sDEVICE=tiffg4 -r1200 -dAutoRotatePages=/PageByPage source.pdf
+gs -o img.tiff -sDEVICE=tiffg4 -r1200 -dAutoRotatePages=/PageByPage -dFirstPage=n -dLastPage=n source.pdf
 tesseract img.tiff texted_output -l san-siddhanta-float
 
 ```

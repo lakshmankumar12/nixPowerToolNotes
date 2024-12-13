@@ -110,6 +110,9 @@ sed -n '/pat/,$p'    # print from pat to end-of-file
 ```sh
 sed '/pattern/s/.*/replacement for the whole line/' file
 
+##replace nth line
+sed '1 s/.*/whatever/'
+
 ```
 
 
@@ -123,7 +126,7 @@ Search: alternate, step, every
 sed -n '2~3p' <>
 ```
 
-## Remote color-codes form screen/tmux capture
+## remove color-codes form screen/tmux capture
 
 ```sh
 sed -r 's:\x1B\[[0-9;]*[mK]::g'
@@ -192,10 +195,32 @@ sed -n '3i' "you line content"
 
 * The whole block is executed on beg_pattern
 * In the block, we keep getting next line and printing until its end_pattern, where we quit.
-* the :loop is a label, to which we branch (and return that is) if its not end.
+* the :loop is a label, to which we jump if its not end_pattern.
 ```sh
 sed -n -e "/beg_pattern/{p; :loop  n; p; /end_pattern/ q; b loop}" in_file
 ```
+
+## replace or add a pattern if it doesn't exist
+
+```sh
+sed '/^FOOBAR=/{h;s/=.*/=newvalue/};${x;/^$/{s//FOOBAR=newvalue/;H};x}' infile
+
+## explanation
+sed '/^FOOBAR=/{      ## if pattern found
+h                     ## copy pattern to hold-space
+s/=.*/=newvalue/      ## substitute
+}
+${                    ## in last line
+x                     ## exchange with hold-space
+/^$/{                 ## if non-empty : already replaced.. not donothing. if empty then:
+s//FOOBAR=newvalue/   ##   add this pattern-newvalue
+H                     ## add this to the last-line(now in hold)
+}
+x                     ## exchange (effecting prints last-line + optionally added new pattern)
+}' infile
+
+```
+
 
 ## Print both first 10 and last 10 with a separator in between
 

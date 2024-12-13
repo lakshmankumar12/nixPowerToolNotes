@@ -358,19 +358,6 @@ note: paste
 paste -d'\t' - - - - < in_file
 ```
 
-## tablular output
-
-search: col column table tabularize
-
-```sh
-# -t    ..  tabular output
-# -s    ..  input-separator
-cat output | column -t -s "|" --output-separator "|"
-
-```
-
-
-
 
 ## Strip leading/trailing white spaces
 

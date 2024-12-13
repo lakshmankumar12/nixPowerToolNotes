@@ -82,6 +82,12 @@ set print elements 0
 
 disassemble /m
 
+## get a function at an address
+
+```
+info symbol <address>
+```
+
 ## Ignore a signal
 
 ```

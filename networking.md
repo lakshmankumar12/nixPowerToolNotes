@@ -19,6 +19,15 @@ ip link show
 ip -d -j -p link show ${linkname}
 ## for eg:
 ip -d -j -p link show gtp_br0 | jq '.[0].linkinfo.info_kind'
+## only get names of ifcs
+ip -j link show | jq -r '.[].ifname'
+## only show up/oper-up and macs .. ilshow
+ip -j link show | jq -r '.[] | [.ifname, .address // "--", ((.flags | map(select(. == "LOWER_UP" or . == "NO-CARRIER" or . == "UP")) | join(",")) | if . == "" then "--" else . end), .master // "--"] | join(";")' | column -t -s\;
+
+
+## get mac of a ifc
+ifc=eth0
+ip -j link show ${ifc} | jq -r '.[0].address'
 
 ## args
 ##  -j         json output
@@ -280,7 +289,12 @@ ip addr show
 
 ### useful version
 
-```
+```sh
+## get first ipv4 of a ifc prgramatically
+ifc=eth0
+ip -j -4 addr show ${ifc} | jq -r '.[0].addr_info[0].local'
+
+
 ip addr show | awk '/^[0-9]+:/ {ifname=$2} /^ *inet / {print ifname " " $2; }' | grep ""
 
 ip -br a
@@ -596,6 +610,7 @@ direct args: 192.168.0.24/8 10.0.0,1,3-7
 -PS<port list> -- syn check to these ports.
 -PR  - arp scan
 -PE  - ICMP-ping only scan
+--open   -- show only open ports(and suppress closed/filtered ports)
 
 
 -v   - be verbose
@@ -606,6 +621,9 @@ direct args: 192.168.0.24/8 10.0.0,1,3-7
 sudo nmap -sn 172.28.1.0/24     ## does a mac probe
 sudo nmap -sn 192.168.122.0/24  ## does a mac probe
 nmap -sn 172.28.1.0/24          ## does ping, syn to 80/443
+
+## check if a udp port is open
+nmap -sU -p $port_or_range --open $ip -Pn
 
 ```
 
@@ -743,6 +761,8 @@ If net, realpath:       /sys/devices/pci0000:42/0000:42:01.0/0000:43:00.3/net/${
 There is a backlink:    device -> ../../
 ```
 
+In case of sriov vfs, the /sys/bus/pci/devices/${pci} folder of the VF-pci will have a `physfn` link to the PCI-folder of the PF
+
 ## device naming
 
 ```sh
@@ -876,6 +896,20 @@ iptables -t nat -A POSTROUTING -o eth0 -d ! 172.16.0.0/12 -j SNAT --to-source 17
 
 ## Sample iptabes
 
+
+### forward a port on host to a particular guest in a std kvm setup
+
+```sh
+hostip=46.4.29.55
+hostport=38883
+hostindev=enp5s0
+guestip=192.168.122.59
+guestport=22
+iptables -I PREROUTING -t nat -i ${hostindev} -d ${hostip} -p tcp --dport ${hostport} -j DNAT --to-dest ${guestip}:${guestport}
+iptables -I FORWARD -p tcp --dport ${guestport} -d ${guestip} -m conntrack --ctstate NEW,RELATED,ESTABLISHED -j ACCEPT
+```
+
+
 ### Nat A IP hidden behind a machine
 
 ```
@@ -977,6 +1011,19 @@ iptables -t nat -A POSTROUTING -p tcp -s 127.0.0.1 -d 11.22.33.44 --dport 5353 -
 
 * Represents a collection of ip
 * see https://unix.stackexchange.com/a/557494
+
+## ebtables
+
+* turn off arp-responses for a specific IP
+
+```sh
+my_local_ip=172.28.1.28
+# Block ARP requests to that local-ip
+ebtables -A OUTPUT -p ARP --arp-op Request --arp-ip-src ${my_local_ip} -j DROP
+# Block ARP replies fort hat local-ip
+ebtables -A OUTPUT -p ARP --arp-op Reply --arp-ip-src ${my_local_ip} -j DROP
+
+```
 
 
 # nft
@@ -1294,6 +1341,7 @@ network:
     enp0s3:
       dhcp4: false
       dhcp6: false
+      optional: true   ## makes this not mandator on system start
       addresses:
       - 192.168.1.122/24
       routes:
@@ -1302,6 +1350,31 @@ network:
       nameservers:
        addresses: [8.8.8.8,8.8.4.4]
 ```
+
+* vlan ifc
+```yaml
+network:
+  version: 2
+  ethernets:
+    eth0:  # Your physical interface name
+      dhcp4: no
+  vlans:
+    eth0.10:
+      id: 10
+      link: eth0
+      addresses: [192.168.10.2/24]
+    eth0.20:
+      id: 20
+      link: eth0
+      addresses: [192.168.20.2/24]
+      nameservers:
+        addresses: [8.8.8.8, 8.8.4.4]
+      routes:
+        - to: 0.0.0.0/0
+          via: 192.168.20.1
+
+```
+
 
 * bond interface
 ```yaml
@@ -1352,6 +1425,9 @@ network:
   * https://askubuntu.com/a/1080483
     * /usr/lib/networkd-dispatcher
     * /etc/networkd-dispatcher (not this)
+
+
+
 
 ## netplan commands
 
@@ -1430,7 +1506,7 @@ https://danielmiessler.com/study/tcpdump/
 -X               # Show the packet’s contents in both hex and ASCII.
 -XX              # Same as -X, but also shows the ethernet header.
 -v, -vv, -vvv    # Increase the amount of packet information you get back.
--c               # Only get x number of packets and then stop.
+-c <pkt-count>   # Only get x number of packets and then stop.
 -s               # Define the snaplength (size) of the capture in bytes. Use -s0 to get everything, unless you are intentionally capturing less. (default is typically 96, older: 68)
 -S               # Print absolute sequence numbers.
 -e               # Get the ethernet header as well.
@@ -1494,6 +1570,10 @@ src mars and not dst port 22
 # filter ping pkts that are wrapped with gtpu
 # 84 bytes ping will generate 84+36 = 120 byte pkt
 tcpdump -n -vv -i eth1 'udp and port 2152 and (ip[2:2] == 120)'
+
+# ethernet mac address
+ether host aa:bb:cc:11:22:33
+ether host ff:ff:ff:ff:ff:ff
 
 # pick a particular vlanid (eg:1000)
 vlan and ether[14:2] & 0xfff == 1000
@@ -1608,7 +1688,7 @@ hping3
 -I <interface>  #interface to bind to
 ```
 
-# iperf
+# iperf3
 
 ## server
 
@@ -1839,7 +1919,10 @@ https://unix.stackexchange.com/questions/442598/how-to-configure-systemd-resolve
 https://blogs.gnome.org/mcatanzaro/2020/12/17/understanding-systemd-resolved-split-dns-and-vpn-configuration/
 
 ```
-## note the spelling - its resolve
+## newer systemd
+resolvectl status
+
+## older note the spelling - its resolve
 systemd-resolve --status
 
 ```
@@ -1860,30 +1943,36 @@ ip xfrm policy show
 ip xfrm state show
 ```
 
-# netcat commands
+# nc commands
 
-Search: nc
+Search: nc netcat
 
 * As a tcp server
-    ```
+    ```sh
         nc -l -s <src-add> -p <src-port>  # might be wrong. The -l automatically takes the <ip> <port> args as local values.
         nc -l <src-add> <src-port>
     ```
 * As a tcp client
-    ```
+    ```sh
         nc -s <src-addr> -p <src-port> <tgt-add> <tgt-port>
+
+        # generate a quick message and exit
+        echo "my message" | nc -q 1 server port
     ```
 * As a udp server
-    ```
+    ```sh
         nc -u -l <optional-src-addr> <mandatory-src-port>   # ip-addr if not mentioned, is any
     ```
 * As a udp client
-    ```
+    ```sh
         nc -u -s <optional-src-addr> <mandatory-srv-ip> <mandatory-srv-port>
+
+        ## send exactly one packet and quit
+        echo "my message" | nc -w0 -u server port
     ```
 
 * As a udp server and client at same time
-    ```
+    ```sh
         nc -u -s 192.2.53.2 -p 19000 192.15.2.2 8090
     ```
 

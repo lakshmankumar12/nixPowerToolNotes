@@ -146,20 +146,21 @@ virt-install --name=${vmname} --os-variant=${osvariant} \
              --cdrom=${image_path} --network bridge=${bridge},model=virtio \
              --disk size=${hdsize}
 
-## copy the image
-vmname=mynewimportedvm
-target_path=/var/lib/libvirt/images/${vmname}.qcow2
-sudo cp $src_path $target_path
-
 
 #import from a qcow2 .. note the imported qcow2 will be used.
 # if you want to start from a backup and still have the backup
 # your should cp your backup first and then import from the new file!
+## copy the image
 vmname=mynewimportedvm
+src_path=.../wherever/source.qcow2
+target_path=/var/lib/libvirt/images/${vmname}.qcow2
+sudo qemu-img convert -O qcow2 $src_path $target_path
+#sudo cp $src_path $target_path
+
 osvariant=ubuntu20.04
 cpu=4
 ram=16384    ## in KB
-importimage=/path/to/import.qcow2     ## W-A-R-N-I-N-G: copy from your source image. This will be the img of the new VM
+importimage=$target_path     ## W-A-R-N-I-N-G: copy from your source image. This will be the img of the new VM
 bridge=virbr0
 graphics=none   # or vnc if u want
 virt-install --name=${vmname} --os-variant=${osvariant} \
@@ -172,6 +173,7 @@ virt-install --name=${vmname} --os-variant=${osvariant} \
 ##   --vpcu=<num>          .. num cpus
 ##   --ram=<value>         .. ran in KB
 ##   --graphics <none|vnc>
+##   --graphics vnc,listen=0.0.0.0,port=5921   .. listen on the chosen port
 ##   --cdrom=${image_path}
 ##   --location ftp://...iso
 ##   --network bridge=${bridge},model=virtio          <-- simply repeat this for a second interf with a diff bridge
@@ -266,6 +268,51 @@ virsh net-start tr0second
 virsh net-autostart tr0second
 ```
 
+## attach a cd to a running vm
+
+* Create a xml
+```xml
+    <disk type='file' device='cdrom'>
+      <driver name='qemu'/>
+      <target dev='sda' bus='sata'/>
+      <source file='/path/to/your/file.iso'/>
+      <readonly/>
+    </disk>
+```
+* and
+
+
+```sh
+virsh update-device vmname file_with_details.xml
+
+##or
+vmname=
+PATH=
+virsh update-device $vmname <(cat <<EOF
+<disk type='file' device='cdrom'>
+  <driver name='qemu'/>
+  <target dev='sda' bus='sata'/>
+  <source file='$PATH'/>
+  <readonly/>
+</disk>
+EOF
+)
+
+```
+
+* you may have to `virsh edit vmname` and adjust boot settings
+
+### Althernate commands
+
+
+```sh
+iso_path=/tmp/ipxe.iso
+virsh attach-disk $vmname $iso_path hda --config --type cdrom --mode readonly
+
+# attach host device
+virsh attach-disk $vmname /dev/sr0 hdc --config --type cdrom
+
+```
 
 
 ## qemu-img
@@ -307,23 +354,6 @@ sudo qemu-img create -f raw ${image_name} 128G
 ```
 
 
-
-* xml snippet to add a cdrom-device (or just add a iso)
-
-```xml
-    <disk type='file' device='cdrom'>
-      <driver name='qemu'/>
-      <target dev='sda' bus='sata'/>
-      <!-- Mostly this is what you should add -->
-      <source file='/path/to/your/file.iso'/>
-      <readonly/>
-      <alias name='sata0-0-0'/>
-      <!-- not sure fi the following is needed.
-           Adding it stops it from being a boot device! -->
-      <address type='drive' controller='0' bus='0' target='0' unit='0'/>
-      <boot order='1'/>
-    </disk>
-```
 
 * attach a network after starting the vm
 ```sh
@@ -525,7 +555,7 @@ virsh dumpxml $vm_name | sed -n '/<channel/,/channel>/ p'
 ## install kvm
 
 ```sh
-sudo apt install -y qemu qemu-kvm qemu-utils libvirt-daemon libvirt-daemon-system libvirt-clients bridge-utils virt-manager dnsmasq libosinfo-bin cpu-checker virt-viewer qemu-efi ovms
+sudo apt install -y qemu qemu-kvm qemu-utils libvirt-daemon libvirt-daemon-system libvirt-clients bridge-utils virt-manager dnsmasq libosinfo-bin cpu-checker virt-viewer qemu-efi ovmf
 sudo reboot
 
 ```
@@ -589,6 +619,25 @@ option-3: create a network first , and add a interface into the network
   <source network='sr-iov-net-40G-XL710'/>
 </interface>
 ```
+
+## pinning cpu
+
+* https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/5/html/virtualization/ch33s08#idm140366063444128
+
+```
+
+## its just a matter  of adding cpuset to the vcpu item in xml
+<vcpus cpuset='4-7'>4</vcpus>
+
+## to dump the current cpus/pin info
+virsh vcpuinfo <dom-name>
+
+## to pin vcpu to a set of cpus
+##  virsh vcpupin <domname> <vcpu> <hostcpu>
+virsh vcpupin guest1 0 4
+
+```
+
 
 # secure linux
 
@@ -661,8 +710,12 @@ src_path=/home/gxcautotest/lakshman/from_official_ubuntu_qcow2/focal-server-clou
 target_path=/var/lib/libvirt/images/${vmname}.qcow2
 sudo cp $src_path $target_path
 
+## optional -- whatever size.. it gets auto-reized .. how cool is that.
+sudo qemu-img resize ${target_path} +20G
+
 ## prepare a iso image of the cloud-data
 second_disk=/home/gxcautotest/lakshman/from_official_ubuntu_qcow2/user-data.img
+second_disk_src=/home/gxcautotest/lakshman/from_official_ubuntu_qcow2/user-data.src
 cloud-localds ${second_disk} ${second_disk_src}
 
 vmname=ubuntu_imported
@@ -711,6 +764,7 @@ vagrant destroy vmname
 References: https://networkengineer.me/2014/07/11/more-than-4-network-cards-in-virtualbox/
 
 ```sh
+
 "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" startvm ubuntu
 
 vboxmanage list vms
@@ -790,6 +844,24 @@ qm showcmd 103
 qm monitor <vmid>
 ## command eg:
 ## change vnc password
+
+## force shut a vm
+qm stop <vmid>
+
+## start a vm
+qm start <vmid>
+
+## extra vnc access: https://pve.proxmox.com/wiki/VNC_Client_Access
+## In  /etc/pve/local/qemu-server/<VMID>.conf,
+args: -vnc 0.0.0.0:5977
+
+## Grab.. untested
+### create a backup of a existing vm
+vzdump <VMID> --mode stop --compress zstd --storage local
+### and Copy the vzdump-qemu-<VMID>-<date>.vma.zst to wherever you want
+
+### resotre a vm from a disk image
+qmrestore /var/lib/vz/dump/vzdump-qemu-<VMID>-<date>.vma.zst <new-VMID> --storage local-lvm
 
 ```
 

@@ -1,3 +1,77 @@
+# gs based operations
+
+## extract a subset of pages
+
+```sh
+infile=..
+outfile=..
+spage=..
+epage=..
+gs -sDEVICE=pdfwrite -dNOPAUSE -dBATCH -dSAFER -q \
+   -dFirstPage=$spage \
+   -dLastPage=$epage \
+   -sOutputFile=$outfile \
+   $infile
+
+## args explained
+###    -dNOPAUSE -- dont enter interactive prompt
+###    -dBATCH   -- quit after done. Def is to enter interactive prompt
+###    -dSAFER   -- avoid unsafe operations (following links etc..)
+###    -q        -- quiet mode.. no unnecessary startup messages
+###    -c "postscript code"  -- note when -c is used, you need to use -f to tell next is input
+```
+
+## combine pdfs
+
+```sh
+gs -dBATCH -dNOPAUSE -dSAFER -q -sDEVICE=pdfwrite -sOutputFile=output.pdf \
+   -dFirstPage=1 -dLastPage=3 input1.pdf \
+   -dFirstPage=2 -dLastPage=4 input2.pdf
+
+# if you want whole of input
+gs -dBATCH -dNOPAUSE -dSAFER -q -sDEVICE=pdfwrite -sOutputFile=output.pdf \
+   input1.pdf input2.pdf
+```
+
+* with pdftk
+
+```sh
+pdftk A=in1.pdf B=in2.pdf cat A1-2 B4-end output out1.pdf
+pdftk *pdf cat output combined.pdf
+```
+
+## rotate pdf
+
+```sh
+# Create a file named rotate.txt with the rotation instructions
+echo "[/Page 1 /Rotate 90 /DELETE pdfmark" > rotate.txt
+
+# Use gs to apply the rotation
+gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=rotated.pdf \
+   rotate.txt input.pdf
+
+## 90 - clockwise, 270 - anti-clockwise , 180 upside-down
+cat <<EOF > rotate.txt
+[/Page 1 /Rotate 90 /DELETE pdfmark
+[/Page 3 /Rotate 180 /DELETE pdfmark
+[/Page 5 /Rotate 270 /DELETE pdfmark
+EOF
+
+## rotate full file
+## 1 - anit-clockwsie, 2-upside down, 3 - clockwise
+gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=rotated.pdf \
+   -c "<</Orientation 3>> setpagedevice" \
+   -f input.pdf
+
+```
+* with pdftk
+```sh
+# rotate the first PDF page to 90 degrees clockwise
+pdftk in.pdf cat 1east 2-end output out.pdf
+
+# rotate an entire PDF document to 180 degrees
+pdftk in.pdf cat 1-endsouth output out.pdf
+```
 
 
 # password related
@@ -80,20 +154,6 @@ pdftk 1.pdf output 1.128.pdf owner_pw foo user_pw baz
 pdftk 1.pdf output 1.128.pdf owner_pw foo user_pw baz allow printing
 ```
 
-# Merge 2 pdfs
-
-```sh
-pdftk A=in1.pdf B=in2.pdf cat A1-2 B4-end output out1.pdf
-pdftk *pdf cat output combined.pdf
-```
-
-* using gs
-
-```sh
-gs -dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE=combine.pdf -dBATCH 1.pdf 2.pdf
-```
-
-
 # print 2 pages per sheet
 
 *  Search : multiple 2x1 2x2
@@ -108,18 +168,7 @@ pdfjam --nup 2x1 --landscape input.pdf --outfile output.pdf
 pdftk input.pdf background mark.pdf output marked-file.pdf
 ```
 
-# rotating pdf
-
-```sh
-# rotate the first PDF page to 90 degrees clockwise
-pdftk in.pdf cat 1east 2-end output out.pdf
-
-# rotate an entire PDF document to 180 degrees
-pdftk in.pdf cat 1-endsouth output out.pdf
-```
-
 # extract a image/jpeg/picture from a pdf
-
 
 ```sh
 convert -verbose -density 150 -trim file.pdf -quality 100 -sharpen 0x1.0 output.jpg
