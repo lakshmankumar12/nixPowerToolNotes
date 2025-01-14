@@ -1642,7 +1642,14 @@ ping <ip>
 -c <n>              # send n ping pkts
 -s <pktsize>        # pkt-size in bytes
 -I <interface>      # Use this interface or ip-address
+-w <secs>           # ping till this time. ping exits either because
+                    ##  this time is hit, or
+                    ##  all sent (c-count) probes are answered, or
+                    ##  some error
 -M do|dont          # do=>set DF bit, dont=>dont set DF
+-f                  ## flood mode. Sent pkts w/o waiting for reply
+                    ## every -i <interval>, default interval is 0s
+-i <secs>           ## float allowed. interval between each send. def: 1s
 ```
 
 Notes on size
