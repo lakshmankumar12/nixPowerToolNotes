@@ -64,5 +64,11 @@ youtube-dl -f 140 $VIDEOID
 * Installing
 ```sh
 brew install yt-dlp
+
+## downlaod only audio
+yt-dlp -f 140 $id
+
+## download transcript
+yt-dlp --write-auto-sub --convert-subs=srt --skip-download $id
 ```
 

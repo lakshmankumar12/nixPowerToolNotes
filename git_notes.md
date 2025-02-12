@@ -712,6 +712,9 @@ Create a new branch that tracks a branch
 
 git branch -t name remotes/origin/name
 git checkout name
+
+## create a branch w/o commits
+git checkout --orphan new_branch_name
 ```
 
 # Info model

@@ -138,6 +138,11 @@ recording
 win + alt +r -- gamebox recording of app on which this key was pressed.
 Recording stored in %USERPROFILE%\Videos\Captures
 
+## clipboard history
+
+```
+win + v
+```
 
 
 
@@ -177,3 +182,12 @@ Link: https://windowsloop.com/display-popup-message-in-windows-10/
 powershell
 -WindowStyle hidden -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('Afternoon Syncup Meeting','Meeting Reminder')}"
 ```
+
+# chrome
+
+disable javascript for a site:
+
+```
+chrome://settings/content/javascript
+```
+

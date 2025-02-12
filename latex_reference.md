@@ -7,8 +7,11 @@
 \usepackage{fontspec}
 \usepackage{setspace}
 
+% Remove headers and footers
+\pagestyle{empty}
+
 % Set Devanagari as main font
-\setmainfont{Noto Sans Devanagari}
+\setmainfont{Noto Sans Devanagari}[Script=Devanagari]
 \newfontfamily\englishfont{Noto Sans}
 \newcommand{\eng}[1]{{\englishfont#1}}
 
@@ -17,9 +20,11 @@
 % The second number (36) is the baseline skip - the distance between lines, also in points
 \fontsize{24}{36}\selectfont
 
+% the \\ enforces a new line
+
 ...devnatext... \eng{englishtest} ....more devnatext\\
 
-{\small 2:30}
+{\small your-small-text}
 
 \end{document}
 ```
@@ -75,3 +80,22 @@ x
 ```
 
 Run the above as `xalatex combine.pdf`
+
+
+## docker running
+
+```
+docker run -it -v $PWD:/data moss/xelatex /bin/bash
+
+# apt update && apt-get install -y fonts-noto
+
+docker commit <image-id> moss_xelatex_fonts
+
+##for fire
+docker run --rm -v $PWD:/data moss_xelatex_fonts xelatex source.pdf
+
+## for html
+docker run --rm -v $PWD:/data moss_xelatex_fonts htxelatex source.pdf
+
+```
+

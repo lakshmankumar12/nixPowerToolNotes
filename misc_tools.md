@@ -856,6 +856,7 @@ dig         dnsutils
 lstopo      hwloc
 nc          netcat
 column      bsdmainutils
+7z          p7zip-full
 
 ```
 
@@ -1036,6 +1037,16 @@ tar tf tarball.tar
 # cat a file to stdout w/o really creating a file
 tar xf file.tgz path/in/tar/ball --to-stdout
 ```
+
+# gunzip
+
+```sh
+## args
+
+-c --stdout --to-stdout   ## output to stdout
+
+```
+
 
 # pulp tool
 
@@ -1317,6 +1328,8 @@ dd if=input of=output status=progress
 
 ## use thse
 dd if=input of=output status=progress conv=fsync oflag=direct bs=100M
+## for copying sakes:
+status=progress conv=fsync oflag=direct bs=100M
 
 
 ## dd image of local disk to another m/c
@@ -1849,13 +1862,25 @@ https://raw.githubusercontent.com/s-n-ushakov/rename-efi-entry/master/rename-efi
 # list all modules
 lsmod
 
+# add a module
+modprobe modulename
+
+# if u have the .ko file in hand
+insmod /path/to/file.ko
+
 onyxedge@svt2agw:~$ lsmod | grep gre
 ip_gre                 28672  0            ## nobody else seems to use ip_gre
 ip_tunnel              24576  1 ip_gre     ## ip_tunnel is used by ip_gre
 gre                    16384  1 ip_gre
 onyxedge@svt2agw:~$
 
-# load 
+```
+
+## blacklist a module
+
+```sh
+echo "blacklist tg3" >> /etc/modprobe.d/blacklist.conf
+## and update initramfs .. see below
 
 ```
 
@@ -2227,16 +2252,16 @@ brew install gdrive
 gdrive about
 
 # ls the root drive - note default is 30 items.. use -m <100> to list 100
-gdrive list
+gdrive files list
 
 # ls a particular dir - get id of parent
-gdrive list --query " 'IdOfTheParentFolder' in parents"
+gdrive files list --query " 'IdOfTheParentFolder' in parents"
 
 # general find by name
-gdrive list --query "name contains 'temp'"
+gdrive files list --query "name contains 'temp'"
 
 #download
-gdrive download <id>
+gdrive files download <id>
 
 #info on file, path where it is..
 gdrive info <id>
@@ -2402,7 +2427,7 @@ search : performance analysis profiling profile
 
 ```sh
 ## without args will prepare the perf.data in the cwd
-sudo perf record -g -p <pid>
+sudo perf record -g -p $pid
 ## arg explanation for record command
 ## -g          Enable call graph
 ## -p <pid>    Only this pid
@@ -2506,6 +2531,12 @@ oathtool -b --totp ${secret}
 ```
 
 # tesseract
+
+```
+sudo apt-get install -y tesseract-ocr
+
+```
+
 
 * devnagiri trained source : 
 

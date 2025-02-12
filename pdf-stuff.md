@@ -161,6 +161,14 @@ pdftk 1.pdf output 1.128.pdf owner_pw foo user_pw baz allow printing
 pdfjam --nup 2x1 --landscape input.pdf --outfile output.pdf
 ```
 
+# get font info from pdf
+
+```sh
+pdffonts document.pdf
+
+```
+
+
 # watermarking
 
 * works only for text-files).

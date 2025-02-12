@@ -1589,18 +1589,28 @@ tcp[tcpflags] & (tcp-syn|tcp-ack) != 0
 
 #gre packets
 protochain GRE && proto IP
-```
 
-* tshark to text-only dump all packets
-
-```
-tshark -V -r a.pcap > a.txt ; vi a.txt
+#sctp pkts - no heartbeats/acks
+not (sctp[12:1] = 4 or sctp[12:1] = 5)
 ```
 
 * to apply display filters
 
-```
-tshark -r infile.pcap  -2 -R "<display-filter>" -w outfile.pcap
+search: std standard tshark
+
+```sh
+infile=file.pcap
+disp_filter="tcp"
+outfile=tcp.pcap
+
+## really what you want.
+## -t ud retains UTC timestamp
+tshark -t ud -r $infile  -2 -Y "$disp_filter" > $outfile
+## w/o any disp filter
+tshark -t ud -r $infile  > $outfile
+
+## write to another pcap
+tshark -r $infile  -2 -Y "$disp_filter" -w $outfile
 ```
 
 * show like in wireshark
@@ -1611,9 +1621,19 @@ tshark -G column-formats
 
 tshark -o 'gui.column.format:"No.","%m","Time","%Yut","Source","%s","Destination","%d","Protocol","%p","Length","%L","Info","%i"' -r infile.pcap > /tmp/output
 
+## the typical std set
+##tshark -r $infile -T fields -e frame.number -e _ws.col.Time -e ip.src -e ip.dst -e _ws.col.Protocol -e frame.len -e _ws.col.Info -2 -Y "$disp_filter" -t ud > $outfile
+
+
 ```
 
+* capture live and save to file
 
+```sh
+capture_live() {
+    sudo dumpcap -i $ifc -f "${filter}" -w - | tee ${file} | tshark -r -
+}
+```
 
 * get timestamp info from a pcap file
 

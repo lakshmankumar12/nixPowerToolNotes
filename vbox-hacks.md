@@ -133,6 +133,10 @@ virt-manager
 
 ```sh
 
+## to install kvm search for qemu-kvm
+
+
+
 ## create a new vm
 vmname=mynewvm
 osvariant=ubuntu20.04   ## use `virt-install --os-variant list` to find options
@@ -183,6 +187,7 @@ virt-install --name=${vmname} --os-variant=${osvariant} \
 ##   --extra-args='console=ttyS0,115200n8 serial'
 ##   --boot uefi
 ##   --boot loader=/usr/share/OVMF/OVMF_CODE.fd,loader_ro=yes,loader_type=pflash,nvram_template=/usr/share/OVMF/OVMF_VARS.fd
+##   --watchdog i6300esb,action=reset
 ##   --print-xml [STEP]    .. USEFUL TO GET XML AND NOT START VM!!
 ##                         .. step is 1/2 if (--cdrom, --location, --pxe or --install) AND (withouth --no-install) is used.
 ##                         .. you probably want 1st step, define it.. and once done, explicitly remove the cd/onreboot-destory elements later

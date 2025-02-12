@@ -891,6 +891,8 @@ Leftovers=$@
 
 ## getopt
 
+search: getopts best argparse argc argv
+
 * Seems to be best of all worlds
 
 ```sh
@@ -1950,8 +1952,8 @@ userdel -f -r ${user_to_del}
 Search : password
 
 ```sh
-username=$(whoami)
 username="whoever"
+username=$(whoami)
 echo "${username} ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers > /dev/null
 
 ## add a particular command for one user
