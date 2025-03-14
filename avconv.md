@@ -44,6 +44,18 @@ For video files (mp4 files) this doesn't work. use MP4Box from `sudo apt-get ins
 MP4Box -cat video1.mp4 -cat video2.mp4 -cat video3.mp4 -new final.mp4
 ```
 
+```sh
+### for file with same format
+cat > list.txt <<EOF
+file input1.m4a
+file input2.m4a
+EOF
+
+ffmpeg -f concat -safe 0 -i list.txt -c copy output.m4a
+
+```
+
+
 ### Merge audio and video
 
 ```

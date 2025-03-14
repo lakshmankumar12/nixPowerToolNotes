@@ -570,6 +570,8 @@ See general_reading_notes/ipsec_notes.md
 #                 eg format:
 #                    '\\n%{response_code}'  // http_code was older
 # -I         --> just get headers only.. and not the BODY
+# -u username       --> prompts password
+# -u username:password   --> boht in stdin
 ### ssl stuff:
 ### server auth
 # --cacert $cacert
@@ -585,6 +587,21 @@ See general_reading_notes/ipsec_notes.md
 
 curl 'http://...link' -o out_file
 ```
+
+* Debug network times with curl
+
+```sh
+curl -kso /dev/null -w "\n===============\n
+| DNS lookup: %{time_namelookup}\n
+| Connect: %{time_connect}\n
+| App connect: %{time_appconnect}\n
+| Pre-transfer: %{time_pretransfer}\n
+| Start transfer: %{time_starttransfer}\n
+| Total: %{time_total}\n
+| HTTP Code: %{http_code}\n===============\n" --cert $CLIENT_CERT --key $CLIENT_KEY https://api.gxcnetwork.com/magma/v1/networks/network_svt_291/alerts
+
+```
+
 
 ## decode tls in wireshark
 
@@ -939,6 +956,21 @@ grub2-mkconfig -o /boot/grub2/grub.cfg
 keep pressing shift
 
 ```
+
+## grub prompt management
+
+```
+(gdb) ls
+(lvm/ubuntu-vg-swap_1) (lvm/ubuntu--vg-root) (hd0) (hd0,msdos1) (hd1) (hd1,gpt2) (hd1,gpt1) (cd0)
+
+(gdb) set root=(hd0,msdos1)
+
+(gdb) chainloader /EFI/boot/grubx64.efi  ## tab completion works
+
+(gdb) boot
+
+```
+
 
 # uefi shell
 
@@ -1620,6 +1652,24 @@ gxcautotest@auto-gamma:~$
 
 ```
 
+# dont start graphical target in xubuntu
+
+```sh
+
+##stop
+sudo systemctl disable lightdm
+sudo systemctl set-default multi-user.target
+sudo reboot
+
+##to restart now
+sudo systemctl start lightdm
+
+##to restart on future reboots
+sudo systemctl set-default graphical.target
+sudo systemctl enable lightdm
+```
+
+
 # boot from a iso on the disk
 
 * https://www.linuxbabe.com/desktop-linux/boot-from-iso-files-using-grub2-boot-loader
@@ -1968,6 +2018,13 @@ console com2
 ## reboot the server
 racadm serveraction hardreset
 ## C-A-R-E-F-U-L-L !!!
+
+
+## get current session
+getssninfo
+
+## close a session
+closessn -i <id>
 
 ```
 

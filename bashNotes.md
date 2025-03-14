@@ -322,7 +322,7 @@ done < /some/input/file
 ```
 
 
-# Arrays
+# array
 
 Read on array: http://stackoverflow.com/a/18136920/2587153
 
@@ -364,6 +364,7 @@ done
 ```
 
 * does array contain a value
+search: presence in array
 ```sh
 printf '%s\0' "${myarray[@]}" | grep -F -x -z -- 'myvalue'
 
@@ -801,6 +802,27 @@ fi
 
 ## you can write a pid into the lock-dir
 ## but only for debug purposes. Dont expect that to be atomic
+```
+
+## delete a file with stray chars
+
+```
+# list with inode numbers
+ls -li
+
+# delete based on inode number
+find . -inum ${inode_num} -delete
+
+```
+
+## check if user is root in a script
+
+```sh
+if [ "$EUID" -ne 0 ]; then
+  echo "Error: This script must be run as root to perform sysctl operations"
+  exit 1
+fi
+
 ```
 
 
@@ -1347,6 +1369,78 @@ done
 
 * phc2sys - sync ptp clock to sys clock
 
+## ts - add a timestamp to every line
+
+```sh
+## install
+apt install moreutils
+
+## add a timestamp
+echo "any outout" | ts
+
+## with a format
+echo "any outout" | ts '%Y-%m-%d %H:%M:%S'
+
+## with a format in a tz
+echo "any outout" | TZ=Etc/UTC ts '%Y-%m-%d %H:%M:%S'
+
+```
+
+
+## touch and stat
+
+```sh
+## stat file
+$ stat /var/log/MME.lakshman-agw-1.root.log.INFO.20250213-143839.3546
+  File: /var/log/MME.lakshman-agw-1.root.log.INFO.20250213-143839.3546
+  Size: 21349           Blocks: 48         IO Block: 4096   regular file
+Device: fc01h/64513d    Inode: 13998       Links: 1
+Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)
+Access: 2025-02-13 14:38:41.848000000 +0000            <-- when file was read
+Modify: 2025-02-13 14:38:41.348000000 +0000            <-- when file was modified
+Change: 2025-02-13 14:38:41.348000000 +0000            <-- when metadata was modified
+ Birth: -
+$
+```
+* mount options around a time:
+   * noatime    - Never update access time
+   * strictatime - Always update access time
+   * relatime    - Update access time with conditions (balanced approach)
+      * any of
+        * The current access time is older than the modification time (mtime)
+        * The current access time is older than 24 hours
+        * The file's status change time (ctime) needs to be updated
+   * lazytime    - Defer timestamp updates to reduce I/O
+* Note that any modification will result in both mtime and ctime change, as
+  file-content modified => mtime has to be updated. And mtime update means a
+  meta-data change so ctime will also be updated
+  * touch can edit atime/mtime, but not ctime. Its always maintained by kernel.
+
+
+```sh
+
+## update all times of a file.
+touch file
+
+## update only atime (+ctime ofcourse)
+touch -a filename
+## update only mtime (+ctime ofcourse)
+touch -m filename
+
+## set time to a value of choice
+## touch -t YYYYMMDDhhmm.ss filename
+touch -t 202312251430.00 filename
+touch -t $(date -d "yesterday" +%Y%m%d%H%M.%S) filename
+touch -t $(date -d "2 hours ago" +%Y%m%d%H%M.%S) filename
+
+## from that of reference file
+touch -r reference_file file1 file2 file3
+
+
+
+```
+
+
 ## hostnamectl
 
 ```sh
@@ -1601,7 +1695,6 @@ search: priority realtime rt
     * pri -> final priority
     * ni  -> nice
     * rtprio -> realtime priority
-* Unfortunately, there is nothing to show the final priority!
 
 * for non-realtime:
     * sched-classes

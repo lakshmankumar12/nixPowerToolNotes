@@ -36,6 +36,11 @@ condition {action}
     ```awk
     /begin/,/end/ { action }
     ```
+* Use a different limiter -- common alternatives - `:@#|`
+    ```sh
+    awk '$0 ~ "#/usr/local/bin/sctpd#" {print $2}'
+    ```
+
 
 ## To use posix regular expression character classes like [[:digit:]]
 

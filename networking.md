@@ -953,6 +953,11 @@ sudo iptables -t filter -A FORWARD -s 192.168.150.1/32 -p tcp -m tcp --sport 443
 
 ```
 iptables -t mangle -A PREROUTING -s ${ip1} -d ${ip2} -j DROP
+
+## drop all sctp packets in & out
+iptables -A PREROUTING -t raw -p sctp -j DROP
+iptables -A POSTROUTING -t mangle -p sctp -j DROP
+
 ```
 * Drop pkts from local-app/kernel
 ```
@@ -1606,6 +1611,8 @@ outfile=tcp.pcap
 ## really what you want.
 ## -t ud retains UTC timestamp
 tshark -t ud -r $infile  -2 -Y "$disp_filter" > $outfile
+## for nas-5g
+tshark -t ud -r $infile  -2 -Y "$disp_filter" -o 'nas-5gs.null_decipher:TRUE' > $outfile
 ## w/o any disp filter
 tshark -t ud -r $infile  > $outfile
 
@@ -1838,7 +1845,7 @@ socat TCP-LISTEN:9000,fork TCP:127.0.0.1:5924
 
 * https://www.tecmint.com/iftop-linux-network-bandwidth-monitoring-tool/
 
-search: monitoring iftop bandwidth bw consumption
+search: monitoring top iftop bandwidth bw consumption stats
 
 ```sh
 sudo iftop -n
