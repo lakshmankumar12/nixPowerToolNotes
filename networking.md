@@ -970,7 +970,7 @@ ssh -nNT -R 9222:localhost:22 lakshman_narayanan@mforge3.corp.aryaka.com &
 
 iptables -t mangle -I PREROUTING -s ${ip} whatever-else-tomatch -j LOG --log-prefix "foo:"
 
-### tcpdump a pkt
+### tcpdump ipsec pkt
 
 ```
 sudo iptables -I INPUT -m addrtype --dst-type LOCAL -m policy --pol ipsec --dir in -j NFLOG --nflog-group 5

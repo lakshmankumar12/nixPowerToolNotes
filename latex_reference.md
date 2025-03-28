@@ -18,7 +18,9 @@
 % Set Devanagari as main font
 \setmainfont{Noto Sans Devanagari}[Script=Devanagari]
 \newfontfamily\englishfont{Noto Sans}
+\newfontfamily\tamilfont{Noto Sans Tamil}[Script=Tamil]
 \newcommand{\eng}[1]{{\englishfont#1}}
+\newcommand{\tamil}[1]{{\tamilfont#1}}
 
 \begin{document}
 % The first number (24) is the font size in points
@@ -143,9 +145,24 @@ docker run --rm -v $PWD:/data mypandoc ${infile} --toc  --toc-depth=3 -o ${outfi
 ```
 %s/^H1 \(.*\)$/\\section{\\eng{\1}}/
 %s/^H2 \(.*\)$/\\subsection{\\eng{\1}}/
+%s/^H3 \(.*\)$/\\subsubsection{\\eng{\1}}/
 
 '<,'>s/$/\\\\/
+'A,'Bs/$/\\\\/
+s/$/\\\\/
 g/section/s/\\\\$//
+
+## from the excel
+%s/^Anu \(\d\+\)\t\(.*\)/\\subsection{\\eng{Anuvaka \1}}\r\2/
+%s/^\d\+-\d\t//
+%s/^\t//
+%s/\(\d\+\) ॥\\\\\n\([^\\]\)/\1 ॥\\\\\r\\\\\r\2/
+s/"//
+
+## time-deleted
+g/\d\+:\d\+/d
+g/⇓/d
+%s/f /\\eng{f} /
 ```
 
 

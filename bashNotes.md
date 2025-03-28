@@ -116,6 +116,11 @@ if [[ $haystack == *"$needle"* ]]
 then
   echo "It's there!";
 fi
+
+## starts with a prefix
+if [[ "$bigstring" == "$prefix"* ]] ; then
+    echo "var bigstring: $bigstring startswith prefix: $prefix"
+fi
 ```
 
 ## other string manipulations
@@ -1181,12 +1186,11 @@ ps -u username -o pid,ppid,tt,%mem,bsdstart,args
 #info on a given pid
 ps -o args= -p $pid
 
-#show processro assignment of all threads in a process
-ps -o spid,pid,ppid,%mem,bsdstart,psr,s,class,pri,comm -T -p $pid
-
 #process against a terminal
 ps -t pts/12 -f
 
+#show processor assignment of all threads in a process
+ps -o spid,pid,ppid,%mem,bsdstart,psr,s,class,pri,comm -T -p $pid
 # show all processed sorted on cpu
 ps -o spid,pid,ppid,%mem,bsdstart,psr,s,class,pri,comm -T -e | sort -n -k 6,6
 # show proceses on a single cpu, eg:5
@@ -1536,6 +1540,17 @@ tail -n +5 file.txt         # all lines except the 4 first, starts at line 5
 ## to achieve cutting last N chars, use 2 rev. Eg to remove last-4 chars
 ...whatever.. | rev | cut -c5- | rev
 
+
+```
+
+## split
+
+```sh
+
+split -d -b 10M largefile.txt chunk_
+## -d      use numeric suffixes
+## -b 10M  file size
+## chunk_  your prefix
 
 ```
 
