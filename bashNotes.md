@@ -1193,6 +1193,7 @@ ps -t pts/12 -f
 ps -o spid,pid,ppid,%mem,bsdstart,psr,s,class,pri,comm -T -p $pid
 # show all processed sorted on cpu
 ps -o spid,pid,ppid,%mem,bsdstart,psr,s,class,pri,comm -T -e | sort -n -k 6,6
+ps -o spid,pid,ppid,%mem,psr,s,class,pri,comm -T -e | sort -n -k 5,5
 # show proceses on a single cpu, eg:5
 ps -o spid,pid,ppid,%mem,bsdstart,psr,s,class,pri,comm -T -e | awk '$6 == 5'
 
@@ -1243,6 +1244,9 @@ tt                 - associate tty
 ```sh
 # ls with full path (use abs-path + glob to invoke)
 ls -d $(pwd)/*
+
+## sort on size .. -S
+ls -lrS
 ```
 
 ## ln
@@ -1294,12 +1298,14 @@ cp src dst
 
 ## column
 
-search: col table tabularize tabular output
+search: column table tabularize tabular output
 
 ```sh
 # -t    ..  tabular output
 # -s    ..  input-separator
 cat output | column -t -s "|" --output-separator "|"
+
+## if column version is old use quick-util / column_t.awk
 
 ```
 
@@ -1495,9 +1501,16 @@ sudo phc_ctl enp25s0f3 set $(python -c 'from dateutil.parser import parse ; impo
 * stop a program after some time
 
 ```sh
+## default does SIGTERM. Your process may not stop if it handles that
+timeout 20s sleep 200
+
+## choose your signal.
 timeout -sHUP 90s sleep 200
-# does SIGKILL?
-timeout 2m sleep 200
+timeout -sKILL 90s sleep 200
+timeout -s 9 90s sleep 200
+
+# kill after n seconds post the first signal(TERM)
+timeout -k 5 10min sleep 200
 
 ```
 
@@ -1553,6 +1566,27 @@ split -d -b 10M largefile.txt chunk_
 ## chunk_  your prefix
 
 ```
+
+## parallel
+
+```sh
+echo "command1" > commands.txt
+echo "command2" >> commands.txt
+# ... and so on
+
+# Run with parallel, maintaining 10 jobs at a time
+parallel -j 10 < commands.txt
+
+```
+
+## seq
+
+```sh
+# print with a format
+seq -f "%04g" 0 100
+
+```
+
 
 
 ## read
@@ -1653,6 +1687,9 @@ watch "$instr"
 
 instr="source yourfiles.sh ; alias_there"
 watch "$instr"
+
+## for aliases that are in bashrc , you need a login bash-shell
+watch bash -ic "alias | piped_command"
 
 ```
 
@@ -1807,6 +1844,8 @@ Search: syslog
 journalctl --list-boots
 ### note: this gives the last boot time
 uptime -s
+## or just
+awk '/btime/ {print $2}' /proc/stat
 
 # lists logs of just one unit (service)
 journalctl -u some_service
@@ -1991,8 +2030,9 @@ if [ $? -ne 0 ] then echo "bad ip" ; fi
 ```sh
 user_to_add=lakshman   #or whoever the name is
 cpass=...crypt-encrypted-pass...
+fullname="whatever"
 #prefer useradd over adduser
-useradd -m -p $cpass -s /bin/bash ${user_to_add}
+useradd -m -p "$cpass" -c "$fullname" -s /bin/bash "${user_to_add}"
 ## options
 # -m, --create-home    -- creates home directory
 # -p <passwd>          -- supply crypted password over commandline

@@ -65,6 +65,9 @@ youtube-dl -f 140 $VIDEOID
 ```sh
 brew install yt-dlp
 
+##or
+wget 'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp' -O $HOME/bin/yt-dlp
+
 ## downlaod only audio
 yt-dlp -f 140 $id
 

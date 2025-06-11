@@ -206,6 +206,7 @@ pdftk my.pdf dump_data | grep NumberOfPages
 apt-get  install poppler-utils
 pdftotext -layout a.pdf a.txt
 pdftotext -layout -f <first-pagenum> -l <last-page-num> a.pdf a.txt
+pdftotext -layout -f $first -l $last $infile $outfile
 ```
 
 # convert pdf to black and white

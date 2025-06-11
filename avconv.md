@@ -70,8 +70,15 @@ avconv -i audio.mp3 -i video.mp4 -acodec copy -vcodec copy mixed.mp4
 strip minutes out
 
 ```
+infile=..
+outfile=..
+start=hh:mm:ss.mmm
+end=hh:mm:ss.mmm
+ffmpeg -i $infile -ss $start -to $end -acodec copy $outfile
+
 avconv -i yourmovie.whatever -ss starttime -t duration -sameq outputfile
 avconv -i Rasanubhavam.mp3 -ss 00:56:58 -t 00:02:31 -acodec copy thillana-Kamas.mp3
+
 ```
 
 or if end position is known,

@@ -19,8 +19,10 @@
 \setmainfont{Noto Sans Devanagari}[Script=Devanagari]
 \newfontfamily\englishfont{Noto Sans}
 \newfontfamily\tamilfont{Noto Sans Tamil}[Script=Tamil]
+\newfontfamily\symbolfont{Noto Sans Symbols}
 \newcommand{\eng}[1]{{\englishfont#1}}
 \newcommand{\tamil}[1]{{\tamilfont#1}}
+\newcommand{\symbol}[1]{{\symbolfont#1}}
 
 \begin{document}
 % The first number (24) is the font size in points
@@ -51,6 +53,8 @@
 {\LARGE heading}   % Large
 {\Large heading}   % Moderately large
 {\large heading}   % Slightly large
+
+% \textbf{this text is in bold}
 
 \vspace{1cm}     % Adds 1cm vertical space
 % or
@@ -143,26 +147,34 @@ docker run --rm -v $PWD:/data mypandoc ${infile} --toc  --toc-depth=3 -o ${outfi
 # vim commands to edit post pasting from docs
 
 ```
-%s/^H1 \(.*\)$/\\section{\\eng{\1}}/
-%s/^H2 \(.*\)$/\\subsection{\\eng{\1}}/
-%s/^H3 \(.*\)$/\\subsubsection{\\eng{\1}}/
+## for eng headings
+'A,'Bs/^H1 \(.*\)$/\\section{\\eng{\1}}/
+'A,'Bs/^H2 \(.*\)$/\\subsection{\\eng{\1}}/
+'A,'Bs/^H3 \(.*\)$/\\subsubsection{\\eng{\1}}/
 
-'<,'>s/$/\\\\/
-'A,'Bs/$/\\\\/
-s/$/\\\\/
+## for devna headings
+'A,'Bs/^H1 \(.*\)$/\\section{\1}/
+'A,'Bs/^H2 \(.*\)$/\\subsection{\1}/
+
+%s/^Anu \(\d\+\)\t\(.*\)/\\subsection{\\eng{Anuvaka \1}}\r\2/
+%s/$/\\\\/
 g/section/s/\\\\$//
+%s/"//
+%s/^\t//
 
 ## from the excel
-%s/^Anu \(\d\+\)\t\(.*\)/\\subsection{\\eng{Anuvaka \1}}\r\2/
-%s/^\d\+-\d\t//
-%s/^\t//
-%s/\(\d\+\) ॥\\\\\n\([^\\]\)/\1 ॥\\\\\r\\\\\r\2/
-s/"//
+'A,'Bs/^Anu \(\d\+\)\t\(.*\)/\\subsection{\\eng{Anuvaka \1}}\r\2/
+'A,'Bs/$/\\\\/
+g/section/s/\\\\$//
+'A,'Bs/^\d\+-\d\t//
+'A,'Bs/^\t//
+'A,'Bs/\(\d\+\) ॥\\\\\n\([^\\]\)/\1 ॥\\\\\r\\\\\r\2/
+'A,'Bs/"//
 
 ## time-deleted
 g/\d\+:\d\+/d
 g/⇓/d
-%s/f /\\eng{f} /
+'A,'Bs/f /\\eng{f} /
 ```
 
 

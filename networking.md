@@ -454,7 +454,7 @@ tc [-s] qdisc show
 tc [-s] qdisc show dev <intf>
 
 tc [-s] [-d] class show
-tc [-s] [-d] class show dev <int>    ## note: only this shows the full htb output
+tc [-s] [-d] class show dev <int>    ## note: only adding a dev, shows the full htb output
 
 tc qdisc add dev <intf> parent <handle> classid <handle> whatever
 ..repl add with del until the classid <handle>
@@ -1520,7 +1520,7 @@ https://danielmiessler.com/study/tcpdump/
 
 -l               # line buffered. SHOW OUTPUT IMMEDIATELY  (NOT ON EXIT)
 
--w <tmpl>       file-name-with-template eg: /tmp/trace-%m-%-%H-%M-%S-%s.pcap
+-w <tmpl>       file-name-with-template eg: /tmp/trace-%Y-%m-%d_%H_%M_%S.pcap
 -W 10           max of 10 files. Stop after that
 -G 120          rollover at 120s
 -C 100          rollover at 100MB
@@ -1538,7 +1538,7 @@ sudo apt install apparmor-utils
 sudo aa-complain /usr/sbin/tcpdump
 
 # run
--w /tmp/trace.pcap -W 10 -C 100
+-w /tmp/trace.pcap -W 100 -C 10
 
 ```
 
@@ -1611,13 +1611,16 @@ outfile=tcp.pcap
 ## really what you want.
 ## -t ud retains UTC timestamp
 tshark -t ud -r $infile  -2 -Y "$disp_filter" > $outfile
-## for nas-5g
-tshark -t ud -r $infile  -2 -Y "$disp_filter" -o 'nas-5gs.null_decipher:TRUE' > $outfile
 ## w/o any disp filter
 tshark -t ud -r $infile  > $outfile
+tshark -t ud -r $infile  | less
 
 ## write to another pcap
 tshark -r $infile  -2 -Y "$disp_filter" -w $outfile
+
+## special options -- for nas-5g
+tshark -t ud -r $infile  -2 -Y "$disp_filter" -o 'nas-5gs.null_decipher:TRUE' > $outfile
+
 ```
 
 * show like in wireshark

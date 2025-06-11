@@ -203,8 +203,8 @@ ssh -fN -L 'forwarding_stuff' user@host
 ## will timeout in interval*(count+1) seconds post the last exchanged data
 -o ServerAliveInterval=60 -o ServerAliveCountMax=3
 
--T disable psuedo-terminal allocation
--t force   psuedo-terminal allocation (useful if you want to run cms on login shell)
+-T   -- disable psuedo-terminal allocation
+-t   -- force   psuedo-terminal allocation (useful if you want to run cms on login shell)
 
 ```
 
@@ -370,6 +370,13 @@ sudo apt install p7zip-full
 
 #list files
 7z l file.7z
+
+#extract one file
+7z x path/to/file.7z path/inside/the/archive -o/path/to/dest/folder
+7z x path/to/file.7z path/inside/the/archive -o./
+
+##print to stdout
+7z x -so path/to/file.7z path/inside/the/archive
 
 ```
 
@@ -562,6 +569,8 @@ See general_reading_notes/ipsec_notes.md
 # -o <file> --> choose output file
 ##                             if output is json, you want to add
 #                              -H "accept:application/json"
+# -O --output-dir         --> use the filename as in server
+# -J                      --> use content-disposition to determine filename -OJ is okay as well.
 # --interface <ip> -- choose a local-bind-ip
 # -X/--request <cmd> -- specifies a custom command to use (eg: -X GET)
 # -H/--header <hdr>  -- extra header to include in request (eg: -H "accept: application/json")
@@ -960,14 +969,41 @@ keep pressing shift
 ## grub prompt management
 
 ```
+## see all disks/partitions
 (gdb) ls
 (lvm/ubuntu-vg-swap_1) (lvm/ubuntu--vg-root) (hd0) (hd0,msdos1) (hd1) (hd1,gpt2) (hd1,gpt1) (cd0)
+
+## see what's in a disk/partition
+(gdb) ls (hd0,msdos1)/
+(gdb) ls (hd0,msdos1)/boot/
 
 (gdb) set root=(hd0,msdos1)
 
 (gdb) chainloader /EFI/boot/grubx64.efi  ## tab completion works
 
 (gdb) boot
+
+## return to menu
+(gdb) normal
+## or
+(gdb) config /boot/grub/grub.cfg
+
+```
+
+# initramfs prompt
+
+```
+## force a reboot
+(initramfs) reboot -f
+
+lsblk
+
+ls /dev/sd*
+ls /dev/nv*
+
+fdisk -l
+
+cat /proc/partitions
 
 ```
 
@@ -1359,7 +1395,7 @@ cdparanoia -B
 dd if=input of=output status=progress
 
 ## use thse
-dd if=input of=output status=progress conv=fsync oflag=direct bs=100M
+sudo dd if=$infile of=$outfile status=progress conv=fsync oflag=direct bs=100M
 ## for copying sakes:
 status=progress conv=fsync oflag=direct bs=100M
 
@@ -1950,6 +1986,14 @@ sudo update-grub
 
 ##sudo grub-mkconfig -o /boot/grub/grub.cfg
 
+## to get it workign right away:
+sudo systemctl start serial-getty@ttyS0.service
+
+## to amek grub itself appear on serial
+GRUB_SERIAL_COMMAND="serial --speed=115200 --unit=0 --word=8 --parity=no --stop=1"
+GRUB_TERMINAL_INPUT="console serial"
+GRUB_TERMINAL_OUTPUT="gfxterm console serial"
+
 ```
 
 # shutdown / reboot linux
@@ -2424,6 +2468,12 @@ cat input.json | jq 'del(.Array[] | select(.foobar2 == "barfoo2"))'
 ## create a new json file
 jq -n --arg greeting world --arg second more_values '{"hello":$greeting,"another":$second}' > file.json
 
+## print 2 fields side by side if your input is also an array of dicts
+jq -r '[.field1, .field2] | @tsv' file.json
+
+## print 2 fields side by side if your input in a dict of dicts
+jq -r 'to_entries | .[] | "\(.value.field1) \(.value.field2)"''
+
 ```
 
 ## manual reading dump
@@ -2607,8 +2657,11 @@ $ tree $TESSDATA_PREFIX
 ├── san-siddhanta-float.traineddata
 └── san.traineddata
 
-gs -o img.tiff -sDEVICE=tiffg4 -r1200 -dAutoRotatePages=/PageByPage -dFirstPage=n -dLastPage=n source.pdf
-tesseract img.tiff texted_output -l san-siddhanta-float
+first=
+last=
+infile=
+gs -o img.tiff -sDEVICE=tiffg4 -r1200 -dAutoRotatePages=/PageByPage -dFirstPage=$first -dLastPage=$last $infile
+tesseract img.tiff output.txt -l san-siddhanta-float
 
 ```
 
