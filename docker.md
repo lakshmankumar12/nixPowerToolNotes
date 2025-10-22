@@ -38,6 +38,9 @@ docker image prune
 ## explicitly remove the <none> images
 docker image rm $(docker image ls | awk '/<none>/ {print $3}')
 
+## tag a image
+docker image existing_tag new_tag
+
 #another command to reclaim space
 docker system prune -a -f
 
@@ -333,6 +336,10 @@ COPY --from=nginx:latest /etc/nginx/nginx.conf /nginx.conf
 * special name for host - `host.docker.internal`
     * works in windows and mac
     * it will typically be 172.17.0.1 for linux
+    * in linux you can do this when you start docker:
+        * `--add-host host.docker.internal:host-gateway`
+        * this will setup `/etc/hosts` appropriately. eg:
+            * `172.17.0.1      host.docker.internal`
 
 * There are 3 networks - bridge / host / none. By default, all containers run in the bridge network
 

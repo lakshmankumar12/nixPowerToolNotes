@@ -93,8 +93,14 @@ virsh define /path/to/xml
 
 virt-clone --original $oldvm --name $newvm --auto-clone
 
+## set / unset autostart of vm
+virsh autostart $vmname
+virsh autostart --disable $vmname
+
 #list all vm's
-virsh list
+virsh list --all
+##  list those with autostart enabled
+virsh list --all --autostart
 
 #list all networks
 virsh net-list --all
@@ -149,6 +155,12 @@ virt-install --name=${vmname} --os-variant=${osvariant} \
              --vcpu=${cpu} --ram=${ram} --graphics vnc \
              --cdrom=${image_path} --network bridge=${bridge},model=virtio \
              --disk size=${hdsize}
+
+
+## todelete:
+vmname=mynewvm
+virsh destroy $vmname
+virsh undefine --remove-all-storage --nvram $vmname
 
 
 #import from a qcow2 .. note the imported qcow2 will be used.
@@ -535,15 +547,17 @@ apt install -y qemu-guest-agent
 ```
 then run this on host:
 ```sh
-virsh qemu-agent-command <vm-name> '{"execute":"guest-network-get-interfaces"}'
+vmname=...
+vmname=test_vm
+virsh qemu-agent-command $vmname '{"execute":"guest-network-get-interfaces"}'
 
 ##or
 virsh domifaddr --source agent lakshmanAgw
 
 ## execute any random command -- 2 stage thing
-virsh qemu-agent-command test-vm   '{"execute": "guest-exec", "arguments": { "path": "apt", "arg": [ "install","cowsay","-y" ], "capture-output": true }}'  --pretty
+virsh qemu-agent-command $vmname   '{"execute": "guest-exec", "arguments": { "path": "apt", "arg": [ "install","cowsay","-y" ], "capture-output": true }}'  --pretty
 ## that gives you the pid of the prcess. you have to now get the result of the pid
-virsh qemu-agent-command test-vm   '{"execute": "guest-exec-status", "arguments": { "pid": 1993 }}' --pretty
+virsh qemu-agent-command $vmname   '{"execute": "guest-exec-status", "arguments": { "pid": 1993 }}' --pretty
 ## and do base64 decode to get both stdout/stderr
 
 ```
@@ -867,6 +881,83 @@ vzdump <VMID> --mode stop --compress zstd --storage local
 
 ### resotre a vm from a disk image
 qmrestore /var/lib/vz/dump/vzdump-qemu-<VMID>-<date>.vma.zst <new-VMID> --storage local-lvm
+
+```
+
+
+# setting up vnc on a desktop ubuntu
+
+install mate
+```sh
+sudo apt update
+sudo apt install -y ubuntu-mate-desktop mate-session-manager mate-desktop-environment-core
+
+sudo apt install -y tightvncserver
+
+
+```
+
+
+
+* contents of `~/.vnc/xstartup`
+```sh
+
+mkdir -p $HOME/.vnc
+cat <<'EOF' > $HOME/.vnc/xstartup
+#!/bin/bash
+
+# Load .Xresources if it exists
+[ -r $HOME/.Xresources ] && xrdb $HOME/.Xresources
+
+# Set background
+xsetroot -solid grey
+
+# Get the correct UID for this user
+USER_UID=$(id -u)
+
+# Set up ICE authority file in the user's home directory
+export ICEAUTHORITY="$HOME/.ICEauthority"
+
+# Set up D-Bus and XDG environment
+export XDG_RUNTIME_DIR="/tmp/runtime-$USER"
+export DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
+
+# Create runtime directory
+mkdir -p $XDG_RUNTIME_DIR
+chmod 700 $XDG_RUNTIME_DIR
+
+# Start D-Bus session
+dbus-launch --sh-syntax > /tmp/dbus-session-$USER
+source /tmp/dbus-session-$USER
+
+# Environment variables for MATE
+export XKL_XMODMAP_DISABLE=1
+export DESKTOP_SESSION=mate
+export XDG_CURRENT_DESKTOP=MATE
+export XDG_SESSION_DESKTOP=mate
+
+# Start MATE session
+exec mate-session
+EOF
+chmod +x $HOME/.vnc/xstartup
+
+## install chrome
+wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+sudo apt update
+sudo apt install google-chrome-stable
+
+```
+
+
+```sh
+vncserver -kill :2
+vncserver :2
+
+## to use different passwd
+vncpaswd .vnc/another_passwd_file
+vncserver :2 -rfbauth ~/.vnc/another_passwd_file
+
 
 ```
 

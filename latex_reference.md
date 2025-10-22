@@ -97,11 +97,13 @@ Run the above as `xalatex combine.pdf`
 # docker running
 
 ```sh
+
+cd ..../quick-utility-scripts/containers/moss_xelatex_fonts/
+
+docker build -t moss_xelatex_fonts .
+
+## and  run it as
 docker run -it -v $PWD:/data moss/xelatex /bin/bash
-
-# apt update && apt-get install -y fonts-noto
-
-docker commit <image-id> moss_xelatex_fonts
 
 ##for pdf
 infile=source.tex

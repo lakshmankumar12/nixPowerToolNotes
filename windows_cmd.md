@@ -19,14 +19,20 @@ I general use `/?` to list help for any command
 ## Get MotherBoard Info
 
 ```
+## this gets motherboard serial
 C:\Users\lnara002>wmic baseboard get product,Manufacturer,version,serialnumber
 Manufacturer           Product    SerialNumber     Version
 ASUSTeK COMPUTER INC.  Z97M-PLUS  140933017106254  Rev X.0x
 
 C:\Users\lnara002>
 
-#just get serial
-wmic bios get serialnumber
+#just get bios/system serial -- typically what's pasted in the back of a laptop.
+C:\Users\laksh>wmic bios get serialnumber
+SerialNumber
+PF3SPYKL
+
+
+C:\Users\laksh>
 ```
 
 ## Display Routing Table
@@ -189,5 +195,35 @@ disable javascript for a site:
 
 ```
 chrome://settings/content/javascript
+```
+
+
+
+# putty notes
+
+```
+To jump
+
+ssh -> proxy
+
+type: local
+hostname: leave it as proxy/80 (this is unused)
+consider proxying local conns: leave unchecked
+dns-lookup at proxy end: auto
+username/pass: <empty>
+
+Command:
+plink.exe -load "JumpHostSession" -nc %host:%port
+
+print-proxy-diag: no
+```
+
+
+# office 365 link
+
+search: dev console microsoft azure
+
+```
+https://entra.microsoft.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade
 ```
 

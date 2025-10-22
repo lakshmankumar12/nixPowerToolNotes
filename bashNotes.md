@@ -1160,7 +1160,6 @@ pwd -P
 
 ## ps
 
-
 ```sh
 ## args explan
 -e        every pid in the system
@@ -1190,12 +1189,12 @@ ps -o args= -p $pid
 ps -t pts/12 -f
 
 #show processor assignment of all threads in a process
-ps -o spid,pid,ppid,%mem,bsdstart,psr,s,class,pri,comm -T -p $pid
+ps -o spid,pid,ppid,%mem,lstart,psr,s,class,pri,comm -T -p $pid
 # show all processed sorted on cpu
-ps -o spid,pid,ppid,%mem,bsdstart,psr,s,class,pri,comm -T -e | sort -n -k 6,6
+ps -o spid,pid,ppid,%mem,lstart,psr,s,class,pri,comm -T -e | sort -n -k 10,10
 ps -o spid,pid,ppid,%mem,psr,s,class,pri,comm -T -e | sort -n -k 5,5
 # show proceses on a single cpu, eg:5
-ps -o spid,pid,ppid,%mem,bsdstart,psr,s,class,pri,comm -T -e | awk '$6 == 5'
+ps -o spid,pid,ppid,%mem,lstart,psr,s,class,pri,comm -T -e | awk '$10 == 5'
 
 
 ```
@@ -1298,7 +1297,7 @@ cp src dst
 
 ## column
 
-search: column table tabularize tabular output
+search: column table tabularize tabular output tabulate
 
 ```sh
 # -t    ..  tabular output
@@ -1381,6 +1380,8 @@ done
 
 ## ts - add a timestamp to every line
 
+search: time stamp append stdin
+
 ```sh
 ## install
 apt install moreutils
@@ -1393,6 +1394,12 @@ echo "any outout" | ts '%Y-%m-%d %H:%M:%S'
 
 ## with a format in a tz
 echo "any outout" | TZ=Etc/UTC ts '%Y-%m-%d %H:%M:%S'
+
+## ping with a timestamp
+ping ... | ts
+
+## make do with awk
+... | awk '{ print strftime("[%Y-%m-%d %H:%M:%S]"), $0 }'
 
 ```
 
@@ -1454,8 +1461,11 @@ touch -r reference_file file1 file2 file3
 ## hostnamectl
 
 ```sh
-hostnamectl set-hostname newhostname
-hostnamectl set-hostname "new-hostname" --pretty
+oldhostname=...
+newhostname=...
+sudo hostnamectl set-hostname $newhostname
+sudo hostnamectl set-hostname "$newhostname" --pretty
+sudo sed -i "s/127\.0\.1\.1[[:space:]]*$oldhostname/127.0.1.1 $newhostname/" /etc/hosts
 
 ```
 
@@ -1559,10 +1569,12 @@ tail -n +5 file.txt         # all lines except the 4 first, starts at line 5
 ## split
 
 ```sh
-
-split -d -b 10M largefile.txt chunk_
+largefile=...
+prefix=chunk_
+split -d -a 4 -b 10M $largefile $prefix
 ## -d      use numeric suffixes
 ## -b 10M  file size
+## -a N    num digits for suffi
 ## chunk_  your prefix
 
 ```
@@ -1576,6 +1588,9 @@ echo "command2" >> commands.txt
 
 # Run with parallel, maintaining 10 jobs at a time
 parallel -j 10 < commands.txt
+
+## if you are tracking a downlaod, how to watch
+watch -n1 'ls -lS nr_160* 2>/dev/null | tail -n 15'
 
 ```
 
@@ -2029,10 +2044,12 @@ if [ $? -ne 0 ] then echo "bad ip" ; fi
 
 ```sh
 user_to_add=lakshman   #or whoever the name is
-cpass=...crypt-encrypted-pass...
+pass="...clear pass.."
 fullname="whatever"
+
 #prefer useradd over adduser
-useradd -m -p "$cpass" -c "$fullname" -s /bin/bash "${user_to_add}"
+cpass=$(python3 -c 'import crypt;print(crypt.crypt("'"$pass"'"))' 2> /dev/null)
+sudo useradd -m -p "$cpass" -c "$fullname" -s /bin/bash "${user_to_add}"
 ## options
 # -m, --create-home    -- creates home directory
 # -p <passwd>          -- supply crypted password over commandline
@@ -2085,7 +2102,8 @@ usermod -p $pass $user
 * delete user
 
 ```sh
-userdel -f -r ${user_to_del}
+user_to_del=...
+sudo userdel -f -r ${user_to_del}
 
 ### 
 ##  -r     -- remove home dir and mail spool
@@ -2142,6 +2160,9 @@ some_admin_user ALL=(remoteagwuser:remoteagwuser) /usr/local/bin/manage_authoriz
 ```sh
 # env var having real user
 echo $SUDO_USER
+
+# pass a environemnt to sudo
+sudo env EDITOR=vim visudo
 
 ```
 

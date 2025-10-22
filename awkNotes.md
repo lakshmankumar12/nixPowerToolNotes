@@ -136,6 +136,8 @@ gsub(what_to_find,what_to_replace,inline_replaced_var);
 
 ### replace a block in file
 
+search: insert multi-line multiline block
+
 ```sh
 to_add_block=$(mktemp /tmp/gxc_bash_hist_fixup-XXXXXX)
 cat <<'EOF' > $to_add_block

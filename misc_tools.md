@@ -578,7 +578,7 @@ See general_reading_notes/ipsec_notes.md
 # -w <format>  -- write given format-string(expaned to values) to stdout
 #                 eg format:
 #                    '\\n%{response_code}'  // http_code was older
-# -I         --> just get headers only.. and not the BODY
+# -I         --> just get headers only.. and not the BODY (sends a HEAD, instead of GET)
 # -u username       --> prompts password
 # -u username:password   --> boht in stdin
 ### ssl stuff:
@@ -670,6 +670,12 @@ tar xf data.tar.gz
 
 ## or 
 dpkg --contents package.deb
+
+## list dependencies of a package, search depends
+debfile=...path/to/file.deb
+dpkg-deb -I $debfile
+dpkg-deb -I $debfile | grep Depends | tr ',' '\n'
+
 ```
 
 * find which package provides a file
@@ -761,7 +767,7 @@ apt-cache policy package   ->  apt list -a package
 apt-cache show package     ->  apt show package
 apt-cache showpkg package  ->  apt show -a package
 
-## list all isntalled pkgs
+## list all installed pkgs
 apt list --installed
 
 ```
@@ -1244,6 +1250,10 @@ C_DRIVE /home/lakshman/host_c vboxsf uid=1000,gid=1000 0 0
 
 # linux hard-disk related tools
 
+## fdisk
+
+search: fdisk partition management
+
 * list all partitions/hard-disks
 ```
 fdisk -l
@@ -1258,8 +1268,13 @@ command: n      ## new partition.. give the same part num, start-sector and the 
                 ## give no for lvm signature overwrite
 command: w      ## write to partition-table and exit
 
+command: g      ## creates a new gpt partition table (will auto-wipe existing partitions)
+command: o      ## creates a new ms-dos partition table (will auto-wipe existing partitions)
+
 ## you have to reboot after this, and do the pvresize /dev/sdaN and lvextend , resize2fs commands
 ```
+
+## other commands
 
 * list filetype of all partiions
 ```sh
@@ -1405,6 +1420,9 @@ dd if=/dev/sda bs=1G status=progress | gzip -c | ssh remotemc 'cat > proxmox_clo
 
 ## dd image from antoher m/c
 ssh remotemc "cat /path/to/image.img.gz" | sudo gunzip -c | sudo dd of=/dev/sda bs=1M status=progress
+
+## in linux, send USR1 to know status
+kill -s SIGUSR1 $pid_of_dd
 ```
 
 ## parted
@@ -1687,6 +1705,12 @@ Checksum:                 0x5b34975f
 gxcautotest@auto-gamma:~$
 
 ```
+
+* monitor udev events
+```sh
+sudo udevadm monitor --kernel --udev
+```
+
 
 # dont start graphical target in xubuntu
 
@@ -2472,7 +2496,8 @@ jq -n --arg greeting world --arg second more_values '{"hello":$greeting,"another
 jq -r '[.field1, .field2] | @tsv' file.json
 
 ## print 2 fields side by side if your input in a dict of dicts
-jq -r 'to_entries | .[] | "\(.value.field1) \(.value.field2)"''
+jq -r 'to_entries | .[] | "\(.value.field1) \(.value.field2)"'
+gwcfg enodebd | jq -r '."enbConfigsBySerial" | to_entries | .[] | [.key, .value.carrierMode] | @tsv' | column -t
 
 ```
 
@@ -2671,6 +2696,42 @@ tesseract img.tiff output.txt -l san-siddhanta-float
 adb devices
 
 adb -s ZY22GCL44Z shell /data/local/tmp/iperf3 -c 172.26.2.119   -p 5679 -i 1 -t 20 -b100M -u -R
+
+```
+
+
+# Quick Linux Desktop
+
+```sh
+##add a -d if you want to demonize
+WRITEDIR=/tmp/desktopwrite
+mkdir -p $WRITEDIR
+sudo docker run --rm --name desktop -p 6080:80 -p 5900:5900 -v /dev/shm:/dev/shm -v $HOME:/hosthome:ro -v /tmp/desktopwrite:/root/Downloads dorowu/ubuntu-desktop-lxde-vnc
+## extra desktop args
+### not needed if you access on browser
+-e RESOLUTION=1920x1080
+### --env-file ./env
+####     echo 'VNC_PASSWORD=password' > ./env
+
+
+..../quick-utililty-scripts/start_desktop.sh
+--name ..
+--fwd_local_port ..
+--WRITEDIR ..
+--do_sudo ..
+--passwd ..
+
+sudo docker exec -it lakshman_desktop /bin/bash
+apt update
+apt install iputils-ping
+
+
+## for rdesktop
+apt update
+apt-get install -y freerdp2-x11
+## and fire
+xfreerdp /u:username /p:password /v:server-ip /cert-ignore /dynamic-resolution
+xfreerdp /u:svt-3 /p:svt-3 /v:172.26.8.251 /cert-ignore /dynamic-resolution
 
 ```
 

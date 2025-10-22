@@ -882,6 +882,7 @@ R-D: Routing-Decision
 
 ```sh
 sudo iptables --policy FORWARD ACCEPT
+sudo iptables --policy FORWARD DROP
 
 ```
 
@@ -1355,6 +1356,19 @@ network:
       nameservers:
        addresses: [8.8.8.8,8.8.4.4]
 ```
+* simple extra ifc with ip
+
+```yaml
+network:
+  ethernets:
+        enp23s0f0:
+            dhcp4: false
+            addresses:
+              - 192.168.201.2/24
+
+
+```
+
 
 * vlan ifc
 ```yaml
@@ -1440,7 +1454,12 @@ network:
 
 * restart networking
 ```sh
+## test
+sudo netplan try
+
 sudo netplan apply
+## with more info
+sudo netplan --debug apply
 ```
 
 
@@ -1614,6 +1633,10 @@ tshark -t ud -r $infile  -2 -Y "$disp_filter" > $outfile
 ## w/o any disp filter
 tshark -t ud -r $infile  > $outfile
 tshark -t ud -r $infile  | less
+## dump with pkts and hexdump
+tshark -t ud -r $infile -V -x > $outfile
+## dump with pkts and hexdump expanding only select protocaols
+tshark -t ud -r $infile -V -O xml > $outfile
 
 ## write to another pcap
 tshark -r $infile  -2 -Y "$disp_filter" -w $outfile
@@ -1629,7 +1652,7 @@ tshark -t ud -r $infile  -2 -Y "$disp_filter" -o 'nas-5gs.null_decipher:TRUE' > 
 ## get to know the columns
 tshark -G column-formats
 
-tshark -o 'gui.column.format:"No.","%m","Time","%Yut","Source","%s","Destination","%d","Protocol","%p","Length","%L","Info","%i"' -r infile.pcap > /tmp/output
+tshark -o 'gui.column.format:"No.","%m","Time","%Yut","Source","%s","Destination","%d","Protocol","%p","Length","%L","Info","%i"' -r $infile > $outfile
 
 ## the typical std set
 ##tshark -r $infile -T fields -e frame.number -e _ws.col.Time -e ip.src -e ip.dst -e _ws.col.Protocol -e frame.len -e _ws.col.Info -2 -Y "$disp_filter" -t ud > $outfile

@@ -119,6 +119,15 @@ git reset --hard HEAD~1
 * you can get it back as long as its in the same repo with git reflog (git pack
   may erase it after some time..)
 
+### go back to a commit , but retain history
+
+```sh
+git revert --no-commit commit_to_goto..
+git commit -m "reverting to commit_to_goto"
+
+```
+
+
 ## To get the commit from where you started working
 
 Normally, `@{u}` is enuf. However, if you did a git fetch, chances are `@{u}` has advanced.

@@ -84,7 +84,13 @@ pdftk protected.pdf input_pw sekritPassword cat output unprotected.pdf
 
 * when u know only user password
 ```sh
-qpdf --password=sekritPassword --decrypt protected.pdf unprotected.pdf
+infile=/pdf/..
+outfile=/pdf/..
+password=...
+
+#    docker run             -it --rm -v $PWD:/pdf ghcr.io/toshy/docker-qpdf:latest --password=$password --decrypt $infile $outfile
+sudo docker run --user root -it --rm -v $PWD:/pdf ghcr.io/toshy/docker-qpdf:latest --password=$password --decrypt $infile $outfile
+qpdf --password=$password --decrypt $infile $outfile
 ```
 
 ## standard scripts
@@ -207,6 +213,7 @@ apt-get  install poppler-utils
 pdftotext -layout a.pdf a.txt
 pdftotext -layout -f <first-pagenum> -l <last-page-num> a.pdf a.txt
 pdftotext -layout -f $first -l $last $infile $outfile
+pdftotext -layout $infile $outfile
 ```
 
 # convert pdf to black and white
