@@ -197,6 +197,21 @@ disable javascript for a site:
 chrome://settings/content/javascript
 ```
 
+* import a cert
+
+```
+chrome://certificate-manager/clientcerts/platformclientcerts
+```
+
+* rename a tab
+```
+add this as a bookmark:
+
+javascript:(function(){document.title=prompt('New tab title:',document.title)})();
+
+```
+
+
 
 
 # putty notes

@@ -1896,6 +1896,12 @@ journalctl --no-pager --reverse | tail -n1
 # or more directly:
 journalctl --no-pager --output=short-iso --since "1970-01-01" | head -n1
 
+## see current disu-usage
+journalctl --disk-usage
+
+## seems to have a lot of info
+journalctl --header
+
 ```
 
 ## logger
@@ -2061,6 +2067,7 @@ usermod [optoins] $USER
 # -a                    -- append to more groups. Must have -G
 # -G GROUP1[,Group2,..] -- groups
 
+# search groupadd addgroup
 #eg:
 sudo usermod -a -G libvirt ${user_to_add}
 # change shell

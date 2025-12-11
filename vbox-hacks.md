@@ -538,6 +538,27 @@ References: https://linuxconfig.org/how-to-use-bridged-networking-with-libvirt-a
 virsh net-define network.xml
 ```
 
+* setting a link down: say you have a interface like below
+```xml
+    <interface type='bridge'>
+      <mac address='52:54:00:c7:38:6b'/>
+      <source bridge='lakshman_s1'/>
+      <target dev='vnet6'/>
+      <model type='virtio'/>
+      <alias name='net1'/>
+      <address type='pci' domain='0x0000' bus='0x02' slot='0x00' function='0x0'/>
+    </interface>
+```
+    * to bring this down
+      ```sh
+      vmname="myvm"  # whatever
+      ifname=vnet6
+      # Bring link down
+      virsh domif-setlink $vmname $ifname down
+
+      # Bring link back up
+      virsh domif-setlink $vmname $ifname up
+      ```
 
 ## guest agent
 

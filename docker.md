@@ -177,8 +177,14 @@ Image --run-command-> Running Container --> Stopped Container -- commit-commnd -
 
 ### Docker logs
 
-```
+```sh
 docker logs <container-name>
+
+## to tail
+docker logs -f <container-name>
+
+## to tail only from the latest 100 lines
+docker logs -f --tail 100 my_container
 ```
 
 * The information that is logged and the format of the log
@@ -190,6 +196,7 @@ docker logs <container-name>
   daemon to stdout/stderr
 * For eg, nginx image sets the `/var/log/nginx/access.log` as a
   softlink to `/dev/stdout`
+
 
 ### inspect
 

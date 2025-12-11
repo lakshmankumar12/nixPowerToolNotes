@@ -296,6 +296,25 @@ get
 mosh-server new -s -c 8 -p 60000 -l LANG=en_US.UTF-8 -l LANGUAGE=en_US -l LC_CTYPE=en_US.UTF-8
 ```
 
+* to forward via a jumper:
+
+```sh
+## at the jump host:
+TARGET_IP=192.168.122.162
+JUMPER_IFACE=eno1
+sudo iptables -t nat -A PREROUTING -i $JUMPER_IFACE -p udp --dport 60000:60010 -j DNAT --to-destination $TARGET_IP -m comment --comment "mosh to lakshman-dev"
+sudo iptables -t filter -I FORWARD -p udp -d $TARGET_IP --dport 60000:60010 -j ACCEPT -m comment --comment "mosh to lakshman-dev"
+sudo iptables -t nat -A PREROUTING -i $JUMPER_IFACE -p tcp --dport 38892 -j DNAT --to-destination $TARGET_IP:22 -m comment --comment "mosh to lakshman-dev"
+sudo iptables -t filter -I FORWARD -p tcp -d $TARGET_IP --dport 22 -j ACCEPT -m comment --comment "mosh to lakshman-dev"
+
+
+## at your client:
+export MOSH_PORT_RANGE=60001:60010
+mosh --ssh="ssh -p 38892" jumperhost
+
+```
+
+
 # login banner in linux
 
 search: motd
@@ -377,6 +396,9 @@ sudo apt install p7zip-full
 
 ##print to stdout
 7z x -so path/to/file.7z path/inside/the/archive
+
+## args
+-y  .. answer yes to all prompts
 
 ```
 
@@ -1039,20 +1061,6 @@ bcfg mv 6 0
 ```
 
 
-# ubuntu iso-install
-
-* subiquity / curtin
-* cloud-init
-* https://ubuntu.com/server/docs/install/autoinstall
-* https://askubuntu.com/a/1322129
-* Login-details of installer - https://askubuntu.com/a/1322129
-    * default sheel is `/usr/bin/subiquity-shell`
-* static ip during install
-    * https://askubuntu.com/a/1361022
-    ```
-    ip=<client-ip>:<server-ip>:<gw-ip>:<netmask>:<hostname>:<device>:<autoconf>:<dns0-ip>:<dns1-ip>:<ntp0-ip>:...
-    ip=192.168.122.53::192.168.122.1:255.255.255.0:onyxedge-nr:ens3::8.8.8.8
-    ```
 
 # tar
 
@@ -1858,6 +1866,31 @@ imgargs vmlinuz initrd=initrd boot=casper ip=${ipval} cloud-config-url=/dev/null
 boot || sleep 3600
 ```
 
+# ubuntu iso-install
+
+* subiquity / curtin
+* cloud-init
+* https://ubuntu.com/server/docs/install/autoinstall
+* https://askubuntu.com/a/1322129
+* Login-details of installer - https://askubuntu.com/a/1322129
+    * default sheel is `/usr/bin/subiquity-shell`
+* static ip during install
+    * https://askubuntu.com/a/1361022
+    ```
+    ip=<client-ip>:<server-ip>:<gw-ip>:<netmask>:<hostname>:<device>:<autoconf>:<dns0-ip>:<dns1-ip>:<ntp0-ip>:...
+    ip=192.168.122.53::192.168.122.1:255.255.255.0:onyxedge-nr:ens3::8.8.8.8
+    ```
+
+# iso study tools
+
+https://www.pugetsystems.com/labs/hpc/ubuntu-22-04-server-autoinstall-iso/
+
+```sh
+isofile=...
+xorriso -indev $isofile -report_el_torito as_mkisofs
+
+```
+
 
 # study cpu of a machine
 
@@ -1920,7 +1953,18 @@ numactl --show
 dmidecode
 
 # show only one section
-dmidecode -t <type>
+dmidecode -t bios
+## list supported sections
+dmidecode -t some_junk_will_give_help
+
+## select info
+dmidecode -s bios-vendor
+dmidecode -s bios-version
+dmidecode -s system-serial-number
+dmidecode -s system-product-name
+## list supported names
+dmidecode -s some_junk_will_give_help
+
 ```
 
 ## tool to edit bios / uefi
@@ -2013,7 +2057,7 @@ sudo update-grub
 ## to get it workign right away:
 sudo systemctl start serial-getty@ttyS0.service
 
-## to amek grub itself appear on serial
+## to make grub itself appear on serial
 GRUB_SERIAL_COMMAND="serial --speed=115200 --unit=0 --word=8 --parity=no --stop=1"
 GRUB_TERMINAL_INPUT="console serial"
 GRUB_TERMINAL_OUTPUT="gfxterm console serial"
@@ -2167,6 +2211,9 @@ echo "module openvswitch +p" > /sys/kernel/debug/dynamic_debug/control
 sudo dmesg -n 7
 ## -w tails the logs
 sudo dmesg -w
+
+## give clock-time (instead of secs since reboot)
+sudo dmesg -T
 
 ##disable
 echo "module openvswitch -p" > /sys/kernel/debug/dynamic_debug/control
@@ -2690,6 +2737,24 @@ tesseract img.tiff output.txt -l san-siddhanta-float
 
 ```
 
+# gpg key management
+
+```sh
+## study a key -- import it first
+mkdir /tmp/gpg-temp
+gpg --homedir /tmp/gpg-temp --import gpg.priv.key
+## list the import key(s)
+gpg --homedir /tmp/gpg-temp --list-secret-keys
+## get public key for the private key (from the above op)
+keyid=...
+gpg --homedir /tmp/gpg-temp --export --armor $keyid > public.gpg.key
+
+## get rid of the keys
+rm -rf /tmp/gpg-temp
+
+```
+
+
 # adb
 
 ```
@@ -2732,6 +2797,10 @@ apt-get install -y freerdp2-x11
 ## and fire
 xfreerdp /u:username /p:password /v:server-ip /cert-ignore /dynamic-resolution
 xfreerdp /u:svt-3 /p:svt-3 /v:172.26.8.251 /cert-ignore /dynamic-resolution
+
+## for access virt-manager of another m/c
+apt update ; apt-get install -y openssh-client
+## and just ssh -X target_machine .. the x-forwarding should work as long as the remote sshd is configured to allow that
 
 ```
 

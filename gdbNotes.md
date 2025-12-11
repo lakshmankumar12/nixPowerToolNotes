@@ -107,7 +107,7 @@ thread apply all bt
   cond 2 $_thread != 57
   ```
 
-### print __thread local variables
+### print `__thread` local variables
 
 
 * Just go to the thread and print the variable
@@ -119,3 +119,14 @@ p my_tls_variable
 ## Interpreting kernel log lines on seg-fault.
 
 https://stackoverflow.com/questions/2549214/interpreting-segfault-messages/2549363
+
+## print BIG data-structures
+
+```
+set max-value-size unlimited
+
+##or
+set max-value-size 200000
+
+```
+

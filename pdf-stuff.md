@@ -126,12 +126,14 @@ done
 ```
 
 ```sh
+sudo docker run --user root -it --rm -v $PWD:/pdf --entrypoint=/bin/bash ghcr.io/toshy/docker-qpdf:latest
 file=...
-start="19750101"
-for i in $(seq 0 $((30*365)) )  ; do
+start="19400101"
+for i in $(seq 0 $((12*365)) )  ; do
     passwd=$(date --date="$start + $i day" +'%d%m%Y');
     echo $passwd
-    qpdf --password=${passwd} --decrypt ${file} a.pdf
+    qpdf --password=$password --decrypt ${file} a.pdf
+    #qpdf --password=${passwd} --decrypt ${file} a.pdf
     if [ $? -eq 0 ] ; then
         break;
     fi
