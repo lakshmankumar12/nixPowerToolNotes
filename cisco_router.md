@@ -272,3 +272,32 @@ Lan switches, with say 24 ports.
     ```
 
 * display all macs on a vlan
+
+
+# MicroTik Router
+
+```sh
+# see ip-arp entries (remove the where to see all)
+[admin@MikroTik] > /ip arp print where address=172.26.4.204
+Flags: X - disabled, I - invalid, H - DHCP, D - dynamic, P - published, C - complete
+ #    ADDRESS         MAC-ADDRESS       INTERFACE
+ 0 DC 172.26.4.204    2C:CF:67:71:EE:8D bridge
+[admin@MikroTik] >
+
+# see dhcp leases
+[admin@MikroTik] > /ip dhcp-server lease print where address=172.26.4.204
+Flags: X - disabled, R - radius, D - dynamic, B - blocked
+ #   ADDRESS                                 MAC-ADDRESS       HOST-NAME                     SERVER                     RATE-LIMIT                     STATUS  LAST-SEEN
+ 0 D 172.26.4.204                            8A:02:54:39:B3:A7                               gxcconf                                                   bound   2m16s
+[admin@MikroTik] >
+
+# get the Manufacturer details of a prefix
+[admin@MikroTik] > /tool fetch url="https://api.macvendors.com/2C:CF:67" output=user
+      status: finished
+  downloaded: 0KiBC-z pause]
+        data: Raspberry Pi (Trading) Ltd
+[admin@MikroTik] >
+
+
+```
+

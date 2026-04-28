@@ -212,6 +212,20 @@ javascript:(function(){document.title=prompt('New tab title:',document.title)})(
 ```
 
 
+* download any page quickly
+
+open dev-tools , console and paste this.
+```
+// Save the whole page text
+const text = document.body.innerText;
+const a = document.createElement('a');
+a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(text);
+a.download = 'current_page.txt';
+a.click();
+
+```
+
+
 
 
 # putty notes

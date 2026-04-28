@@ -200,6 +200,7 @@ virt-install --name=${vmname} --os-variant=${osvariant} \
 ##   --boot uefi
 ##   --boot loader=/usr/share/OVMF/OVMF_CODE.fd,loader_ro=yes,loader_type=pflash,nvram_template=/usr/share/OVMF/OVMF_VARS.fd
 ##   --watchdog i6300esb,action=reset
+##   --tpm backend.type=emulator,backend.version=2.0,model=tpm-tis        ## requires apt install swtpm swtpm-tools
 ##   --print-xml [STEP]    .. USEFUL TO GET XML AND NOT START VM!!
 ##                         .. step is 1/2 if (--cdrom, --location, --pxe or --install) AND (withouth --no-install) is used.
 ##                         .. you probably want 1st step, define it.. and once done, explicitly remove the cd/onreboot-destory elements later
@@ -247,10 +248,24 @@ https://unix.stackexchange.com/a/620880
   <ip address='192.168.123.1' netmask='255.255.255.0'>
     <dhcp>
       <range start='192.168.123.10' end='192.168.123.100'/>
+
+      <!-- optional mac->ip binding -->
+      <host mac="52:54:00:25:53:7e" ip="192.168.122.129" name="optinal-name-for-this-ip-on-kvm-host"/>
+      <host mac="52:54:00:04:52:bd" ip="192.168.122.219" name="neednt-match-that-in-guest"/>
+      <host mac="52:54:00:da:0f:40" ip="192.168.122.171" name="but-better-to-match"/>
     </dhcp>
   </ip>
 </network>
 ```
+
+* add a mac-to-ip binding at runtime:
+```sh
+virsh net-update default add ip-dhcp-host \
+  "<host mac='52:54:00:25:53:7e' name='devops-vm-gamma' ip='192.168.122.129'/>" \
+  --live --config
+
+```
+
 
 * Bridged network
   * Not clear - in this mode, looks like kvm wont create the bridge itself.
@@ -374,11 +389,11 @@ sudo qemu-img create -f raw ${image_name} 128G
 
 * attach a network after starting the vm
 ```sh
-# this adds when the vm is down.
-## remove --config if the vm is running (not sure how the guest os will respond though).
+# --live   ..  adds when the vm is up
+# --config .. update the config of the vm as well (permenant)
 virsh attach-interface --domain lakshmantrfvm --type bridge \
         --source virbr0 --model virtio \
-        --mac 52:54:00:4b:73:5f --config
+        --mac 52:54:00:4b:73:5f --config --live
 
 
 ```
@@ -559,6 +574,35 @@ virsh net-define network.xml
       # Bring link back up
       virsh domif-setlink $vmname $ifname up
       ```
+
+### adding a fixed mapping for a host
+
+```xml
+<network>
+  <name>default</name>
+  ...
+  <ip address="192.168.122.1" netmask="255.255.255.0">
+    <dhcp>
+      <range start="192.168.122.2" end="192.168.122.254"/>
+      <!-- Add this: -->
+      <host mac="52:54:00:2a:91:bc" name="lakshman-agw-docker" ip="192.168.122.63"/>
+    </dhcp>
+  </ip>
+</network>
+```
+* and then `virsh net-destroy default` and `virsh net-start default`
+    * WARNING: all existing machines will lose connectivity to virbr0
+
+* Untested
+
+```sh
+virsh net-update default add ip-dhcp-host \
+  '<host mac="52:54:00:ab:cd:ef" name="myvm" ip="192.168.122.200"/>' \
+  --live --config
+```
+
+
+
 
 ## guest agent
 
@@ -749,6 +793,7 @@ vmname=ubuntu_imported
 src_path=/home/gxcautotest/lakshman/from_official_ubuntu_qcow2/focal-server-cloudimg-amd64.img
 target_path=/var/lib/libvirt/images/${vmname}.qcow2
 sudo cp $src_path $target_path
+sudo qemu-img convert -O qcow2 $src_path $target_path
 
 ## optional -- whatever size.. it gets auto-reized .. how cool is that.
 sudo qemu-img resize ${target_path} +20G

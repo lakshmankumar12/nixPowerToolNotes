@@ -92,6 +92,10 @@ info symbol <address>
 
 ```
 handle SIGPIPE nostop noprint pass
+
+##for SIGINT.. doesn't really work well.
+## if your program is handling SIGINT, suppress it with a file-check or env-var
+handle SIGINT stop nopass
 ```
 
 ## thread

@@ -146,6 +146,16 @@ git log -n 1
 git log -n 1 --pretty=format:"%H"
 ```
 
+## only commit
+
+search: for cherry-pick ease
+
+```sh
+git log --reverse pointa..pointb --pretty=format:"%H" | while read commit ; do echo "commit:$commit" ; git cherry-pick $commit ; done
+
+```
+
+
 ## geting parent commit of a commit
 
 ```
@@ -156,6 +166,9 @@ commit~2  .. Grand(second) Parent of commit
 
 commit^1  .. First left parent of commit
 commit^2  .. second left parent of commit (meaningful for merge commits)
+
+## club current staged changes into HEAD
+git commit --amend --no-edit
 ```
 
 

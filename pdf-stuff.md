@@ -19,6 +19,10 @@ gs -sDEVICE=pdfwrite -dNOPAUSE -dBATCH -dSAFER -q \
 ###    -dSAFER   -- avoid unsafe operations (following links etc..)
 ###    -q        -- quiet mode.. no unnecessary startup messages
 ###    -c "postscript code"  -- note when -c is used, you need to use -f to tell next is input
+
+## or with qpdf
+qpdf --empty --pages $infile $spage-$epage -- $outfile
+sudo docker run --user root -it --rm -v $PWD:/pdf ghcr.io/toshy/docker-qpdf:latest --empty --pages /pdf/$infile $spage-$epage -- /pdf/$outfile
 ```
 
 ## combine pdfs
@@ -84,12 +88,14 @@ pdftk protected.pdf input_pw sekritPassword cat output unprotected.pdf
 
 * when u know only user password
 ```sh
-infile=/pdf/..
-outfile=/pdf/..
+cd ...wherever
+# inffile and outfile should be just basenames
+infile=..
+outfile=..
 password=...
 
 #    docker run             -it --rm -v $PWD:/pdf ghcr.io/toshy/docker-qpdf:latest --password=$password --decrypt $infile $outfile
-sudo docker run --user root -it --rm -v $PWD:/pdf ghcr.io/toshy/docker-qpdf:latest --password=$password --decrypt $infile $outfile
+sudo docker run --user root -it --rm -v $PWD:/pdf ghcr.io/toshy/docker-qpdf:latest --password=$password --decrypt /pdf/$infile /pdf/$outfile
 qpdf --password=$password --decrypt $infile $outfile
 ```
 
@@ -255,5 +261,15 @@ gs                              \
   -r1200                        \
   -dAutoRotatePages=/PageByPage \
    infile.pdf
+```
+
+
+# tool to remove a particular image out of a pdf
+
+search: insurance filler amma maxbupa niva
+
+```
+inkscape
+
 ```
 

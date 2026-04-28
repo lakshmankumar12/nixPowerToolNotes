@@ -27,11 +27,17 @@ rdesktop 135.227.232.97 -u 'ENG\lnara002' -p - -z  -x 0x81 -g 1152x648 -a 32
 ```
 #  come to the window to be moved
 :move-window -t target_session_name
+
+## or in bash .. across session .. swap sessionA:P with sessionB:Q
+tmux move-window -s sessionB:Q -t sessionA:99
+tmux move-window -s sessionA:P -t sessionB:Q
+tmux move-window -s sessionA:99 -t sessionA:P
 ```
 * Easy-peasy way
     * mark window1 first `<backtick> m`
     * come to other window and type `:swap-window`
       * or press `<backtick> <` and choose `swap marked (s)`
+
 
 
 * move a pane from one session/window to another
@@ -97,6 +103,11 @@ Ensure your original tmux and the attached-client version are same!
 :select-layout even-vertical
 # otherones
 main-vertical
+
+## save a layout
+tmux display-message -p "#{window_layout}" -t session:index > layout_save
+## restore a layout
+tmux select-layout "$(cat layout_file)"
 ```
 
 * To resize a pane
@@ -208,6 +219,21 @@ ssh -fN -L 'forwarding_stuff' user@host
 
 ```
 
+* multi hop jumping
+
+```sh
+
+bhlogin=...your-bastion-host-login-name..
+bastionhost=142.132.204.245
+gwport=..nr-port-from-table..
+nrsshkeyfile=..ssh-key-file-of-nr..
+agwsshkeyfile=..sh-key-file-of-agw..
+
+ssh -o "ProxyCommand ssh -J ${bhlogin}@${bastionhost} -p ${gwport} -i ${nrsshkeyfile} onyxedge@localhost nc %h %p" -i ${agwsshkeyfile} onyxedge@10.0.2.1
+
+```
+
+
 ## ssh_config setting
 
 Search: sshconfig
@@ -238,11 +264,32 @@ Host testvm
 ### To use a dynamic ip on the sshconfig
 Host chaningiphost
   ProxyCommand socat stdio tcp:${BUILD_MACHINE_IP}:22
+
+### command line proxying  -- mind the quotes.. its all over -o 'proxycommand ssh all args nc %h %p'
+ssh -o 'proxycommand ssh  -o hostname=172.26.22.21  nrany nc %h %p' -o hostname=10.0.2.1 agwany
 ```
 
 * Dynamic ip host: https://superuser.com/a/338314
 * Match-exec: https://superuser.com/a/1778495
 * Override hostname alone: https://unix.stackexchange.com/a/598532
+
+## sshpass
+
+```sh
+# Pass password directly (use single quotes to avoid shell issues)
+sshpass -p 'mypassword' ssh user@192.168.1.10
+
+# Read password from a file
+sshpass -f /path/to/password_file ssh user@host
+
+# Read from an environment variable
+SSHPASS='mypassword' sshpass -e ssh user@host
+
+## works same for scp as well
+sshpass -p 'mypassword' scp file.txt user@host:/remote/path/
+
+```
+
 
 ## ssh-keygen
 
@@ -277,6 +324,29 @@ ssh-keygen -lf ~/.ssh/id_rsa.pub -E md5
 ssh-keygen -f private_key.pem -y
 
 ```
+
+### multiline ssh
+
+```sh
+## mind the 'EOF' at the end.
+port=61112
+ssh -o IdentityFile=~/.ssh/gxc_nr_key -o IdentityFile=~/.ssh/tr0_key -o port=$port agwprod 'bash -i'  <<'EOF'
+hostname
+agw_orc8r_ids
+get_gateway_type
+type="$(get_gateway_type)"
+if [ "$type" == "onyxedge" ] ; then
+   mver
+elif [ "$type" == "nr5g" ] ; then
+   nrver
+else
+   echo type:$type unknown
+fi
+date
+EOF
+
+```
+
 
 ## sftp
 
@@ -314,6 +384,26 @@ mosh --ssh="ssh -p 38892" jumperhost
 
 ```
 
+# rsync
+
+```sh
+##
+rsync -avz -e "ssh -o StrictHostKeyChecking=no" source/ user@host:/dest/
+
+## -a -> archive mode.. preserves almost everything -
+##       permissions, timestamps, symbolic links, ownership,
+##       and recursively copies directories.
+##       It's essentially -rlptgoD combined.
+## -v -> versbose
+## -z -> compress as you transfer
+## -e "..." -> use this instead of just ssh
+
+
+#By default hte above just adds/modifies files form source to dest.
+#File only in dest are left alone. If you want to mirror, then:
+rsync -avz --delete ... source/ destination/
+
+```
 
 # login banner in linux
 
@@ -329,6 +419,9 @@ To check what went wrong if something isn't showing:
 
 ```sh
 run-parts /etc/update-motd.d/ > /dev/null
+
+## just list whihc will be run withouth executing
+run-parts --test /etc/update-motd.d/gGH
 ```
 
 
@@ -443,7 +536,7 @@ https://www.pcre.org/original/doc/html/pcrepattern.html
 
 ```sh
 # stop at preprocessing
-gcc -E 
+gcc -E
 
 # disassemble all function in a binary
 objdump -S binary > disassembled.S
@@ -454,7 +547,7 @@ nm -C binary > func_list.S
 ##   -g .. display extern symbols
 ##   -C .. demangle
 
-# another otions 
+# another otions
 readelf -sW a.out | awk '$4 == "FUNC"' | c++filt
 ## args of readelf
 ##   -s  .. list symbols
@@ -466,7 +559,7 @@ readelf -sW a.out | awk '$4 == "FUNC"' | c++filt
 
 # core mgmt in linux
 
-search: coredump
+search: coredump corepattern
 
 ```sh
 cat /proc/sys/kernel/core_pattern
@@ -690,7 +783,7 @@ control.tar.gz  data.tar.gz  debian-binary
 ## your data file are in data.tar.gz
 tar xf data.tar.gz
 
-## or 
+## or
 dpkg --contents package.deb
 
 ## list dependencies of a package, search depends
@@ -849,6 +942,17 @@ Pin: version 2.15.4-9gxc
 Pin-Priority: 1001
 ```
 
+## pip
+
+```sh
+pip download -d /tmp/pkgdir pandas
+
+pip install --no-index -f /tmp/pkgdir pandas
+
+## this will install/upgrade/downgrade to that version
+pip install protobuf==3.19.0
+
+```
 
 
 
@@ -1196,6 +1300,24 @@ cscope -bqi cscope.files
 ```
 
 
+# patch
+
+```sh
+## directly apply w/o taking cues from aptchfile
+cat a.diff | patch file/to/apply.txt
+
+# args
+## -p0: Use full path from patch
+## -p1: Strip 1 directory level (most common)
+## -p2: Strip 2 directory levels
+## --dry-run: Test without applying
+## --no-backup-if-mismatch: Don't create .orig files
+## -R: Reverse the patch
+## -N: Ignore already applied patches
+
+```
+
+
 # rsyslog
 
 ```sh
@@ -1252,7 +1374,222 @@ C_DRIVE /home/lakshman/host_c vboxsf uid=1000,gid=1000 0 0
 
 ```
 
+## journalctl
 
+Search: syslog
+
+```sh
+journalctl --list-boots
+### note: this gives the last boot time
+uptime -s
+## or just
+awk '/btime/ {print $2}' /proc/stat
+
+# lists logs of just one unit (service)
+journalctl -u some_service
+
+##other args
+##  -f                 --  follow
+##  -n 100             --  last 100 lines
+##  -r                 --  reverse .. newer entries first
+
+# list log of a particular boot
+journalctl -b -1
+
+# list log since current boot only
+journalctl -b 0
+
+# only from till
+journalctl --since "3 hours ago"
+journalctl --since "2 days ago"
+journalctl --since "2015-06-26 23:15:00" --until "2015-06-26 23:20:00"
+
+#only form processes running as a user
+journalctl _UID=108
+
+#only for one service and only from last invocation/start
+journalctl _SYSTEMD_INVOCATION_ID=$(systemctl show --value -p InvocationID magma@magmad)
+
+# clean up / clear
+journalctl --vacuum-time=2d
+journalctl --vacuum-size=500M
+
+## find the earliest log
+journalctl --no-pager --reverse | tail -n1
+# or more directly:
+journalctl --no-pager --output=short-iso --since "1970-01-01" | head -n1
+
+## see current disu-usage
+journalctl --disk-usage
+
+## seems to have a lot of info
+journalctl --header
+
+## know the first time stamp
+journalctl --header | grep 'Head realtime' | sort -k 8
+
+## to know how much journal will use
+## basically it logs this at start. So do restart if you dont have that log
+#sudo systemctl restart systemd-journald
+sudo journalctl -f -u systemd-journald
+sudo journalctl -u systemd-journald > /tmp/a
+
+## to se oom-kill info, check kernel log
+sudo journalctl -k > /tmp/kern.log
+## follow
+sudo journalctl -fk
+
+```
+
+* config - `/etc/systemd/journald.conf.d/10-whatever.conf`
+    * and restart `systemd-journald`
+
+```conf
+[Journal]
+SystemMaxUse=25G
+SystemKeepFree=25G
+
+```
+
+
+### logging in a moderm machine
+
+```
+
+/dev/log -> historical socket
+
+/dev/log -> /run/systemd/journal/dev-log  softlink. So journal is the front-door for logging.
+
+Application → /dev/log → journald (stores in journal) → rsyslog (reads via /run/systemd/journal/syslog) → /var/log/syslog
+                              ↓
+                          journalctl reads here
+
+```
+
+
+## logger
+
+* useful to log from shell scripts
+
+```sh
+## args
+## -i                 ..   include pid in logline
+## -p facility.level  ..   eg: local3.info
+##                              levels: emerg alert crit err warning notice info debug
+##                              facility: user local0 .. local7
+## -s                 ..   output to stderr also
+## -t                 ..   use this tag (instead of username)
+
+```
+
+
+## systemctl
+
+search: systemd
+
+```sh
+systemctl list-units --type=service
+
+# This will make systemd read all services and update
+# its database
+sudo systemctl daemon-reload
+
+# verify a definition file
+sudo systemd-analyze verify phy_ifc_map_check.service
+
+# show prperties of a aservice
+systemctl show $SERVICE
+
+# any specific one .. Get pid of main process
+#  --value avoids printing PropertyName=
+systemctl show --property MainPID --value $SERVICE
+
+# gives active inactive .. also exit status gives info
+systemctl is-active application.service
+
+# get the pstree picture
+sudo systemd-cgls
+```
+
+```sh
+# Types:
+Type=simple
+Type=oneshot
+
+# unit configs
+StartLimitInterval=3600
+StartLimitBurst=5            ## together StartLimitInterval and StartLimitBurst
+                             ## control how much the service can restart in
+                             ## the interval. Beyond that systemd will not
+                             ## restart the service.
+
+```
+
+search: systemd
+
+* Simple user service
+```sh
+mkdir -p  ~/.config/systemd/user/
+
+cat <<EOF > ~/.config/systemd/user/devvm_ssh_starter.service
+[Unit]
+Description=ssh monitor for dev-vm
+StartLimitInterval=3600
+StartLimitBurst=5
+
+[Service]
+Type=simple
+ExecStart=ssh -N -o ExitOnForwardFailure=yes -o PreferredAuthentications=publickey -L *:38882:localhost:22 lakshman@192.168.122.162
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target
+EOF
+
+systemctl --user daemon-reload
+systemctl --user enable --now  devvm_ssh_starter.service
+
+systemctl --user status devvm_ssh_starter.service
+journalctl --user -u devvm_ssh_starter
+```
+
+
+* dynamically adjust resources
+
+https://www.linkedin.com/pulse/do-you-know-can-limit-service-memory-cpu-linux-tahmid-ul-muntakim
+
+```sh
+## set once for this incarnation
+ystemctl set-property --runtime fhttpd.servicee CPUQuota=infinity MemoryLimit=infinity
+
+## set forever
+systemctl set-property httpd.service MemoryLimit=500M
+systemctl set-property httpd.service CPUQuota=20%
+```
+
+* man pages
+
+```sh
+man systemd.resource-control
+```
+
+* watch-systemd
+
+```sh
+systemd-cgtop
+
+```
+
+* for timers:
+    * https://documentation.suse.com/sle-micro/6.0/html/Micro-systemd-working-with-timers/index.html
+
+
+
+* IF you want to see cgroup limits:
+  ```
+  cat /sys/fs/cgroup/memory/system.slice/system-magma.slice/magma@sessiond.service/memory.limit_in_bytes
+  ```
 
 
 
@@ -1295,6 +1632,14 @@ lsblk
 
 #lsblk with filetypes, label, uuid
 lsblk -f
+
+#quick check of disks
+sudo lsblk -nbdo NAME,SIZE,TYPE,RM,TRAN
+## args
+### -n .. no-heading
+### -b .. size in bytes
+### -d .. nodeps.. (no partitions)
+### -o .. specify columns to display
 
 ```
 
@@ -1371,7 +1716,7 @@ screen /dev/ttyUSB0 115200
 
 ## to know the pci of a usb
 root@svt2-proxmox:~# lsusb |grep Telit
-Bus 002 Device 002: ID 1bc7:1070 Telit Wireless Solutions FN990   <== Bus 2 
+Bus 002 Device 002: ID 1bc7:1070 Telit Wireless Solutions FN990   <== Bus 2
 
 root@svt2-proxmox:~# readlink /sys/bus/usb/devices/usb2
 ../../../devices/pci0000:00/0000:00:08.1/0000:c5:00.3/usb2      <== c5:00.3
@@ -1689,7 +2034,7 @@ https://superuser.com/questions/401217/how-to-check-root-partition-with-fsck
 
 ## in /etc/default/grub
 GRUB_CMDLINE_LINUX_DEFAULT=".... fsck.mode=force fsck.repair=yes"
-## and then 
+## and then
 sudo update-grub
 
 
@@ -1718,6 +2063,28 @@ gxcautotest@auto-gamma:~$
 ```sh
 sudo udevadm monitor --kernel --udev
 ```
+
+## cryptsetup
+
+```sh
+# Commands reference:
+cryptsetup luksAddKey      # - Add new key (requires existing key to authorize)
+cryptsetup luksRemoveKey   # - Remove a key (only needs the key being removed)
+cryptsetup luksDump        # - Inspect key slots
+systemd-cryptenroll        # - Enroll TPM2/FIDO2/etc into LUKS2
+
+
+## test
+gxcadmin@gxc-ctrlr-host:~$ sudo cryptsetup luksOpen --test-passphrase -v /dev/vda3
+No usable token is available.
+Enter passphrase for /dev/vda3:
+Key slot 2 unlocked.
+Command successful.
+gxcadmin@gxc-ctrlr-host:~$
+
+
+```
+
 
 
 # dont start graphical target in xubuntu
@@ -2004,6 +2371,24 @@ efi=runtime
 
 ```
 https://raw.githubusercontent.com/s-n-ushakov/rename-efi-entry/master/rename-efi-entry.bash
+```
+
+
+```sh
+##yet to verify if this work reliably
+currboot=$(sudo efibootmgr -v | awk '/BootCurrent/ {print $2}')
+uuid=$(sudo efibootmgr -v | awk '/BootCurrent:/ {c=$2;next} $1 ~ c {split($0,r,",");print r[3];q}')
+file=$(sudo efibootmgr -v | awk '/BootCurrent:/ {c=$2;next} $1 ~ c {split($0,r,"(");print substr(r[3],0,length(r[3])-1);q}')
+device_disk=$(realpath /dev/disk/by-partuuid/$uuid | sed 's/[[:digit:]]\+$//')
+device_part=$(realpath /dev/disk/by-partuuid/$uuid | grep -o '[[:digit:]]\+$')
+echo ${currboot}
+echo $uuid
+echo $file
+echo $device_disk
+echo $device_part
+
+sudo efibootmgr --bootnum ${currboot} --delete-bootnum
+echo sudo efibootmgr --create --disk ${device_disk} --part ${device_part} --label 'Onyxedge-NR' --loader "${file}"
 ```
 
 
@@ -2422,6 +2807,7 @@ brew install gdrive
 
 #to authenticate -- follow instructions
 gdrive about
+gdrive account add
 
 # ls the root drive - note default is 30 items.. use -m <100> to list 100
 gdrive files list
@@ -2618,6 +3004,19 @@ sudo perf report -f
 
 ```
 
+# sshd config
+
+
+
+```cfg
+## note the folder is ssh and file is sshd_config - /etc/ssh/sshd_config
+
+## for all ip listenting in ssh -R rquests
+GatewayPorts yes
+
+```
+
+
 # vnc
 
 ```sh
@@ -2717,7 +3116,7 @@ sudo apt-get install -y tesseract-ocr
 ```
 
 
-* devnagiri trained source : 
+* devnagiri trained source :
 
 https://github.com/tesseract-ocr/tessdata
 https://github.com/Shreeshrii/tessdata_shreetest
@@ -2798,9 +3197,14 @@ apt-get install -y freerdp2-x11
 xfreerdp /u:username /p:password /v:server-ip /cert-ignore /dynamic-resolution
 xfreerdp /u:svt-3 /p:svt-3 /v:172.26.8.251 /cert-ignore /dynamic-resolution
 
+## for vnc
+## this shows up under start->internet:
+apt-get install -y tigervnc-viewer
+
 ## for access virt-manager of another m/c
-apt update ; apt-get install -y openssh-client
-## and just ssh -X target_machine .. the x-forwarding should work as long as the remote sshd is configured to allow that
+apt update
+apt-get install -y openssh-client
+## and just ssh -Y target_machine .. the x-forwarding should work as long as the remote sshd is configured to allow that
 
 ```
 

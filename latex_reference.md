@@ -62,6 +62,20 @@
 
 ```
 
+# table
+
+```tex
+{\centering
+\begin{longtable}{|c|c|}
+\hline
+row1text &  row2text\\
+\hline
+\end{longtable}
+}
+
+```
+
+
 # xlatex prompt
 
 ```

@@ -170,6 +170,16 @@ ${string/#substring/replacement}
 ${string/%substring/replacement}
 ```
 
+* substring replace anywhere
+```sh
+## replace first occurence
+${string/find/replace}
+## repalce all occurences
+${string//find/replace}
+
+```
+
+
 ## Changing cases for strings
 
 ```sh
@@ -560,7 +570,7 @@ exec 4<>filename  # open for both reading/writing
 #   If you omit the exec, then the effect is only for this one command
 
 echo "foo" 2>&1   # writes stderr to stdout
-echo "foo" 1>&2   # rare: writes stdout into stderr
+echo "something went wrong" 1>&2   # writes stdout into stderr .. std-way to write to stderr
 
 # suppress all output /errors .. Order is important
 ls /badfile > /dev/null 2>&1
@@ -568,7 +578,7 @@ ls /badfile > /dev/null 2>&1
 
 cmd 0<&-          # closes stdin for cmd
 
-cmd &> file       # short for 2>&1 >file.. (the exception to &-not-first rule)
+cmd &> file       # short for >file 2>&1 .. (the exception to &-not-first rule)
                   # write stderr and stdout to a file.
 ```
 
@@ -1589,8 +1599,11 @@ echo "command2" >> commands.txt
 # Run with parallel, maintaining 10 jobs at a time
 parallel -j 10 < commands.txt
 
-## if you are tracking a downlaod, how to watch
-watch -n1 'ls -lS nr_160* 2>/dev/null | tail -n 15'
+## if you are tracking a download, how to watch
+## if you want to watch a command that has pipes
+watch -n1 'ls -lS nr_* 2>/dev/null | tail -n 15'
+
+apt install parallel
 
 ```
 
@@ -1832,6 +1845,9 @@ search : human readable friendly
 ```sh
 numfmt --to=iec-i --suffix=B --format="%9.2f" 1975684956
 
+## the --field arg will replace in-line only the field given.
+cat myfile| numfmt --field=2 --to=iec-i --suffix=B
+
 ```
 
 ## reverse lines
@@ -1850,174 +1866,6 @@ rev
 ##    note cut only snips the first n chars
 ... | rev | cut -c5- | rev
 ```
-
-## journalctl
-
-Search: syslog
-
-```sh
-journalctl --list-boots
-### note: this gives the last boot time
-uptime -s
-## or just
-awk '/btime/ {print $2}' /proc/stat
-
-# lists logs of just one unit (service)
-journalctl -u some_service
-
-##other args
-##  -f                 --  follow
-##  -n 100             --  last 100 lines
-##  -r                 --  reverse .. newer entries first
-
-# list log of a particular boot
-journalctl -b -1
-
-# list log since current boot only
-journalctl -b 0
-
-# only from till
-journalctl --since "3 hours ago"
-journalctl --since "2 days ago"
-journalctl --since "2015-06-26 23:15:00" --until "2015-06-26 23:20:00"
-
-#only form processes running as a user
-journalctl _UID=108
-
-#only for one service and only from last invocation/start
-journalctl _SYSTEMD_INVOCATION_ID=$(systemctl show --value -p InvocationID magma@magmad)
-
-# clean up / clear
-journalctl --vacuum-time=2d
-journalctl --vacuum-size=500M
-
-## find the earliest log
-journalctl --no-pager --reverse | tail -n1
-# or more directly:
-journalctl --no-pager --output=short-iso --since "1970-01-01" | head -n1
-
-## see current disu-usage
-journalctl --disk-usage
-
-## seems to have a lot of info
-journalctl --header
-
-```
-
-## logger
-
-* useful to log from shell scripts
-
-```sh
-## args
-## -i                 ..   include pid in logline
-## -p facility.level  ..   eg: local3.info
-##                              levels: emerg alert crit err warning notice info debug
-##                              facility: user local0 .. local7
-## -s                 ..   output to stderr also
-## -t                 ..   use this tag (instead of username)
-
-```
-
-
-## systemctl
-
-search: systemd
-
-```sh
-systemctl list-units --type=service
-
-# This will make systemd read all services and update
-# its database
-sudo systemctl daemon-reload
-
-# verify a definition file
-sudo systemd-analyze verify phy_ifc_map_check.service
-
-# show prperties of a aservice
-systemctl show $SERVICE
-
-# any specific one .. Get pid of main process
-#  --value avoids printing PropertyName=
-systemctl show --property MainPID --value $SERVICE
-
-# gives active inactive .. also exit status gives info
-systemctl is-active application.service
-```
-
-```sh
-# Types:
-Type=simple
-Type=oneshot
-
-# unit configs
-StartLimitInterval=3600
-StartLimitBurst=5            ## together StartLimitInterval and StartLimitBurst
-                             ## control how much the service can restart in
-                             ## the interval. Beyond that systemd will not
-                             ## restart the service.
-
-```
-
-search: systemd
-
-* Simple user service
-```sh
-mkdir -p  ~/.config/systemd/user/
-
-cat <<EOF > ~/.config/systemd/user/devvm_ssh_starter.service
-[Unit]
-Description=ssh monitor for dev-vm
-StartLimitInterval=3600
-StartLimitBurst=5
-
-[Service]
-Type=simple
-ExecStart=ssh -N -o ExitOnForwardFailure=yes -o PreferredAuthentications=publickey -L *:38882:localhost:22 lakshman@192.168.122.162
-Restart=always
-RestartSec=5
-
-[Install]
-WantedBy=default.target
-EOF
-
-systemctl --user daemon-reload
-systemctl --user enable --now  devvm_ssh_starter.service
-
-systemctl --user status devvm_ssh_starter.service
-journalctl --user -u devvm_ssh_starter
-```
-
-
-* dynamically adjust resources
-
-https://www.linkedin.com/pulse/do-you-know-can-limit-service-memory-cpu-linux-tahmid-ul-muntakim
-
-```sh
-## set once for this incarnation
-ystemctl set-property --runtime fhttpd.servicee CPUQuota=infinity MemoryLimit=infinity
-
-## set forever
-systemctl set-property httpd.service MemoryLimit=500M
-systemctl set-property httpd.service CPUQuota=20%
-```
-
-* man pages
-
-```sh
-man systemd.resource-control
-```
-
-* watch-systemd
-
-```sh
-systemd-cgtop
-
-```
-
-* for timers:
-    * https://documentation.suse.com/sle-micro/6.0/html/Micro-systemd-working-with-timers/index.html
-
 
 
 
@@ -2101,6 +1949,8 @@ python3
 
 ## here is a command line arg of getting passwd
 pass=$(python3 -c 'import crypt; print(crypt.crypt("clearpass"))')
+
+openssl passwd -6 -salt "yoursalt" "yourpassword"
 
 ## update it to use
 usermod -p $pass $user

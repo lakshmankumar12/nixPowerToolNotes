@@ -56,6 +56,14 @@ sudo ip link set dev ${ifname} up
 
 ```
 
+### find manufacturer for a mac
+
+```sh
+mac="2C:CF:67:71:EE:8D"
+curl https://api.macvendors.com/$mac
+
+```
+
 
 
 ### arp
@@ -838,6 +846,10 @@ iptables-restore -c < /tmp/a.iptables
 -m tcp --tcp-flags SYN,ACK,RST ACK
 # match a conn-tracker state
 -m state --state NEW
+## match a byte pattern in the paket .. give as "|xx|" (in hex)
+##   algo bm -> boyer-moore (useful for long patterns .. preprocesing cost)
+##   algo kmp -> kunth-morris-pratt (for short-patters .. no pre-process)
+-m string --string "|001c40|" --algo bm
 
 ```
 
@@ -1460,6 +1472,9 @@ sudo netplan try
 sudo netplan apply
 ## with more info
 sudo netplan --debug apply
+
+
+netplan hook file - /usr/lib/networkd-dispatcher/routable.d
 ```
 
 
@@ -1643,6 +1658,11 @@ tshark -r $infile  -2 -Y "$disp_filter" -w $outfile
 
 ## special options -- for nas-5g
 tshark -t ud -r $infile  -2 -Y "$disp_filter" -o 'nas-5gs.null_decipher:TRUE' > $outfile
+
+## dump one pkt in full
+## -V .. full verbose
+## -x .. with hexdump
+tshark -r $infile -Y "frame.number == 42" -V -x > $outfile
 
 ```
 

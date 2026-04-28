@@ -39,7 +39,7 @@ docker image prune
 docker image rm $(docker image ls | awk '/<none>/ {print $3}')
 
 ## tag a image
-docker image existing_tag new_tag
+docker image tag existing_tag new_tag
 
 #another command to reclaim space
 docker system prune -a -f
@@ -54,14 +54,14 @@ python3 docker_descendants.py <image_id>
 
 ```sh
 #save an image locally into a file
-docker save existing_image_name | gzip > saved_image.tgz
-#or
-docker save -o outputfile.tar.gz existing_image_name
+docker image save existing_image_name | gzip > saved_image.tgz
+#or .. no gzip
+docker image save -o outputfile.tar existing_image_name
 
 #load save images
 gunzip < saved_image.tgz | docker load
 #or
-docker load -i saved_file.tar.gz
+docker image load -i saved_file.tar.gz
 ```
 
 
@@ -206,6 +206,9 @@ docker inspect  container_name
 
 # get pid of main process of a container
 docker inspect --format '{{.State.Pid}}' container_name
+
+## get the mounts
+docker inspect $container | jq '.[0].Mounts'
 ```
 
 # Repository mgmt
@@ -414,6 +417,17 @@ Old notes:
 * Data volumes have persist lifetime, and not related to container lifetime
 
 (I dont understand this fully - for now -v host-dir:container-dir is good enuf)
+
+## other userful docker tools
+
+
+```sh
+#study a image and its layers in detail
+docker run -ti --rm -v $PWD:/data -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive my_image_to_study
+docker run -ti --rm -v $PWD:/data -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive my_image_to_study -j /data/my_image_details.json
+
+```
+
 
 # nw_demo_image
 

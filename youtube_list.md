@@ -73,5 +73,12 @@ yt-dlp -f 140 $id
 
 ## download transcript
 yt-dlp --write-auto-sub --convert-subs=srt --skip-download $id
+
+
+## in windows
+## use the "Get cookies.txt LOCALLY" extension to get cookies
+## click on the network - xhr/file peice link to get this url
+python -m yt_dlp --cookies C:\Users\laksh\Downloads\cookies.txt "https://cdn.yoursite.com/hls-videos/146483/69eccf497bbc574eb31fbdff/v0/prog_index.m3u8"
+
 ```
 
