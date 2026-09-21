@@ -119,6 +119,20 @@ DISKPART
 > create partition primary
 ```
 
+# rsync for windows
+
+search: copy files transfer
+
+```
+## /E  - copy subfolders including empty ones
+## /Z  - restartable
+## /XO - exclude old files (already copied)
+## /w:5 - wait time of 5s
+## /r:2 - retry of 2s
+robocopy "\\visalakshipc\carnatic" "C:\Users\laksh\Downloads\from-visalakshi" /E /Z /XO /w:5 /r:2
+```
+
+
 
 # Good windows-Programs
 

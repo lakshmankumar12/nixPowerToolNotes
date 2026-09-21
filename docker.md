@@ -58,7 +58,7 @@ docker image save existing_image_name | gzip > saved_image.tgz
 #or .. no gzip
 docker image save -o outputfile.tar existing_image_name
 
-#load save images
+#load save images -- docker import
 gunzip < saved_image.tgz | docker load
 #or
 docker image load -i saved_file.tar.gz
@@ -109,7 +109,7 @@ docker port container_name
 pid = "$(docker inspect -f '{{.State.Pid}}' "container_name | Uuid")"
 
 #Get all volumes
-docker inspect -f '{{ .Mounts }}' containerid
+docker inspect -f '{{ .Mounts }}' ${container}
 
 ```
 
@@ -598,4 +598,50 @@ networks:
 * Start containers -- and restart if they fail
 * service discovery -- allow them to find each other
 * resource allocation -- match containers to computers
+
+
+# skopeo tool
+
+
+```sh
+
+## login
+docker login <registry>
+
+## lookup a image (skopeo uses the docker's auth.json)
+skopeo inspect --tls-verify=false docker://localhost:32999/2360/controller:4.1.0-2360-gxcr-1783621849-2b0f0cbe
+
+## list all tags against a container
+skopeo list-tags --tls-verify=false docker://localhost:32122/nr-stackv2-runtime-x86-64-v4
+
+## delete a container:tag
+skopeo delete --tls-verify=false docker://localhost:32122/alpine:latest
+skopeo --debug delete --tls-verify=false docker://localhost:32122/alpine:latest
+
+## download to a tar ball
+skopeo --tls-verify=false copy ${src_docker_url} docker-archive:${filename}:${target_tag}
+
+skopeo copy \
+  docker://localhost:32999/2360/controller:4.1.0-2360-gxcr-1783621849-2b0f0cbe \
+  docker-archive:controller.tar:localhost:32999/2360/controller:4.1.0-2360-gxcr-1783621849-2b0f0cbe
+
+src_docker_url=docker://localhost:32122/nr-stackv2-runtime-x86-64-v4:4.1.1-6-gxcr
+filename=nr-4.1.1-6-gxcr.tar
+target_tag=4.1.1-6-gxcr
+skopeo --tls-verify=false copy ${src_docker_url} docker-archive:${filename}:${target_tag}
+
+
+```
+
+To lsit a registry
+
+```
+registry=".."
+curl --user=$CREDS https://${registry}/v2/_catalog | jq -r '.repositories[]'
+
+
+one_repo="..from-above"
+curl --user=$CREDS https://${registry}/v2/${one_repo}/tags/list | jq -r '.tags[]'
+
+```
 

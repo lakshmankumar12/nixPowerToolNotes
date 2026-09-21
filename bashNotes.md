@@ -667,6 +667,7 @@ done
 or
 
 ```sh
+## only bash.. see below for zsh
 while true; do
     read -p "Do you wish to install this program?" yn
     case $yn in
@@ -678,7 +679,12 @@ done
 ```
 
 ```sh
+## bash
 read -p prompt -t timeout variable_that_stores_input
+
+## zsh
+
+read "varname?your promtp after the question mark? "
 ```
 
 ## Find all unique files in 2 folders
@@ -1329,7 +1335,8 @@ date '+%Y-%m-%d-%H-%M-%S'
 %Y - XXXX
 %m - NN
 %d - DD
-%B - Month in Aaa form
+%b - Month in Aaa form
+%B - Month in full
 %H - hour
 %M - minute
 %S - second
@@ -1596,14 +1603,37 @@ echo "command1" > commands.txt
 echo "command2" >> commands.txt
 # ... and so on
 
+prefix=
+lastnum=426
+rm commands.txt ; for i in $(seq 0 ${lastnum}) ; do echo wget http://78.46.81.50:19999/${prefix}$(printf "%04d" $i) >> commands.txt ; done
+
+###
+### onyxedge@SVT54:~$ parallel --version
+### GNU parallel 20210822
+### Copyright (C) 2007-2021 Ole Tange, http://ole.tange.dk and Free Software
+### Foundation, Inc.
+### License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>
+### This is free software: you are free to change and redistribute it.
+### GNU parallel comes with no warranty.
+### 
+### Web site: https://www.gnu.org/software/parallel
+### 
+### When using programs that use GNU Parallel to process data for publication
+### please cite as described in the manpage.
+### onyxedge@SVT54:~$
+
 # Run with parallel, maintaining 10 jobs at a time
+sudo apt install parallel
 parallel -j 10 < commands.txt
 
 ## if you are tracking a download, how to watch
 ## if you want to watch a command that has pipes
 watch -n1 'ls -lS nr_* 2>/dev/null | tail -n 15'
 
-apt install parallel
+
+prefix=
+finalfile=
+cat ${prefix}* > ${finalfile}
 
 ```
 
@@ -1902,7 +1932,7 @@ pass="...clear pass.."
 fullname="whatever"
 
 #prefer useradd over adduser
-cpass=$(python3 -c 'import crypt;print(crypt.crypt("'"$pass"'"))' 2> /dev/null)
+cpass=$(openssl passwd -6 "$pass")
 sudo useradd -m -p "$cpass" -c "$fullname" -s /bin/bash "${user_to_add}"
 ## options
 # -m, --create-home    -- creates home directory
@@ -1951,6 +1981,9 @@ python3
 pass=$(python3 -c 'import crypt; print(crypt.crypt("clearpass"))')
 
 openssl passwd -6 -salt "yoursalt" "yourpassword"
+# let openssl generate the salt
+openssl passwd -6 "yourpassword"
+
 
 ## update it to use
 usermod -p $pass $user

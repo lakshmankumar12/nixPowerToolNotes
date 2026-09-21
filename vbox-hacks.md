@@ -346,6 +346,30 @@ virsh attach-disk $vmname /dev/sr0 hdc --config --type cdrom
 
 ```
 
+* adding watchdog
+
+```xml
+
+  <devices>
+      ....
+      <watchdog model='i6300esb' action='reset'/>
+  </devices>
+
+```
+
+```sh
+# Create a small XML snippet
+cat > /tmp/watchdog.xml <<'EOF'
+<watchdog model='i6300esb' action='reset'/>
+EOF
+
+# Attach live + persist to config
+virsh attach-device $vmname /tmp/watchdog.xml --live --config
+
+
+```
+
+
 
 ## qemu-img
 
@@ -722,6 +746,55 @@ virsh vcpupin guest1 0 4
 
 ```
 
+## hooks
+
+```
+cat <<EOF > /etc/libvirt/hooks/qemu
+
+GUEST_NAME="$1"
+OPERATION="$2"
+
+[[ "$GUEST_NAME" == "5gcorevm" ]] || exit 0
+[[ "$OPERATION" == "started" ]] || exit 0
+
+VLANS=(70 501 502 503 504 505 506 507)
+TARGET_BRIDGE="br_core_inet"
+
+logger -t libvirt-hook "hook called for GUEST_NAME: $GUEST_NAME , OPERATION: $OPERATION"
+
+# Read XML from stdin (libvirt provides this for qemu hooks)
+XML=$(cat)
+
+# Extract tap names where bridge matches
+# Parse <interface>...<source bridge='br0'/>...<target dev='vnetX'/></interface>
+taps=$(echo "$XML" | python3 -c "
+import sys, xml.etree.ElementTree as ET
+root = ET.fromstring(sys.stdin.read())
+for iface in root.iter('interface'):
+    src = iface.find('source')
+    tgt = iface.find('target')
+    if src is not None and tgt is not None and src.get('bridge') == '$TARGET_BRIDGE':
+        print(tgt.get('dev'))
+")
+
+for tap in $taps; do
+    for vid in "${VLANS[@]}"; do
+        bridge vlan add dev "$tap" vid "$vid" 2>/dev/null
+    done
+    logger -t libvirt-hook "Added VLANs ${VLANS[*]} to $tap"
+done
+
+exit 0
+
+
+
+EOF
+
+
+
+```
+
+
 
 # secure linux
 
@@ -1013,6 +1086,15 @@ sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable
 sudo apt update
 sudo apt install google-chrome-stable
 
+curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+sudo apt update && sudo apt install google-chrome-stable
+
+curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" | tee /etc/apt/sources.list.d/google-chrome.list
+apt update && apt install google-chrome-stable
+
+
 ```
 
 
@@ -1023,7 +1105,6 @@ vncserver :2
 ## to use different passwd
 vncpaswd .vnc/another_passwd_file
 vncserver :2 -rfbauth ~/.vnc/another_passwd_file
-
 
 ```
 

@@ -107,6 +107,8 @@ Explanation
 ## if there are blanks in input, stich in a IFBLANK(.., 1, ..) to get it out of way
 =IFERROR(INDEX($A$2:$A$10, MATCH(0,IF(ISBLANK($A$2:$A$10),1,COUNTIF($B$1:B1, $A$2:$A$10)), 0)),"done")
 
+=IFERROR(INDEX($G$2:$G$1000, MATCH(0,IF(ISBLANK($G$2:$G$1000),1,COUNTIF($H$1:H1, $G$2:$G$1000)), 0)),"done")
+
 
 ```
 

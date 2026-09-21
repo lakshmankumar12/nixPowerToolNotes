@@ -1663,6 +1663,8 @@ tshark -t ud -r $infile  -2 -Y "$disp_filter" -o 'nas-5gs.null_decipher:TRUE' > 
 ## -V .. full verbose
 ## -x .. with hexdump
 tshark -r $infile -Y "frame.number == 42" -V -x > $outfile
+## dump all in full
+tshark -r $infile -V -x > $outfile
 
 ```
 
@@ -1999,8 +2001,13 @@ https://unix.stackexchange.com/questions/442598/how-to-configure-systemd-resolve
 https://blogs.gnome.org/mcatanzaro/2020/12/17/understanding-systemd-resolved-split-dns-and-vpn-configuration/
 
 ```
+## configure in
+/etc/systemd/resolved.conf
+sudo systemctl restart systemd-resolved
+
 ## newer systemd
 resolvectl status
+sudo resolvectl status
 
 ## older note the spelling - its resolve
 systemd-resolve --status

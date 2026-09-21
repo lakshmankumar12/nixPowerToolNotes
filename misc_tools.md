@@ -104,15 +104,25 @@ Ensure your original tmux and the attached-client version are same!
 # otherones
 main-vertical
 
+## know your current heightxwidth
+tmux display-message -p '#{window_width}x#{window_height}'
+
 ## save a layout
-tmux display-message -p "#{window_layout}" -t session:index > layout_save
+window="session:index"
+tmux display-message -t "$window" -p "#{window_layout}" > layout_save
 ## restore a layout
-tmux select-layout "$(cat layout_file)"
+tmux select-layout -t "$window" "$(cat layout_file)"
 ```
 
 * To resize a pane
 ```
 C-S up/down/left/right (my own maps)
+or
+
+tmux resize-pane -t <> -D 5
+tmux resize-pane -t <> -U 5
+tmux resize-pane -t <> -L 5
+tmux resize-pane -t <> -R 5
 ```
 
 
@@ -774,6 +784,11 @@ dpkg -i package-name
 ```
 dpkg-query -L <package-name>
 ```
+* list files in a package
+```
+dpkg-deb --contents package.deb
+dpkg-deb -c package.deb
+```
 * extract files in a deb package
 ```sh
 ar x file.deb
@@ -783,8 +798,8 @@ control.tar.gz  data.tar.gz  debian-binary
 ## your data file are in data.tar.gz
 tar xf data.tar.gz
 
-## or
-dpkg --contents package.deb
+## directly from dpkg
+dpkg-deb --fsys-tarfile package.deb | tar xf - ./path/to/file
 
 ## list dependencies of a package, search depends
 debfile=...path/to/file.deb
@@ -1015,6 +1030,7 @@ lstopo      hwloc
 nc          netcat
 column      bsdmainutils
 7z          p7zip-full
+tcpdump     tcpdump
 
 ```
 
@@ -2104,6 +2120,24 @@ sudo systemctl set-default graphical.target
 sudo systemctl enable lightdm
 ```
 
+## speed up your boot by disabling unwanted services
+
+
+```sh
+# Network wait - the big one, almost always wasted time on a VM
+sudo systemctl disable NetworkManager-wait-online.service 2>/dev/null
+sudo systemctl disable systemd-networkd-wait-online.service 2>/dev/null
+
+# Plymouth (boot splash) - useless without GUI
+sudo systemctl disable plymouth-quit-wait.service
+
+sudo systemctl disable ModemManager.service
+sudo systemctl disable bluetooth.service
+
+
+```
+
+
 
 # boot from a iso on the disk
 
@@ -2352,7 +2386,9 @@ efibootmgr -o 0001,0002,0003,0005
 efibootmgr --bootnum 0005 --delete-bootnum
 
 ## add a boot number
-efibootmgr --create --disk /dev/sda --part 2 --label 'My new label' --loader '\EFI\ubuntu\shimx64.efi'
+## efibootmgr --create --disk /dev/sda --part 2 --label 'My new label' --loader '\EFI\ubuntu\shimx64.efi'
+## typical for a ubuntu-iso-dd'ed usb.
+sudo efibootmgr --create --disk /dev/sda --part 2 --label 'USB Installer' --loader '\EFI\boot\bootx64.efi'
 
 ## '*' in the o/p shows if the entry is active or not, -a => active, -A => inactive
 efibootmgr -a <0002>
@@ -2813,7 +2849,8 @@ gdrive account add
 gdrive files list
 
 # ls a particular dir - get id of parent
-gdrive files list --query " 'IdOfTheParentFolder' in parents"
+idparent=..IdOfParentFolder..
+gdrive files list --query " '"$idparent"' in parents"
 
 # general find by name
 gdrive files list --query "name contains 'temp'"
@@ -2824,7 +2861,7 @@ gdrive files download <id>
 #info on file, path where it is..
 gdrive info <id>
 
-gdrive upload --parent <parent-id> ubuntu_install_debug.tar
+gdrive files upload --parent <parent-id> ubuntu_install_debug.tar
 
 python3 -m http.server 8000
 ```
@@ -2931,6 +2968,17 @@ jq -r '[.field1, .field2] | @tsv' file.json
 ## print 2 fields side by side if your input in a dict of dicts
 jq -r 'to_entries | .[] | "\(.value.field1) \(.value.field2)"'
 gwcfg enodebd | jq -r '."enbConfigsBySerial" | to_entries | .[] | [.key, .value.carrierMode] | @tsv' | column -t
+
+## search - har-generic cmd to table.
+jq -r 'to_entries[] |
+    [
+      .key,
+      .value.startedDateTime,
+      (.value.request.postData.text.params.shell_params | join(" ")),
+      .value.response.content.text.data.response.stdout
+    ] | join(" | ")
+  ' responses.json > table.txt
+
 
 ```
 
@@ -3158,6 +3206,13 @@ rm -rf /tmp/gpg-temp
 
 ```
 adb devices
+
+## know imsi requires root. you can know hte local-ip and map it to root
+adb -s 34271FDH200495 shell ip -br -4 a
+
+## to detach/attach
+adb -s 35101FDH20003X shell cmd connectivity airplane-mode enable
+adb -s 35101FDH20003X shell cmd connectivity airplane-mode disable
 
 adb -s ZY22GCL44Z shell /data/local/tmp/iperf3 -c 172.26.2.119   -p 5679 -i 1 -t 20 -b100M -u -R
 

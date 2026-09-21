@@ -86,64 +86,40 @@ pdftk in.pdf cat 1-endsouth output out.pdf
 pdftk protected.pdf input_pw sekritPassword cat output unprotected.pdf
 ```
 
-* when u know only user password
+* qpdf is cool - it tries both user password and owner password. Use this.
 ```sh
 cd ...wherever
-# inffile and outfile should be just basenames
+# inffile and outfile should be just basenames .. RUn this in the folder where your in is.
 infile=..
 outfile=..
 password=...
 
-#    docker run             -it --rm -v $PWD:/pdf ghcr.io/toshy/docker-qpdf:latest --password=$password --decrypt $infile $outfile
-sudo docker run --user root -it --rm -v $PWD:/pdf ghcr.io/toshy/docker-qpdf:latest --password=$password --decrypt /pdf/$infile /pdf/$outfile
+#    docker run             -it --rm -v $PWD:/pdf -v $PWD:/outdir ghcr.io/toshy/docker-qpdf:latest --password=$password --decrypt /pdf/$infile /outdir/$outfile
+sudo docker run --user root -it --rm -v $PWD:/pdf -v $PWD:/outdir ghcr.io/toshy/docker-qpdf:latest --password=$password --decrypt /pdf/$infile /outdir/$outfile
 qpdf --password=$password --decrypt $infile $outfile
 ```
 
 ## standard scripts
 
-* by 4 digit numbers
-
-```sh
-#crak password of unknown pdf
-protected=
-unprotected=a.pdf
-for i in $(seq 0 9999) ; do
-    pass=$(printf "laks%04d" $i)
-    echo "Trying $pass"
-    qpdf --password=$pass --decrypt ${protected} ${unprotected}
-    if [ $? -eq 0 ] ; then
-        break
-    fi
-done
-```
-
-* crack dates -- see below for full year also.
-```sh
-for month in $(seq 1 12) ; do
-    for day in $(seq 1 31) ; do
-        pass=$(printf "laks%02d%02d" $day $month)
-        echo "Trying $pass"
-        qpdf --password=$pass --decrypt ${protected} ${unprotected}
-        if [ $? -eq 0 ] ; then
-            break
-        fi
-    done
-done
-```
-
 ```sh
 sudo docker run --user root -it --rm -v $PWD:/pdf --entrypoint=/bin/bash ghcr.io/toshy/docker-qpdf:latest
+#crack password for DOB - DDMMYYYY as password
 file=...
-start="19400101"
-for i in $(seq 0 $((12*365)) )  ; do
-    passwd=$(date --date="$start + $i day" +'%d%m%Y');
-    echo $passwd
+start="19800101" ## should be in YYYMMDD for date cmd to pick
+for i in $(seq 0 $((30*366)) )  ; do
+    password=$(date --date="$start + $i day" +'%d%m%Y');
+    ##password="laks$(date --date="$start + $i day" +'%d%m')";  ## .. for laksDDMM
+    echo qpdf --password=$password --decrypt ${file} a.pdf
     qpdf --password=$password --decrypt ${file} a.pdf
-    #qpdf --password=${passwd} --decrypt ${file} a.pdf
-    if [ $? -eq 0 ] ; then
+    if [ -f a.pdf ] ; then
         break;
     fi
 done
+
+## note - if you do double loops remember to exit all on if file.
+
+## other for loop
+for a in {A..Z} ; do echo $a ; done
 ```
 
 ## Add password
